@@ -101,7 +101,6 @@ ENV/
 .mypy_cache/
 *.mat
 *.png
-*.txt
 *.ckpt
 train_files/det_lesion_ck/networks/checkpoint
 train_files/det_lesion_ck/networks/det_lesion.ckpt.data-00000-of-00001

@@ -83,15 +83,11 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options):
         In total 4 text files will be generated. For training, a positive and a negative file, and the same for testing.
     """
 
-    # train_positive_file = open(os.path.join(output_folder_path, 'training_positive_det_patches_' + output_file_name + '.txt'), 'w')
-    # train_negative_file = open(os.path.join(output_folder_path, 'training_negative_det_patches_' + output_file_name + '.txt'), 'w')
-    # test_positive_file = open(os.path.join(output_folder_path, 'testing_positive_det_patches_' + output_file_name + '.txt'), 'w')
-    # test_negative_file = open(os.path.join(output_folder_path, 'testing_negative_det_patches_' + output_file_name + '.txt'), 'w')
+    train_positive_file = open(os.path.join(output_folder_path, 'training_positive_det_patches_' + output_file_name + '.txt'), 'w')
+    train_negative_file = open(os.path.join(output_folder_path, 'training_negative_det_patches_' + output_file_name + '.txt'), 'w')
+    test_positive_file = open(os.path.join(output_folder_path, 'testing_positive_det_patches_' + output_file_name + '.txt'), 'w')
+    test_negative_file = open(os.path.join(output_folder_path, 'testing_negative_det_patches_' + output_file_name + '.txt'), 'w')
 
-    train_positive_file = open(os.path.join(output_folder_path, 'OV_training_positive_det_patches_' + output_file_name + '.txt'), 'w')
-    train_negative_file = open(os.path.join(output_folder_path, 'OV_training_negative_det_patches_' + output_file_name + '.txt'), 'w')
-    test_positive_file = open(os.path.join(output_folder_path, 'OV_testing_positive_det_patches_' + output_file_name + '.txt'), 'w')
-    test_negative_file = open(os.path.join(output_folder_path, 'OV_testing_negative_det_patches_' + output_file_name + '.txt'), 'w')
 
     # read in bbs from txt file
     if crops_list is not None:
@@ -196,8 +192,8 @@ if __name__ == "__main__":
     crops_list_sp = '../crops_list/crops_LiTS_gt.txt'
     output_file_name_sp = 'example'
     # all possible combinations of data augmentation
-    data_aug_options_sp = 8
-    sample_bbs_train(crops_list_sp, output_file_name_sp, data_aug_options_sp)
+    # data_aug_options_sp = 8
+    # sample_bbs_train(crops_list_sp, output_file_name_sp, data_aug_options_sp)
 
     # Example of sampling bounding boxes around liver for tests images, when there are no labels
     # uncomment for using this option

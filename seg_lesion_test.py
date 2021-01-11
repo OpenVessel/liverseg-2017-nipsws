@@ -19,10 +19,13 @@ import utils.det_filter
 from config import Config
 
 gpu_id = 0
-number_slices = 3
 
+
+# inputs
+number_slices = 3
 crops_list = 'crops_LiTS_gt.txt'
 det_results_list = 'detection_lesion_example'
+
 task_name = 'seg_lesion_ck'
 
 ### config constants ###
@@ -42,11 +45,27 @@ dataset = Dataset(None, test_file, None, database_root, number_slices, store_mem
 
 result_path = os.path.join(result_root, task_name)
 checkpoint_path = model_name
-segmentation.test(dataset, checkpoint_path, result_path, number_slices)
-utils.crop_to_image.crop(base_root=root_folder, input_config=task_name, crops_list=crops_list)
-utils.mask_with_liver.mask(base_root=root_folder, labels_path=liver_results_path, input_config='out_' + task_name, th=0.5)
-utils.det_filter.filter(base_root=root_folder, crops_list=crops_list, input_config='masked_out_' + task_name,
-                        results_list=det_results_list, th=0.33)
 
+# 1. Does inference with the lesion segmentation network
+segmentation.test(dataset, checkpoint_path, result_path, number_slices) 
 
+# 2. Returns results to the original size (from cropped slices to 512x512)
+utils.crop_to_image.crop(
+    base_root=root_folder, 
+    input_config=task_name, 
+    crops_list=crops_list)
 
+# 3. Masks the results with the liver segmentation masks
+utils.mask_with_liver.mask(
+    base_root=root_folder, 
+    labels_path=liver_results_path, 
+    input_config='out_' + task_name, 
+    th=0.5)
+
+# 4. Checks positive detections of lesions in the liver. Remove those false positive of the segmentation network using the detection results.
+utils.det_filter.filter(
+    base_root=root_folder, 
+    crops_list=crops_list, 
+    input_config='masked_out_' + task_name,
+    results_list=det_results_list, 
+    th=0.33)

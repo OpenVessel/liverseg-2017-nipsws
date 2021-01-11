@@ -32,10 +32,10 @@ def interp_surgery(variables):
             h, w, k, m = v.get_shape()
             tmp = np.zeros((m, k, h, w))
             if m != k:
-                print 'input + output channels need to be the same'
+                print('input + output channels need to be the same')
                 raise
             if h != w:
-                print 'filters need to be square'
+                print('filters need to be square')
                 raise
             up_filter = upsample_filt(int(h))
             tmp[range(m), range(k), :, :] = up_filter
@@ -303,7 +303,7 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
     init = tf.global_variables_initializer()
 
     with tf.Session(config=config) as sess:
-        print 'Init variable'
+        print('Init variable')
         sess.run(init)
 
         # op to write logs to Tensorboard
@@ -338,7 +338,7 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
         sess.run(interp_surgery(tf.global_variables()))
         print('Weights initialized')
 
-        print 'Start training'
+        print('Start training')
         while step < max_training_iters + 1:
             # Average the gradient
             for iter_steps in range(0, iter_mean_grad):
@@ -442,7 +442,7 @@ def validate(dataset, checkpoint_path, result_path, number_slices=1, config=None
         for frame in range(0, pos_size/batch_size + (pos_size % batch_size > 0)):
             img, label, x_bb, y_bb = dataset.next_batch(batch_size, 'val', 1)
             curr_ct_scan = img[0]
-            print 'Testing ' + curr_ct_scan
+            print('Testing ' + curr_ct_scan)
             image = preprocess_img(img, x_bb, y_bb)
             res = sess.run(probabilities, feed_dict={input_image: image})
             label = np.array(label).astype(np.float32).reshape(batch_size, 1)
@@ -464,7 +464,7 @@ def validate(dataset, checkpoint_path, result_path, number_slices=1, config=None
         for frame in range(0, neg_size/batch_size + (neg_size % batch_size > 0)):
             img, label, x_bb, y_bb = dataset.next_batch(batch_size, 'val', 0)
             curr_ct_scan = img[0]
-            print 'Testing ' + curr_ct_scan
+            print('Testing ' + curr_ct_scan)
             image = preprocess_img(img, x_bb, y_bb)
             res = sess.run(probabilities, feed_dict={input_image: image})
             label = np.array(label).astype(np.float32).reshape(batch_size, 1)
@@ -537,7 +537,7 @@ def test(dataset, checkpoint_path, result_path, number_slices=1, volume=False, c
         for frame in range(0, total_size/batch_size + (total_size % batch_size > 0)):
             img, x_bb, y_bb = dataset.next_batch(batch_size, 'test', 1)
             curr_ct_scan = img[0]
-            print 'Testing ' + curr_ct_scan
+            print('Testing ' + curr_ct_scan)
             image = preprocess_img(img, x_bb, y_bb)
             res = sess.run(probabilities, feed_dict={input_image: image})
 
