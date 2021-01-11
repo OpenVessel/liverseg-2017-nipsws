@@ -23,7 +23,7 @@ task_name = 'seg_liver_ck'
 config = Config()
 database_root = config.database_root
 logs_path = config.get_log(task_name)
-result_root = config.get_result_root('results')
+result_root = config.get_result_root('LiTS_database')
 root_folder = config.root_folder
 ###
 
