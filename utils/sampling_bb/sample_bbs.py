@@ -82,7 +82,6 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options):
     test_positive_file = open(os.path.join(output_folder_path, 'testing_positive_det_patches_' + output_file_name + '.txt'), 'w')
     test_negative_file = open(os.path.join(output_folder_path, 'testing_negative_det_patches_' + output_file_name + '.txt'), 'w')
 
-
     # read in bbs from txt file
     if crops_list is not None:
         with open(crops_list) as t:
