@@ -191,8 +191,8 @@ if __name__ == "__main__":
     crops_list_sp = '../crops_list/crops_LiTS_gt.txt'
     output_file_name_sp = 'example'
     # all possible combinations of data augmentation
-    data_aug_options_sp = 8
-    sample_bbs_train(crops_list_sp, output_file_name_sp, data_aug_options_sp)
+    # data_aug_options_sp = 8
+    # sample_bbs_train(crops_list_sp, output_file_name_sp, data_aug_options_sp)
 
     # Example of sampling bounding boxes around liver for tests images, when there are no labels
     # uncomment for using this option
