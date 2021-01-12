@@ -6,14 +6,18 @@ import math
 
 
 def numerical_sort(value):
-    return int(value.split('.png')[0].split('/')[-1])
+    
+    #return int(value.split('.png')[0].split('/')[-1]) ## change for Windows OS 1/12/2021
+    return int(os.path.basename(value).split('.png')[0])
+
 
 
 def mask(base_root, labels_path, input_config='out_lesion/', th=0.5):
 
-    results_path = base_root + 'results/'
-
+    
+    results_path = os.path.join(base_root , 'results/')
     input_images_path = results_path + input_config
+    print(input_images_path)
     output_images_path = results_path + 'masked_' + input_config
 
     masks_folders = os.listdir(input_images_path)
