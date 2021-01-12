@@ -1,10 +1,10 @@
 import numpy as np
 from scipy import misc
 import os
+from utils.parse_result import parse_result
 
 
-def crop(base_root, input_config='lesion/',
-         crops_list='./crops_list/crops_LiTS_gt.txt'):
+def crop(base_root, input_config='lesion/', crops_list='./crops_list/crops_LiTS_gt.txt'):
 
     crops_list = base_root + '/utils/crops_list/' + crops_list
     input_results_path = base_root + '/results/' + input_config
@@ -17,14 +17,7 @@ def crop(base_root, input_config='lesion/',
     for i in range(len(crops_lines)):
             result = crops_lines[i].split(' ')
 
-            if len(result) > 2:
-                id_img, bool_zoom, mina, maxa, minb, maxb = result
-                mina = int(mina)
-                maxa = int(maxa)
-                minb = int(minb)
-                maxb = int(maxb.split('\n')[0])
-            else:
-                id_img, bool_zoom = result
+            id_img, bool_zoom, mina, maxa, minb, maxb = parse_result(result)
 
             if int(id_img.split('/')[-2]) > 104:
                 if not os.path.exists(os.path.join(output_results_path, id_img.split('/')[0])):

@@ -2,6 +2,7 @@ import numpy as np
 import scipy.misc
 import scipy.io
 import os
+from utils.parse_result import parse_result
 
 
 def sample_bbs_test(crops_list, output_file_name):
@@ -21,14 +22,7 @@ def sample_bbs_test(crops_list, output_file_name):
     for i in range(len(crops_lines)):
         result = crops_lines[i].split(' ')
 
-        if len(result) > 2:
-            id_img, bool_zoom, mina, maxa, minb, maxb = result # parsed line from txt file
-            mina = int(mina)
-            maxa = int(maxa)
-            minb = int(minb)
-            maxb = int(maxb)
-        else:
-            id_img, bool_zoom = result
+        id_img, bool_zoom, mina, maxa, minb, maxb = parse_result(result)
 
         if bool_zoom == '1':
 

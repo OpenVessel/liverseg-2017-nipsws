@@ -37,7 +37,4 @@ O -> hard_results.txt, soft_results.txt
 ### seg_lesion_test.py
 
 I -> num_slices, crops_list.txt, det_results_list, ?????? testing_volume_3_crops.txt ???????
-O -> ...
-
-
-
+O -> results/det_masked_out_seg_lesion_ck/.png

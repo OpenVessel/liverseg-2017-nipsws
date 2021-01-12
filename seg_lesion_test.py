@@ -48,12 +48,16 @@ checkpoint_path = model_name
 
 # 1. Does inference with the lesion segmentation network
 segmentation.test(dataset, checkpoint_path, result_path, number_slices) 
+    # O -> results/seg_lesion_ck/.png
+
 
 # 2. Returns results to the original size (from cropped slices to 512x512)
 utils.crop_to_image.crop(
     base_root=root_folder, 
     input_config=task_name, 
     crops_list=crops_list)
+    # O -> results/out_seg_lesion_ck/.png
+
 
 # 3. Masks the results with the liver segmentation masks
 utils.mask_with_liver.mask(
@@ -61,6 +65,7 @@ utils.mask_with_liver.mask(
     labels_path=liver_results_path, 
     input_config='out_' + task_name, 
     th=0.5)
+    # O -> masked_out_seg_lesion_ck
 
 # 4. Checks positive detections of lesions in the liver. Remove those false positive of the segmentation network using the detection results.
 utils.det_filter.filter(
@@ -69,3 +74,4 @@ utils.det_filter.filter(
     input_config='masked_out_' + task_name,
     results_list=det_results_list, 
     th=0.33)
+    # O -> results/det_masked_out_seg_lesion_ck/.png
