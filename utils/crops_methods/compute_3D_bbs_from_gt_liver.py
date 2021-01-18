@@ -5,29 +5,29 @@ import glob
 import math
 import scipy.io
 
-def compute_3D_bbs_from_gt_liver():
+def compute_3D_bbs_from_gt_liver(config):
 
     MIN_AREA_SIZE = 512.0*512.0
 
     ## this file is generated at the end 
     crops_list_name = 'crops_LiTS_gt_2.txt'
 
-    database_root = '../../LiTS_database/'
+
 
     utils_path = '../crops_list/'
     results_path = '../../results/'
 
     # inputs
-    images_path = os.path.join(database_root, 'images_volumes')
-    labels_path = os.path.join(database_root,  'item_seg/')
-    labels_liver_path = os.path.join(database_root,  'liver_seg/')
-    liver_results = os.path.join(database_root, 'seg_liver_ck/')
+    images_path = os.path.join(config.database_root, 'images_volumes')
+    labels_path = os.path.join(config.database_root,  'item_seg/')
+    labels_liver_path = os.path.join(config.database_root,  'liver_seg/')
+    liver_results = os.path.join(config.database_root, 'seg_liver_ck/')
 
     # outputs
-    output_images_path_bb = os.path.join(database_root, 'bb_images_volumes_alldatabase3_gt_nozoom_common_bb')
-    output_labels_path_bb = os.path.join(database_root,  'bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb')
-    output_labels_liver_path_bb = os.path.join(database_root,  'bb_liver_seg_alldatabase3_gt_nozoom_common_bb')
-    output_liver_results_path_bb = os.path.join(database_root, 'liver_results/')
+    output_images_path_bb = os.path.join(config.database_root, 'bb_images_volumes_alldatabase3_gt_nozoom_common_bb')
+    output_labels_path_bb = os.path.join(config.database_root,  'bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb')
+    output_labels_liver_path_bb = os.path.join(config.database_root,  'bb_liver_seg_alldatabase3_gt_nozoom_common_bb')
+    output_liver_results_path_bb = os.path.join(config.database_root, 'liver_results/')
 
     # This script computes the bounding boxes around the liver from the ground truth, computing
     # a single 3D bb for all the volume.
@@ -170,4 +170,6 @@ def compute_3D_bbs_from_gt_liver():
     crops_file.close()
 
 if __name__ =='__main__':
-    compute_3D_bbs_from_gt_liver()
+    from config import Config
+    config = Config()
+    compute_3D_bbs_from_gt_liver(config)
