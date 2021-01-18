@@ -15,24 +15,30 @@ import seg_liver as segmentation
 from dataset.dataset_seg import Dataset
 from config import Config
 
-number_slices = 3
+def seg_liver_test(config, number_slices=3):
+    """
+        segmentation of liver
+    """
 
-task_name = 'seg_liver_ck'
+    task_name = 'seg_liver_ck'
 
-### config constants ###
-config = Config() 
-database_root = config.database_root
-logs_path = config.get_log(task_name)
-result_root = config.get_result_root('LiTS_database')
-root_folder = config.root_folder
-###
+    ### config constants ###
+    database_root = config.database_root
+    logs_path = config.get_log(task_name)
+    result_root = config.get_result_root('LiTS_database')
+    root_folder = config.root_folder
+    ###
 
-model_name = os.path.join(logs_path, "seg_liver.ckpt")
+    model_name = os.path.join(logs_path, "seg_liver.ckpt")
 
-test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_3.txt')
+    test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_3.txt')
 
-dataset = Dataset(None, test_file, None, database_root, number_slices, store_memory=False)
+    dataset = Dataset(None, test_file, None, database_root, number_slices, store_memory=False)
 
-result_path = os.path.join(result_root, task_name)
-checkpoint_path = model_name
-segmentation.test(dataset, checkpoint_path, result_path, number_slices)
+    result_path = os.path.join(result_root, task_name)
+    checkpoint_path = model_name
+    segmentation.test(dataset, checkpoint_path, result_path, number_slices)
+
+if __name__ =='__main__':
+    config = Config()
+    seg_liver_test(config)
