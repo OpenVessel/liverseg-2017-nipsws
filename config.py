@@ -16,7 +16,10 @@ class Config:
         
         self.resnet_ckpt = os.path.join(self.root_folder, 'train_files', 'resnet_v1_50.ckpt')
         self.imagenet_ckpt = os.path.join(self.root_folder, 'train_files', 'vgg_16.ckpt')
-    
+        
+        self.debug = 0
+
+
     def get_log(self, task_name):
         return os.path.join(self.root_folder, 'train_files', task_name, 'networks')
 

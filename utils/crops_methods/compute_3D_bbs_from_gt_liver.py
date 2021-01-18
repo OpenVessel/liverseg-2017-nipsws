@@ -13,9 +13,11 @@ def compute_3D_bbs_from_gt_liver(config):
     crops_list_name = 'crops_LiTS_gt_2.txt'
 
 
-
-    utils_path = '../crops_list/'
-    results_path = '../../results/'
+    # 1/18/2021 change
+    #utils_path = '../crops_list/'
+    utils_path = os.path.join(config.root_folder, 'utils/crops_list/' )
+    #results_path = '../../results/'
+    results_path = config.get_result_root('results')
 
     # inputs
     images_path = os.path.join(config.database_root, 'images_volumes')
@@ -111,9 +113,12 @@ def compute_3D_bbs_from_gt_liver(config):
 
                 # elements of txt line
                 current_file = file_names[j].split('.png')[0]
-                print("current file ->",current_file)
-                png = current_file.split('/')[-1] + '.png'
-                mat = current_file.split('/')[-1] + '.mat'
+                
+                if config.debug:
+                    print("current file ->",current_file)
+                    
+                png = os.path.basename(current_file) + '.png'
+                mat = os.path.basename(current_file) + '.mat'
                 liver_seg = current_file.split('liver_seg/')[-1]
 
                 if len(np.where(img == 1)[0]) > 500:
@@ -130,10 +135,11 @@ def compute_3D_bbs_from_gt_liver(config):
                     crops_file.write(line + '\n')
 
                     ######### apply 3Dbb to files ##########
-                    print("images_path",images_path)
-                    print("dir_name", dir_name)
-                    print("mat", mat)
-                    print("png", png)
+                    if config.debug:
+                        print("images_path",images_path)
+                        print("dir_name", dir_name)
+                        print("mat", mat)
+                        print("png", png)
 
                     # .mat
                     original_img = np.array(scipy.io.loadmat(os.path.join(images_path, dir_name, mat))['section'], dtype = np.float32)

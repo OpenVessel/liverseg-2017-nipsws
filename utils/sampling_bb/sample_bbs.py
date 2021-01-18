@@ -5,7 +5,7 @@ import os
 from utils.parse_result import parse_result
 
 
-def sample_bbs_test(crops_list, output_file_name):
+def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks_path, output_folder_path):
     """Samples bounding boxes around liver region for a test image.
     Args:
     crops_list: Textfile, each row with filename, boolean indicating if there is liver, x1, x2, y1, y2, zoom.
@@ -31,6 +31,8 @@ def sample_bbs_test(crops_list, output_file_name):
             mask_filename = file.split('.')[0]
 
             # binarize liver mask
+            print("Mask filename" ,mask_filename)
+            print("liver_masks_path", liver_masks_path)
             mask_liver = scipy.misc.imread(os.path.join(liver_masks_path, mask_filename + '.png'))/255.0
             mask_liver[mask_liver > 0.5] = 1.0
             mask_liver[mask_liver < 0.5] = 0.0

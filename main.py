@@ -27,7 +27,7 @@ class LiverLesion:
         crops_list_sp = './utils/crops_list/crops_LiTS_gt.txt'
         output_file_name_sp = 'test_patches'
 
-        sample_bbs_test(crops_list_sp, output_file_name_sp)
+        sample_bbs_test(crops_list_sp, output_file_name_sp, liver_masks_path, lesion_masks_path, output_folder_path)
 
 
     def det_lesion_test(self):
@@ -44,21 +44,23 @@ class LiverLesion:
         """
 
         test_steps = [
-            ('seg_liver_test', self.seg_liver_test) 
-            ('compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver), 
-            ('sample_bbs_test', self.sample_bbs_test), 
-            ('det_lesion_test', self.det_lesion_test), 
-            ('seg_lesion_test', self.seg_lesion_test)
+            #['seg_liver_test', self.seg_liver_test],
+            #['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], 
+            ['sample_bbs_test', self.sample_bbs_test], 
+            ['det_lesion_test', self.det_lesion_test], 
+            ['seg_lesion_test', self.seg_lesion_test]
         ]
         for name, step in test_steps:
-            print('... ... ... ...Running step: '+ name)
+            print('Running step: '+ name)
             step()
-            print('... ... ... ...Done step: '+ name)
+            print('Done step: '+ name)
 
 if __name__ =='__main__':
     from config import Config
 
     config = Config()
+    print(config.get_result_root('results'))
+
     liver_lesion = LiverLesion(config)
     liver_lesion.test()
     
