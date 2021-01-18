@@ -17,19 +17,23 @@ def mask(base_root, labels_path, input_config='out_lesion/', th=0.5):
     
     results_path = os.path.join(base_root , 'results/')
     input_images_path = results_path + input_config
-    print(input_images_path)
     output_images_path = results_path + 'masked_' + input_config
+    # print("results_path ->", results_path)
+    # print("input_images_path ->", input_images_path)
+    # print("output_images_path ->", output_images_path)
 
     masks_folders = os.listdir(input_images_path)
 
     if not os.path.exists(os.path.join(output_images_path)):
         os.makedirs(os.path.join(output_images_path))
+
     for i in range(len(masks_folders)):
         if 1:
             if not masks_folders[i].startswith(('.', '\t')):
                 dir_name = masks_folders[i]
-                masks_of_volume = glob.glob(os.path.join(input_images_path, dir_name + '/*.png'))
+                masks_of_volume = glob.glob(os.path.join(input_images_path, dir_name + '/*.png')) ## its
                 file_names = (sorted(masks_of_volume, key=numerical_sort))
+                
                 depth_of_volume = len(masks_of_volume)
                 if not os.path.exists(os.path.join(output_images_path, dir_name)):
                     os.makedirs(os.path.join(output_images_path, dir_name))
@@ -38,8 +42,14 @@ def mask(base_root, labels_path, input_config='out_lesion/', th=0.5):
                 img = misc.imread(file_names[j])
                 img = img/255.0
 
-                filename = file_names[j].split('.png')[0].split('/')[-1] + '.png'
+                #filename = file_names[j].split('.png')[0].split('/')[-1] + '.png'
+                filename = os.path.basename(file_names[j])
+                # print(labels_path)
+                # print(dir_name)
+                #print(filename)
 
+                ## connect seg_liver_ck
+                ## original labels
                 original_label = misc.imread(os.path.join(labels_path, dir_name, filename))
                 original_label = original_label/255.0
                 original_label[np.where(original_label > th)] = 1

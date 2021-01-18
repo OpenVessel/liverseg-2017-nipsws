@@ -7,15 +7,25 @@ from PIL import Image
 
 def filter(base_root, crops_list='crops_LiTS_gt.txt', input_config='masked_out_lesion', results_list='detection_lesion_example', th=0.5):
 
-    crops_list = base_root + 'utils/crops_list/' + crops_list
-    results_list = base_root + 'detection_results/' + results_list + '/soft_results.txt'
+    # crops_list = base_root + 'utils/crops_list/' + crops_list
+    # results_list = base_root + 'detection_results/' + results_list + '/soft_results.txt'
+    
+    print("crops_list before" , crops_list)
+    print("results_list before" , results_list)
+    crops_list = os.path.join( base_root, 'utils/crops_list/', crops_list) ## crop list of ground truths
+    results_list = os.path.join( base_root , 'detection_results/' , results_list , 'soft_results.txt')
+    print("crops_list after" , crops_list)
+    print("results_list after" , results_list)
 
     if crops_list is not None:
         with open(crops_list) as t:
             crops_lines = t.readlines()
 
-    input_results_path = base_root + 'results/' + input_config
-    output_results_path = base_root + 'results/det_' + input_config
+    print("input_config before use ", input_config)
+    input_results_path = os.path.join(base_root , 'results/' , input_config) ###
+    output_results_path = os.path.join(base_root , 'results/det_' + input_config) ###
+    print("input_results_path after ", input_results_path)
+    print("output_results_path after ", output_results_path)
 
     if not os.path.exists(os.path.join(output_results_path)):
         os.makedirs(os.path.join(output_results_path))
@@ -24,7 +34,9 @@ def filter(base_root, crops_list='crops_LiTS_gt.txt', input_config='masked_out_l
         with open(results_list) as t:
             results_lines = t.readlines()
 
-    for i in range(105, 131):
+## hard range input assoicated with error on line 60 #IOError:
+## 105 131
+    for i in range(105, 105):
             folder_name = str(i)
             images = []
             nm = folder_name + '/'
@@ -50,7 +62,10 @@ def filter(base_root, crops_list='crops_LiTS_gt.txt', input_config='masked_out_l
                             x_bb = int(float(images[l].split()[1]))
                             y_bb = int(float(images[l].split()[2].split('\n')[0]))
                             aux_name = images[l].split()[0] + '.png'
+
+                            #IOError: [Errno 2] No such file or directory: 'D:\\L_pipe\\liver_open\\liverseg-2017-nipsws\\results/masked_out_seg_lesion_ck\\106/359.png'
                             total_patch = (np.array(Image.open(os.path.join(input_results_path, aux_name)), dtype=np.uint8))/255.0
+
                             cropped_patch = total_patch[x_bb: (x_bb + 80), y_bb:(y_bb + 80)]
                             aux_mask[x_bb: (x_bb + 80), y_bb:(y_bb + 80)] = cropped_patch
                             total_mask.append(aux_mask)

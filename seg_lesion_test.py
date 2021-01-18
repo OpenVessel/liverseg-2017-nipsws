@@ -24,7 +24,7 @@ gpu_id = 0
 # inputs
 number_slices = 3
 #crops_list = 'crops_LiTS_gt.txt'
-crops_list = 'crops_predict_gt.tx'
+crops_list = 'crops_predict_gt.txt'
 #crops_predict_gt.tx
 det_results_list = 'detection_lesion_example'
 
@@ -37,8 +37,8 @@ logs_path = config.get_log(task_name)
 result_root = config.get_result_root('results')
 root_folder = config.root_folder
 ###
-
-liver_results_path = os.path.join(database_root, 'out_liver_results')
+#seg_liver_ck
+liver_results_path = os.path.join(database_root, 'seg_liver_ck')
 model_name = os.path.join(logs_path, "seg_lesion.ckpt")
 #D:\L_pipe\liver_open\liverseg-2017-nipsws\seg_DatasetList\testing_volume_105_OV.txt
 #testing_volume_3_crops.txt
@@ -49,22 +49,22 @@ dataset = Dataset(None, test_file, None, database_root, number_slices, store_mem
 result_path = os.path.join(result_root, task_name)
 checkpoint_path = model_name
 
-# 1. Does inference with the lesion segmentation network
-#testing_volume_105_OV.txt
-print("segmenting lesions")
-segmentation.test(dataset, checkpoint_path, result_path, number_slices) 
-    # O -> results/seg_lesion_ck/.png
+# # 1. Does inference with the lesion segmentation network
+# #testing_volume_105_OV.txt
+# print("segmenting lesions")
+# segmentation.test(dataset, checkpoint_path, result_path, number_slices) 
+#     # O -> results/seg_lesion_ck/.png
 
 
-# 2. Returns results to the original size (from cropped slices to 512x512)
-## 'crops_LiTS_gt.txt'
-### D:\L_pipe\liver_open\liverseg-2017-nipsws\utils\crops_list\crops_predict_gt.tx
-print("uncropping results")
-utils.crop_to_image.crop(
-    base_root=root_folder, 
-    input_config=task_name, 
-    crops_list=crops_list)
-    # O -> results/out_seg_lesion_ck/.png
+# # 2. Returns results to the original size (from cropped slices to 512x512)
+# ## 'crops_LiTS_gt.txt'
+# ### D:\L_pipe\liver_open\liverseg-2017-nipsws\utils\crops_list\crops_predict_gt.tx
+# print("uncropping results")
+# utils.crop_to_image.crop(
+#     base_root=root_folder, 
+#     input_config=task_name, 
+#     crops_list=crops_list)
+#     # O -> results/out_seg_lesion_ck/.png
 
 
 # 3. Masks the results with the liver segmentation masks
