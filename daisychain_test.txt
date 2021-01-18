@@ -4,7 +4,7 @@ utils/matlab_utils/process_database_liver
 
 I -> nifti_path, database_root
 O -> images_volumes/, item_seg/, liver_seg/
-
+## leave preprocessing alone 
 
 ### seg_liver_test.py
 
