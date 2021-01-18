@@ -17,7 +17,7 @@ class LiverLesion:
     
 
     def compute_3D_bbs_from_gt_liver(self):
-        compute_3D_bbs_from_gt_liver()
+        compute_3D_bbs_from_gt_liver(self.config)
     
 
     def sample_bbs_test(self):
