@@ -44,7 +44,7 @@ def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks
             mask_filename = file.split('.')[0]
 
             # binarize liver mask
-            print("Mask filename" ,mask_filename)
+            print("Mask filename", mask_filename)
             print("liver_masks_path", liver_masks_path)
             mask_liver = scipy.misc.imread(os.path.join(liver_masks_path, mask_filename + '.png'))/255.0
             mask_liver[mask_liver > 0.5] = 1.0
@@ -80,7 +80,7 @@ def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks
     test_file.close()
 
 
-def sample_bbs_train(crops_list, output_file_name, data_aug_options):
+def sample_bbs_train(crops_list, output_file_name, data_aug_options, liver_masks_path, lesion_masks_path, output_folder_path):
 
     """
     Samples bounding boxes around liver region for a train image. In this case, we will train two files, one with the positive bounding boxes
@@ -115,14 +115,12 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options):
             id_img, bool_zoom = result
             
         # constants
-        
-        mask_filename = os.path.basename(id_img).split('.')[0]
-        print(mask_filename)
+        mask_filename = os.path.splitext(id_img)[0]
+        print("Mask Filename:", mask_filename)
         liver_seg_file = id_img.split('liver_seg/')[-1]
-        
-        
-        
-        if bool_zoom == '1' and int(mask_filename)!= 59:
+        print("Int Thing:", mask_filename.split(os.path.sep), os.path.split(mask_filename)[1])
+
+        if bool_zoom == '1' and int(os.path.split(mask_filename)[1])!= 59:
 
             # binarize masks
 
@@ -206,10 +204,10 @@ if __name__ == "__main__":
     output_file_name_sp = 'example'
     # all possible combinations of data augmentation
     data_aug_options_sp = 8
-    sample_bbs_train(crops_list_sp, output_file_name_sp, data_aug_options_sp)
+    sample_bbs_train(crops_list_sp, output_file_name_sp, data_aug_options_sp, liver_masks_path, lesion_masks_path, output_folder_path)
 
     # Example of sampling bounding boxes around liver for tests images, when there are no labels
     # uncomment for using this option
-    output_file_name_sp = 'test_patches'
+    # output_file_name_sp = 'test_patches'
     #sample_bbs_test(crops_list_sp, output_file_name_sp)
     
