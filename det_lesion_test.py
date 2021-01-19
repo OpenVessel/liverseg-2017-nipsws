@@ -29,9 +29,14 @@ def det_lesion_test(config):
     ###
 
     model_name = os.path.join(logs_path, "det_lesion.ckpt")
+    #liver_open\liverseg-2017-nipsws\det_DatasetList\testing_negative_det_patches_test_patches_dummy.txt
+    #liver_open\liverseg-2017-nipsws\det_DatasetList\testing_positive_det_patches_test_patches_dummy.txt
+    val_file_pos = os.path.join(root_folder, 'det_DatasetList', 'testing_positive_det_patches_test_patches_dummy.txt')
+    val_file_neg = os.path.join(root_folder, 'det_DatasetList', 'testing_negative_det_patches_test_patches_dummy.txt')
 
-    val_file_pos = os.path.join(root_folder, 'det_DatasetList', 'testing_positive_det_patches.txt')
-    val_file_neg = os.path.join(root_folder, 'det_DatasetList', 'testing_negative_det_patches.txt')
+
+    # val_file_pos = os.path.join(root_folder, 'det_DatasetList', 'testing_positive_det_patches.txt')
+    # val_file_neg = os.path.join(root_folder, 'det_DatasetList', 'testing_negative_det_patches.txt')
 
     dataset = Dataset(None, None, val_file_pos, val_file_neg, None, database_root, store_memory=False)
 

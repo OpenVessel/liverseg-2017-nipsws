@@ -116,11 +116,11 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options, liver_masks
             
         # constants
         mask_filename = os.path.splitext(id_img)[0]
-        print("Mask Filename:", mask_filename)
+        #print("Mask Filename:", mask_filename)
         liver_seg_file = id_img.split('liver_seg/')[-1]
-        print("Int Thing:", mask_filename.split(os.path.sep), os.path.split(mask_filename)[1])
+        #print("Int Thing:", mask_filename.split(os.path.sep)[0], os.path.split(mask_filename)[1])
 
-        if bool_zoom == '1' and int(os.path.split(mask_filename)[1])!= 59:
+        if bool_zoom == '1' and int(mask_filename.split(os.path.sep)[0])!= 59:
 
             # binarize masks
 
@@ -165,8 +165,12 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options, liver_masks
                             if (mina + mult*x) > 15.0 and ((mina + (x+1)*mult) < 490.0) and (minb + y*mult) > 15.0 and ((minb + (y+1)*mult) < 490.0):
                                 a1 = mina + mult*x - 15.0
                                 b1 = minb + y*mult - 15.0
+                                #print(train_negative_file)
+                                #print(train_positive_file)
+                                # print(liver_seg_file.split(os.path.sep))
+                                # print(liver_seg_file.split(os.path.sep))
                                 if pos_lesion > mult:
-                                    if int(liver_seg_file.split('/')[-2]) < 105:
+                                    if int(liver_seg_file.split(os.path.sep)[-2]) < 105:
                                         for j in range(data_aug_options):
                                             train_positive_file.write('images_volumes/{} {} {} {} \n'.format(liver_seg_file, a1, b1, j + 1))
                                     else:
@@ -174,7 +178,7 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options, liver_masks
                                             test_positive_file.write('images_volumes/{} {} {} {} \n'.format(liver_seg_file, a1, b1, j + 1))
 
                                 else:
-                                    if int(liver_seg_file.split('/')[-2]) < 105:
+                                    if int(liver_seg_file.split(os.path.sep)[-2]) < 105:
                                         for j in range(data_aug_options):
                                             train_negative_file.write('images_volumes/{} {} {} {} \n'.format(liver_seg_file, a1, b1, j + 1))
                                     else:
