@@ -2,8 +2,21 @@ import numpy as np
 import scipy.misc
 import scipy.io
 import os
-from utils.parse_result import parse_result
+#from utils.parse_result import parse_result
 
+
+def parse_result(result):
+    if len(result) > 2:
+            id_img, bool_zoom, mina, maxa, minb, maxb = result # parsed line from txt file
+            mina = int(mina)
+            maxa = int(maxa)
+            minb = int(minb)
+            maxb = int(maxb)
+    else:
+        id_img, bool_zoom = result
+        mina = minb = maxa = maxb = None
+    
+    return id_img, bool_zoom, mina, maxa, minb, maxb
 
 def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks_path, output_folder_path):
     """Samples bounding boxes around liver region for a test image.
@@ -21,7 +34,7 @@ def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks
 
     for i in range(len(crops_lines)):
         result = crops_lines[i].split(' ')
-
+        print(result)
         id_img, bool_zoom, mina, maxa, minb, maxb = parse_result(result)
 
         if bool_zoom == '1':
@@ -79,10 +92,10 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options):
         In total 4 text files will be generated. For training, a positive and a negative file, and the same for testing.
     """
 
-    train_positive_file = open(os.path.join(output_folder_path, 'training_positive_det_patches_' + output_file_name + '.txt'), 'w')
-    train_negative_file = open(os.path.join(output_folder_path, 'training_negative_det_patches_' + output_file_name + '.txt'), 'w')
-    test_positive_file = open(os.path.join(output_folder_path, 'testing_positive_det_patches_' + output_file_name + '.txt'), 'w')
-    test_negative_file = open(os.path.join(output_folder_path, 'testing_negative_det_patches_' + output_file_name + '.txt'), 'w')
+    train_positive_file = open(os.path.join(output_folder_path, 'training_positive_det_patches_' + output_file_name + '_dummy.txt'), 'w')
+    train_negative_file = open(os.path.join(output_folder_path, 'training_negative_det_patches_' + output_file_name + '_dummy.txt'), 'w')
+    test_positive_file = open(os.path.join(output_folder_path, 'testing_positive_det_patches_' + output_file_name + '_dummy.txt'), 'w')
+    test_negative_file = open(os.path.join(output_folder_path, 'testing_negative_det_patches_' + output_file_name + '_dummy.txt'), 'w')
 
     # read in bbs from txt file
     if crops_list is not None:
@@ -102,10 +115,14 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options):
             id_img, bool_zoom = result
             
         # constants
-        mask_filename = id_img.split('images_volumes/')[-1].split('.')[0]
+        
+        mask_filename = os.path.basename(id_img).split('.')[0]
+        print(mask_filename)
         liver_seg_file = id_img.split('liver_seg/')[-1]
         
-        if bool_zoom == '1' and int(mask_filename.split('/')[0])!= 59:
+        
+        
+        if bool_zoom == '1' and int(mask_filename)!= 59:
 
             # binarize masks
 
@@ -184,14 +201,15 @@ if __name__ == "__main__":
     output_folder_path =  '../../det_DatasetList/'
 
     # Example of sampling bounding boxes around liver for train images
-    crops_list_sp = '../crops_list/crops_LiTS_gt.txt'
+    crops_list_sp = '../crops_list/crops_LiTS_gt_2.txt'
+    #crops_list_sp = '../crops_list/crops_LiTS_gt.txt'
     output_file_name_sp = 'example'
     # all possible combinations of data augmentation
-    # data_aug_options_sp = 8
-    # sample_bbs_train(crops_list_sp, output_file_name_sp, data_aug_options_sp)
+    data_aug_options_sp = 8
+    sample_bbs_train(crops_list_sp, output_file_name_sp, data_aug_options_sp)
 
     # Example of sampling bounding boxes around liver for tests images, when there are no labels
     # uncomment for using this option
     output_file_name_sp = 'test_patches'
-    sample_bbs_test(crops_list_sp, output_file_name_sp)
+    #sample_bbs_test(crops_list_sp, output_file_name_sp)
     

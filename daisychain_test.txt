@@ -27,6 +27,7 @@ O -> crops_LiTS_gt_2.txt
 I -> images_volumes/, item_seg/, liver_seg/, crops_list.txt, output_file_name, 
 O -> test_patches.txt
 
+--> we need to output the testing ->testing_positive_det_patches.txt, testing_negative_det_patches.txt
 
 ### det_lesion_test.py
 
