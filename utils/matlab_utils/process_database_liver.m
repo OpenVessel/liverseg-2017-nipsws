@@ -1,3 +1,5 @@
+% 17.5 minutes or 1071.8 seconds
+
 % Measures time
 tic;
 
@@ -7,9 +9,9 @@ addpath('nifti_library/');
 niftis_path = 'UnZip/';
 
 root_process_database = 'LiTS_database/';
-folder_volumes = strcat(root_process_database, 'images_volumes/');
-folder_seg_liver = strcat(root_process_database, 'liver_seg/');
-folder_seg_item = strcat(root_process_database, 'item_seg/');
+folder_volumes = strcat(root_process_database, 'images_volumes_testingMAT/');
+folder_seg_liver = strcat(root_process_database, 'liver_seg_testingMAT/');
+folder_seg_item = strcat(root_process_database, 'item_seg_testingMAT/');
 
 
 if ~(exist(root_process_database, 'dir'))
