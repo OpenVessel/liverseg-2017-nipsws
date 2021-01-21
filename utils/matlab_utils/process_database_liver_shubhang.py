@@ -1,23 +1,36 @@
+#!/usr/bin/env python
+
+# This took 2604.6 seconds or 43.5 minutes
+
 import os
 import nibabel as nib # pip install nibabel 
 # https://nipy.org/nibabel/nifti_images.html
-
+import time 
 import numpy as np
+
+###
+# Why are we importing matplotlib if we're never calling it?
+import matplotlib
+matplotlib.use('TkAgg') 
 import matplotlib.pyplot as plt
+###
+
 import scipy.io
 from PIL import Image
 
-
+start = time.time()
+print("Starting to log time!")
 # path constants
-niftis_path = '../../Database/media/nas/01_Datasets/CT/LITS/Training Batch 1/'
+# niftis_path = '../../Database/media/nas/01_Datasets/CT/LITS/Training Batch 1/'
 root_process_database = '../../LiTS_database/'
 
-niftis_path = r'C:\Users\grego\OneDrive\Projects\Python Projects\fake_niftis'
-root_process_database = r'C:\Users\grego\OneDrive\Projects\Python Projects\fake_root'
+### Change these paths to match yours ###
+niftis_path = "../../UnZip" # "/Users/shubhang/Downloads/nifti" r'C:\Users\grego\OneDrive\Projects\Python Projects\fake_niftis'
+# root_process_database = "" # r'C:\Users\grego\OneDrive\Projects\Python Projects\fake_root'
 
-folder_volumes = os.path.join(root_process_database, 'images_volumes/')
-folder_seg_liver = os.path.join(root_process_database, 'liver_seg/')
-folder_seg_item = os.path.join(root_process_database, 'item_seg/')
+folder_volumes = os.path.join(root_process_database, 'images_volumes_testing/')
+folder_seg_liver = os.path.join(root_process_database, 'liver_seg_testing/')
+folder_seg_item = os.path.join(root_process_database, 'item_seg_testing/')
 
 
 # create non-existent paths
@@ -93,3 +106,7 @@ for filename in filenames:
             liver_seg_filename = os.path.join(folder_seg_liver_num, str(k+1) + '.png')
             im_liver = Image.fromarray(liver_seg_section)
             im_liver.save(liver_seg_filename)
+
+
+end = time.time()
+print("Elapsed Time is:", end - start)
