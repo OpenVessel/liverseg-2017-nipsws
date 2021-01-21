@@ -6,7 +6,7 @@ I -> nifti_path, database_root
 O -> images_volumes/, item_seg/, liver_seg/
 ## leave preprocessing alone 
 
-### seg_liver_test.py
+### seg_liver_test.py 8 hours 
 
 I -> num_slices, ???? testing_volume_3.txt ????
 O -> seg_liver_ck/patient01/1.png

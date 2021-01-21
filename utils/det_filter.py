@@ -36,7 +36,8 @@ def filter(base_root, crops_list='crops_LiTS_gt.txt', input_config='masked_out_l
 
 ## hard range input assoicated with error on line 60 #IOError:
 ## 105 131
-    for i in range(105, 105):
+    for i in range(105, 107):
+        if i != 106: ## we did this skip of 106 because we tewst code on 1/19/2021
             folder_name = str(i)
             images = []
             nm = folder_name + '/'
