@@ -22,6 +22,21 @@ import scipy.misc
 
 DTYPE = tf.float32
 
+### Function from old tensorflow that wan't working
+def upsample_filt(size):
+    """
+    Make a 2D bilinear kernel suitable for upsampling of the given (h, w) size.
+    """
+    factor = (size + 1) // 2
+    if size % 2 == 1:
+        center = factor - 1
+    else:
+        center = factor - 0.5
+    og = np.ogrid[:size, :size]
+    return (1 - abs(og[0] - center) / factor) * \
+           (1 - abs(og[1] - center) / factor)
+### Ignore it. We can find a way to remove this
+
 
 # set parameters s.t. deconvolutional layers compute bilinear interpolation
 # N.B. this is for deconvolution without groups

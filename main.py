@@ -49,18 +49,29 @@ class LiverLesion:
         """
         
         test_steps = [
-            ['seg_liver_test', self.seg_liver_test],
+            # ['seg_liver_test', self.seg_liver_test],
             ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], 
-            ['sample_bbs_test', self.sample_bbs_test], 
-            ['det_lesion_test', self.det_lesion_test], 
-            ['seg_lesion_test', self.seg_lesion_test]
+            # ['sample_bbs_test', self.sample_bbs_test], 
+            # ['det_lesion_test', self.det_lesion_test], 
+            # ['seg_lesion_test', self.seg_lesion_test]
         ]
+
+        time_list = []
+
         for name, step in test_steps:
-            print('Running step: '+ name)
+            print('Running step: ' + name + "\n")
             start_time = time.time()
             step()
-            print('Done step: '+ name)
-            print ("My program took", time.time() - start_time, "to run")
+            print('\nDone step: '+ name)
+            total_time = time.time() - start_time
+            time_list.append(total_time)
+            print ("\nTime taken: " + str(total_time) + " secondsor, " + str(total_time/60) + " minutes to run\n")
+
+        print("Time for each function: ")
+        for func in range(len(test_steps)):
+            print("\t" + str(test_steps[func][0]) + ": " + str(time_list[func]) + " seconds, " + str(time_list[func]/60) + " minutes.\n")
+        
+        print("Total time: " + str(sum(time_list)) + " seconds, " + str(sum(time_list)/60) + " minutes.\n")
 
 if __name__ =='__main__':
     from config import Config
