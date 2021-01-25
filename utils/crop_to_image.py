@@ -13,13 +13,17 @@ def crop(base_root, input_config='lesion/', crops_list='./crops_list/crops_LiTS_
     if crops_list is not None:
         with open(crops_list) as t:
             crops_lines = t.readlines()
-
+            #print(crops_lines)
     for i in range(len(crops_lines)):
             result = crops_lines[i].split(' ')
-
+            #print(result)
             id_img, bool_zoom, mina, maxa, minb, maxb = parse_result(result)
-
-            if int(id_img.split('/')[-2]) > 104:
+            #print("id_img", id_img)
+            
+            ## perviously -2 
+            ## 104 is specific to the dataset train/test split 
+            training_set_cutoff = 104
+            if int(id_img.split(os.path.sep)[0]) > training_set_cutoff:
                 if not os.path.exists(os.path.join(output_results_path, id_img.split('/')[0])):
                     os.makedirs(os.path.join(output_results_path, id_img.split('/')[0]))
 

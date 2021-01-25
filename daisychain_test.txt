@@ -1,4 +1,8 @@
 ######### testing ##########
+  #crops_list = 'crops_LiTS_gt.txt'
+#crops_list = 'crops_predict_gt.txt'
+
+##### #####################
 
 utils/matlab_utils/process_database_liver
 
@@ -8,7 +12,7 @@ O -> images_volumes/, item_seg/, liver_seg/
 
 ### seg_liver_test.py 8 hours 
 
-I -> num_slices, ???? testing_volume_3.txt ????
+I -> num_slices, ???? testing_volume_3.txt ???? (testing_volume_OV.txt')
 O -> seg_liver_ck/patient01/1.png
 
 

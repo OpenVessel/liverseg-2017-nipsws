@@ -36,8 +36,10 @@ def filter(base_root, crops_list='crops_LiTS_gt.txt', input_config='masked_out_l
 
 ## hard range input assoicated with error on line 60 #IOError:
 ## 105 131
-    for i in range(105, 107):
-        if i != 106: ## we did this skip of 106 because we tewst code on 1/19/2021
+## what are the inputs to this?
+    for i in range(105, 108):
+        if i != 106: ## we did this skip of 106 because we test code on 1/19/2021
+            print(i)
             folder_name = str(i)
             images = []
             nm = folder_name + '/'
@@ -90,8 +92,9 @@ def filter(base_root, crops_list='crops_LiTS_gt.txt', input_config='masked_out_l
                 id_img, bool_zoom, mina, maxa, minb, maxb  = result
             else:
                 id_img, bool_zoom = result
-
-            if int(id_img.split('/')[-2]) > 104:
+            # 104 is specific to the dataset train/test split 
+            training_set_cutoff = 104
+            if int(id_img.split(os.path.sep)[0]) > training_set_cutoff:
                 if not os.path.exists(os.path.join(output_results_path, id_img + '.png')):
                     mask = np.zeros([512, 512])
                     misc.imsave(os.path.join(output_results_path, id_img + '.png'), mask)
