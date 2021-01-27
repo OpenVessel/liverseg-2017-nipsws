@@ -65,7 +65,7 @@ class LiverLesion:
             step()
             tf.reset_default_graph()
             print('\nDone step: '+ name)
-            total_time = time.time() - start_time
+            total_time = int(time.time() - start_time)
             time_list.append(total_time)
             print ("\nTime taken: " + str(total_time) + " seconds or, " + str(total_time/60) + " minutes to run\n")
 
