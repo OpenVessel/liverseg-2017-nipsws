@@ -258,7 +258,8 @@ def class_balanced_cross_entropy_loss(output, label):
 
     loss_pos = tf.reduce_sum(-tf.multiply(labels, loss_val))
     loss_neg = tf.reduce_sum(-tf.multiply(1.0 - labels, loss_val))
-
+    
+    #How to calulate weights
     final_loss = 0.931 * loss_pos + 0.069 * loss_neg
 
     return final_loss
@@ -506,7 +507,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
         sess.run(interp_surgery(tf.global_variables()))
         print('Weights initialized')
 
-        print 'Start training'
+        print ('Start training')
         while step < max_training_iters + 1:
             # Average the gradient
             for iter_steps in range(0, iter_mean_grad):
