@@ -41,9 +41,12 @@ print(liver_seg_patID)
 print()
 
 
-line = ''
+all_paths = []
 
 for i in range(len(images_volumes_patID) - 1):
+
+    all_patient_data = [[], [], []]
+
     if images_volumes_patID[i] != ".DS_Store":
         patient_path = os.path.join(images_volumes_fold, images_volumes_patID[i])
         patient_slice = os.listdir(patient_path)
@@ -51,16 +54,34 @@ for i in range(len(images_volumes_patID) - 1):
         patient_slice = sorted(patient_slice, key=len)
         for pat_slice in patient_slice:
             pat_slice_path = os.path.join(patient_path, pat_slice)
-            print(pat_slice_path)
+            all_patient_data[0].append(pat_slice_path)
+
+    if item_seg_patID[i] != ".DS_Store":
+        patient_path = os.path.join(item_seg_fold, item_seg_patID[i])
+        patient_slice = os.listdir(patient_path)
+        patient_slice.sort()
+        patient_slice = sorted(patient_slice, key=len)
+        for pat_slice in patient_slice:
+            pat_slice_path = os.path.join(patient_path, pat_slice)
+            all_patient_data[1].append(pat_slice_path)
+
+    if liver_seg_patID[i] != ".DS_Store":
+        patient_path = os.path.join(liver_seg_fold, liver_seg_patID[i])
+        patient_slice = os.listdir(patient_path)
+        patient_slice.sort()
+        patient_slice = sorted(patient_slice, key=len)
+        for pat_slice in patient_slice:
+            pat_slice_path = os.path.join(patient_path, pat_slice)
+            all_patient_data[2].append(pat_slice_path)
+
+    all_paths.append(all_patient_data)
+
+print(all_paths[0])
+print(all_paths[1])
+print(all_paths[2])
 
 
-            
-        print(patient_path)
-
-    # if item_seg_patID[i] != ".DS_Store":
-    #     patient_path = os.path.join(item_seg_fold, item_seg_patID[i])
-    #     print(patient_path)
-
-    # if liver_seg_patID[i] != ".DS_Store":
-    #     patient_path = os.path.join(liver_seg_fold, liver_seg_patID[i])
-    #     print(patient_path)
+# TO-DO
+    # Need to think of a way to remove the ../../LiTS_databse
+    # Make output txt file
+    # Easy peasy
