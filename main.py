@@ -80,7 +80,6 @@ if __name__ =='__main__':
     from config import Config
 
     config = Config()
-    print(config.get_result_root('results'))
 
     liver_lesion = LiverLesion(config)
     liver_lesion.test()

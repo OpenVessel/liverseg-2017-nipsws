@@ -22,6 +22,3 @@ class Config:
 
     def get_log(self, task_name):
         return os.path.join(self.root_folder, 'train_files', task_name, 'networks')
-
-    def get_result_root(self, result_name):
-        return os.path.join(self.root_folder, result_name)

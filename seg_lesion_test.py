@@ -31,7 +31,7 @@ def seg_lesion_test(config, number_slices=3):
     ### config constants ###
     database_root = config.database_root
     logs_path = config.get_log(task_name)
-    result_root = config.get_result_root('results')
+    result_root = os.path.join(config.root_folder, 'results')
     root_folder = config.root_folder
     ###
     #seg_liver_ck

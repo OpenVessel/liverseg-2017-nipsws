@@ -24,7 +24,7 @@ def det_lesion_test(config):
     ### config constants ###
     database_root = config.database_root
     logs_path = config.get_log(task_name)
-    result_root = config.get_result_root('detection_results/')
+    result_root = os.path.join(config.root_folder, 'detection_results/')
     root_folder = config.root_folder
     ###
 

@@ -10,7 +10,7 @@ I -> nifti_path, database_root
 O -> images_volumes/, item_seg/, liver_seg/
 ## leave preprocessing alone 
 
-### seg_liver_test.py 8 hours 
+### seg_liver_test.py 8 hours
 
 I -> num_slices, ???? testing_volume_3.txt ???? (testing_volume_OV.txt')
 O -> seg_liver_ck/patient01/1.png
@@ -19,16 +19,16 @@ O -> seg_liver_ck/patient01/1.png
 ### utils\crops_methods\compute_3D_bbs_from_gt_liver.py
 
 I -> images_volumes/, item_seg/, liver_seg/, seg_liver_ck/
-O -> crops_LiTS_gt_2.txt normal name is crops_LiTS_gt.txt var = crops_list.txt
-        bb_images_volumes_alldatabase3_gt_nozoom_common_bb/
-        bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/
-        bb_liver_seg_alldatabase3_gt_nozoom_common_bb/
-        liver_results/
+O ->  crops_df
+      bb_images_volumes_alldatabase3_gt_nozoom_common_bb/
+      bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/
+      bb_liver_seg_alldatabase3_gt_nozoom_common_bb/
+      liver_results/
 
-    ## ARE THESE ever used?
-    bb_images_volumes_alldatabase3_gt_nozoom_common_bb/
-        bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/
-        bb_liver_seg_alldatabase3_gt_nozoom_common_bb/
+      ## ARE THESE ever used?
+      bb_images_volumes_alldatabase3_gt_nozoom_common_bb/
+      bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/
+      bb_liver_seg_alldatabase3_gt_nozoom_common_bb/
 
 ### utils\sampling_bb\sample_bbs.py
 
