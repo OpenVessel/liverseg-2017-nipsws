@@ -50,11 +50,12 @@ class LiverLesion:
         """
         
         test_steps = [
-            ['seg_liver_test', self.seg_liver_test],
-            ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], 
-            ['sample_bbs_test', self.sample_bbs_test], 
-            ['det_lesion_test', self.det_lesion_test], 
-            ['seg_lesion_test', self.seg_lesion_test]
+            ['seg_liver_test', self.seg_liver_test], ## seg_liver_test.py
+            ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ## compute_3D_bbs_from_gt_liver.py
+            ['sample_bbs_test', self.sample_bbs_test], ### sample_bbs.py
+            ['det_lesion_test', self.det_lesion_test], ### det_lesion_test.py
+            ['seg_lesion_test', self.seg_lesion_test] ##### seg_lesion_test.py
+
         ]
 
         time_list = []
@@ -65,7 +66,7 @@ class LiverLesion:
             step()
             tf.reset_default_graph()
             print('\nDone step: '+ name)
-            total_time = time.time() - start_time
+            total_time = int(time.time() - start_time)
             time_list.append(total_time)
             print ("\nTime taken: " + str(total_time) + " seconds or, " + str(total_time/60) + " minutes to run\n")
 

@@ -21,8 +21,8 @@ def compute_3D_bbs_from_gt_liver(config):
 
     # inputs
     images_path = os.path.join(config.database_root, 'images_volumes')
-    labels_path = os.path.join(config.database_root,  'item_seg/')
-    labels_liver_path = os.path.join(config.database_root,  'liver_seg/')
+    labels_path = os.path.join(config.database_root,  'item_seg/') ##GT labels
+    labels_liver_path = os.path.join(config.database_root,  'liver_seg/') ## GT labels
     liver_results = os.path.join(config.database_root, 'seg_liver_ck/')
 
     # outputs
@@ -34,6 +34,7 @@ def compute_3D_bbs_from_gt_liver(config):
     # This script computes the bounding boxes around the liver from the ground truth, computing
     # a single 3D bb for all the volume.
 
+    ## all paths in a list
     bb_paths = [output_labels_path_bb, output_images_path_bb, output_labels_liver_path_bb, output_liver_results_path_bb]
 
     for bb_path in bb_paths:
