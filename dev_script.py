@@ -20,16 +20,35 @@ def png_to_gif(patient_ID):
     for png in file_list:
         new_path = pathway_result + '\\' + png
         list_of_path.append(new_path)
-    
+    #print(list_of_path)
+    en_list = []
+    print(enumerate(list_of_path))
+    en_list = enumerate(list_of_path)
+    number = []
+    for j in en_list:
+        number.append(j[0])
+    x = 10
+    print(number[-1])
     frames = []
-    for i in list_of_path:
-        new_frame = Image.open(i)
+    for i in number:
+        
+        print(i)
+        print(list_of_path[i])
+        if i == x+x:
+            for j in range(5):
+                i = i + 10
+        
+        new_frame = Image.open(list_of_path[i])
         frames.append(new_frame)
-        new_frame.closed 
-
-    frames[0].save('fire3_PIL.gif', format='GIF',
-    append_images=frames[1:],
-    save_all=True,
-    duration=300, loop=0)
+        
+        
+        if i == number[-1]:
+            print("test")
+            frames[0].save('D:\L_pipe\liver_open\liverseg-2017-nipsws\fire3_PIL.gif', format='GIF',
+            append_images=frames[1:],
+            save_all=True,
+            duration=300, loop=0)
+            new_frame.close()
+    
 
 png_to_gif(patient_ID)

@@ -6,14 +6,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
 from PIL import Image
-
-
+import time 
+start = time.time()
 # path constants
-niftis_path = '../../Database/media/nas/01_Datasets/CT/LITS/Training Batch 1/'
-root_process_database = '../../LiTS_database/'
-
-niftis_path = r'C:\Users\grego\OneDrive\Projects\Python Projects\fake_niftis'
-root_process_database = r'C:\Users\grego\OneDrive\Projects\Python Projects\fake_root'
+niftis_path = 'E:\Datasets\LiTS_liver_lesion\LITS17'
+root_process_database = '../../output_folder/'
+#D:\L_pipe\liver_open\liverseg-2017-nipsws\output_folder
+niftis_path = r'E:\Datasets\LiTS_liver_lesion\LITS17'
+root_process_database = r'D:\L_pipe\liver_open\liverseg-2017-nipsws\output_folder'
 
 folder_volumes = os.path.join(root_process_database, 'images_volumes/')
 folder_seg_liver = os.path.join(root_process_database, 'liver_seg/')
@@ -93,3 +93,7 @@ for filename in filenames:
             liver_seg_filename = os.path.join(folder_seg_liver_num, str(k+1) + '.png')
             im_liver = Image.fromarray(liver_seg_section)
             im_liver.save(liver_seg_filename)
+
+
+end = time.time()
+print("Elapsed Time is:", end - start)

@@ -47,6 +47,7 @@ def compute_3D_bbs_from_gt_liver(config):
 
     ## If no labels, the masks_folder should contain the results of liver segmentation
     # masks_folders = os.listdir(results_path + 'liver_seg/')
+    print(labels_liver_path)
     masks_folders = os.listdir(labels_liver_path) # liver seg
     sorted_mask_folder = sorted(masks_folders, key=integerise)
 
@@ -56,7 +57,10 @@ def compute_3D_bbs_from_gt_liver(config):
     sort_by_path = lambda x: int(os.path.splitext(os.path.basename(x))[0])
 
     for i in range(len(masks_folders)):
-        if masks_folders[i] != '.DS_Store' and int(masks_folders[i]) > 104 and int(masks_folders[i]) < 110: # change numbers to change range of patients.
+
+        # change numbers to change range of patients.
+        #what does the label data look like
+        if masks_folders[i] != '.DS_Store':
             if not masks_folders[i].startswith(('.', '\t')):
                 dir_name = masks_folders[i]
                 ## If no labels, the masks_folder, should contain the results of liver segmentation
@@ -79,6 +83,7 @@ def compute_3D_bbs_from_gt_liver(config):
                 
             for j in range(0, depth_of_volume):
                 img = misc.imread(file_names[j])
+                print(img)
                 img = img/255.0
                 img[np.where(img > 0.5)] = 1
                 img[np.where(img < 0.5)] = 0

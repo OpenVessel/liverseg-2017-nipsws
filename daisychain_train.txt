@@ -1,0 +1,56 @@
+
+## to do list  we will need to generate training_volume_3.txt
+
+
+#### step 1.  NOTES seg_liver_train.py
+
+
+## train_file
+## val_file
+## requires database_root
+
+## Three main Variables
+    ## global_step ??? 
+    ## learning_rate ????
+    ## segmentation.train(dataset)
+
+#### step 1. seg_liver_train.py
+I - training_volume_3.txt, testing_volume_3
+ seg_liver - inputs tensorflow placeholder that contains input image
+O - tensor of the network, end_points
+
+
+### step 2. det_lesion_train.py
+
+## dataset class  - dataset_det_data_aug
+    train_list: TXT file with the path to the images to use for training (Images must be between 0 and 255)
+        test_list: TXT file with the path to the images to use for testing (Images must be between 0 and 255)
+        database_root: Path to the root of the Database
+        store_memory: True stores all the training images, False loads at runtime the images
+
+    I - train_file_pos, train_file_neg, val_file_pos, val_file_neg 
+    O - LOADS all data into memory Started loading training files... ,Started loading validation files... 
+          Started loading testing files... Done initializing Dataset
+
+## detection.train
+    I- global_step, weights, learning_rate, logs_path, max_training_iters, 
+
+        dataset: Reference to a Dataset object instance
+        initial_ckpt: Path to the checkpoint to initialize the network (May be parent network or pre-trained Imagenet)
+        supervison: Level of the side outputs supervision: 1-Strong 2-Weak 3-No supervision
+        learning_rate: Value for the learning rate. It can be number or an instance to a learning rate object.
+        logs_path: Path to store the checkpoints
+        max_training_iters: Number of training iterations
+        save_step: A checkpoint will be created every save_steps
+        display_step: Information of the training will be displayed every display_steps
+        global_step: Reference to a Variable that keeps track of the training steps
+        iter_mean_grad: Number of gradient computations that are average before updating the weights
+        batch_size:
+        momentum: Value of the momentum parameter for the Momentum optimizer
+        resume_training: Boolean to try to restore from a previous checkpoint (True) or not (False)
+        config: Reference to a Configuration object used in the creation of a Session
+        finetune: Use to select to select type of training, 0 for the parent network and 1 for finetunning
+
+    O-    
+
+### step 3. seg_lesion_train.py 
