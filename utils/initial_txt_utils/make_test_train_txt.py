@@ -64,21 +64,8 @@ def listSort():
         #       item_seg = all paths for patientXYZ from that folder
         #      liver_seg = all paths for patientXYZ from that folder
 
-# images_volumes/0/1.mat 
-# item_seg/0/1.png 
-# liver_seg/0/1.png 
-# images_volumes/0/2.mat 
-# item_seg/0/2.png 
-# liver_seg/0/2.png 
-# images_volumes/0/3.mat 
-# item_seg/0/3.png 
-# liver_seg/0/3.png 
-# 0.000132 0.028108
-    # first number: number of voxels that belong to lesion class divided by the total volume 
-    # second number: number of voxels that belong to liver class divided by the total volume
 
-# Making the output
-
+# Makes each individual line for training file
 def makeTrainLine(list):
     lineList = []
     line = ''
@@ -93,6 +80,7 @@ def makeTrainLine(list):
 
     return lineList
 
+# Makes each individual line for testing file
 def makeTestLine(list):
     lineList = []
     line = ''
@@ -107,6 +95,7 @@ def makeTestLine(list):
 
     return lineList
 
+# Makes each training TXT file
 def makeTrainTXT():
     lineList = makeTrainLine(listOfLists)
 
@@ -117,6 +106,7 @@ def makeTrainTXT():
 
     TXTfile.close()
 
+# Makes each testing TXT file
 def makeTestTXT():
     lineList = makeTestLine(listOfLists)
 
@@ -127,16 +117,19 @@ def makeTestTXT():
 
     TXTfile.close()
 
+# Makes training DF
 def makeTrainDF():
     lineList = makeTrainLine(listOfLists)
 
     return pd.DataFrames(lineList)
 
+# Makes testing DF
 def makeTestDF():
     lineList = makeTestLine(listOfLists)
 
     return pd.DataFrame(lineList)
 
+# Header
 if __name__ == "__main__":
     root_dataset = "../../LiTS_database/"
 
