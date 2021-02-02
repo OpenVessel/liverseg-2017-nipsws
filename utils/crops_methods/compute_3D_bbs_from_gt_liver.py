@@ -103,7 +103,7 @@ def compute_3D_bbs_from_gt_liver(config):
 
                     new_img = img[total_mina:total_maxa, total_minb:total_maxb]
 
-                # gt filename (a counter ie 1, 2 ...)
+                # gt filename
                 current_file = os.path.splitext(file_names[j])[0]
                 # current_file = file_names[j].split('.png')[0]
                 
@@ -121,7 +121,6 @@ def compute_3D_bbs_from_gt_liver(config):
                     area = 1
                     zoom = math.sqrt(MIN_AREA_SIZE/area)
                 
-
 
                     # write to crops df
                     crops_df_rows.append([liver_seg, is_liver, total_mina, total_maxa, total_minb, total_maxb])
