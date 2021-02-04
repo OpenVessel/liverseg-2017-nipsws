@@ -18,6 +18,9 @@ class LiverLesion:
     def seg_liver_test(self):
         seg_liver_test(self.config, self.number_slices)
     
+    def seg_liver_train(self):
+        seg_liver_train(self.config, self.number_slices)
+    
 
     def compute_3D_bbs_from_gt_liver(self):
         compute_3D_bbs_from_gt_liver(self.config)
@@ -39,10 +42,15 @@ class LiverLesion:
     def det_lesion_test(self):
         det_lesion_test(self.config)
 
+    def det_lesion_train(self):
+        det_lesion_train(self.config)
 
     def seg_lesion_test(self):
         seg_lesion_test(self.config, self.number_slices)
     
+    def seg_lesion_train(self):
+        seg_lesion_train(self.config, self.number_slices)
+
 
     def test(self):
         """
@@ -76,6 +84,38 @@ class LiverLesion:
         
         print("Total time: " + str(sum(time_list)) + " seconds, " + str(sum(time_list)/60) + " minutes.\n")
 
+def train(self):
+        """
+            Driver code for testing the model.
+        """
+        
+        test_steps = [
+            ['seg_liver_test', self.seg_liver_train], ## seg_liver_test.py
+            ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ## compute_3D_bbs_from_gt_liver.py
+            ['sample_bbs_test', self.sample_bbs_test], ### sample_bbs.py
+            ['det_lesion_test', self.det_lesion_train], ### det_lesion_test.py
+            ['seg_lesion_test', self.seg_lesion_train] ##### seg_lesion_test.py
+
+        ]
+
+        time_list = []
+
+        for name, step in test_steps:
+            print('Running step: ' + name + "\n")
+            start_time = time.time()
+            step()
+            tf.reset_default_graph()
+            print('\nDone step: '+ name)
+            total_time = int(time.time() - start_time)
+            time_list.append(total_time)
+            print ("\nTime taken: " + str(total_time) + " seconds or, " + str(total_time/60) + " minutes to run\n")
+
+        print("Time for each function: ")
+        for func in range(len(test_steps)):
+            print("\t" + str(test_steps[func][0]) + ": " + str(time_list[func]) + " seconds, " + str(time_list[func]/60) + " minutes.\n")
+        
+        print("Total time: " + str(sum(time_list)) + " seconds, " + str(sum(time_list)/60) + " minutes.\n")
+
 if __name__ =='__main__':
     from config import Config
 
@@ -84,6 +124,8 @@ if __name__ =='__main__':
 
     liver_lesion = LiverLesion(config)
     liver_lesion.test()
+
+    #liver_lesion.train()
     
 
 

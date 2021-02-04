@@ -29,11 +29,14 @@ O -> crops_LiTS_gt_2.txt normal name is crops_LiTS_gt.txt var = crops_list.txt
     bb_images_volumes_alldatabase3_gt_nozoom_common_bb/
         bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/
         bb_liver_seg_alldatabase3_gt_nozoom_common_bb/
+        ### not output here text file ends in no back progration 3 
+
 
 ### utils\sampling_bb\sample_bbs.py
 
 I -> images_volumes/, item_seg/, liver_seg/, crops_list.txt, output_file_name, 
 O -> test_patches.txt
+// det_Dataset 
 
 --> we need to output the testing ->testing_positive_det_patches.txt, testing_negative_det_patches.txt
 

@@ -521,7 +521,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
         sess.run(interp_surgery(tf.global_variables()))
         print('Weights initialized')
 
-        print 'Start training'
+        print('Start training')
         while step < max_training_iters + 1:
             # Average the gradient
             for iter_steps in range(0, iter_mean_grad):
@@ -649,13 +649,13 @@ def test(dataset, checkpoint_path, result_path, number_slices=1, volume=False, c
 
                 aux_var = curr_frames[number_of_slices/2][0]
                 scipy.misc.imsave(os.path.join(result_path, curr_ct_scan, aux_var), res_np)
-                print 'Saving ' + os.path.join(result_path, curr_ct_scan, aux_var)
+                print( 'Saving ' + os.path.join(result_path, curr_ct_scan, aux_var))
 
                 for i in range(number_of_slices):
                     aux_var = curr_frames[i][0]
                     if not os.path.exists(os.path.join(result_path, curr_ct_scan, aux_var)):
                         res_np = res.astype(np.float32)[0, :, :, i]
                         scipy.misc.imsave(os.path.join(result_path, curr_ct_scan, aux_var), res_np)
-                        print 'Saving ' + os.path.join(result_path, curr_ct_scan, aux_var)
+                        print ('Saving ' + os.path.join(result_path, curr_ct_scan, aux_var))
 
 

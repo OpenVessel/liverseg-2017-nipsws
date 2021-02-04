@@ -20,6 +20,26 @@ I - training_volume_3.txt, testing_volume_3
 O - tensor of the network, end_points
 
 
+####
+####
+#####
+cp -rf ./results/seg_liver_ck ./LiTS_database/seg_liver_ck
+
+cd utils/crops_methods
+python compute_3D_bbs_from_gt_liver.py
+
+LiTS_database/bb_liver_seg_alldatabase3_gt_nozoom_common_bb
+LiTS_database/bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb
+LiTS_database/bb_images_volumes_alldatabase3_gt_nozoom_common_bb
+LiTS_database/liver_results
+
+cd utils/sampling_bb
+python sample_bbs.py
+
+#####
+####
+####
+
 ### step 2. det_lesion_train.py
 
 ## dataset class  - dataset_det_data_aug
@@ -54,3 +74,6 @@ O - tensor of the network, end_points
     O-    
 
 ### step 3. seg_lesion_train.py 
+
+I - 
+    train_file - 
