@@ -567,12 +567,12 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
             # Save a checkpoint
             if step % save_step == 0:
                 save_path = saver.save(sess, model_name, global_step=global_step)
-                print "Model saved in file: %s" % save_path
+                print ("Model saved in file: %s" % save_path)
             step += 1
 
         if (step-1) % save_step != 0:
             save_path = saver.save(sess, model_name, global_step=global_step)
-            print "Model saved in file: %s" % save_path
+            print ("Model saved in file: %s" % save_path)
 
         print('Finished training.')
 
