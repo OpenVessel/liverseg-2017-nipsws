@@ -35,8 +35,8 @@ class LiverLesion:
         self.display_step = 2
         self.ini_learning_rate = 1e-8
         self.boundaries = [10000, 15000, 25000, 30000, 40000]
-        self.values = [ini_learning_rate, ini_learning_rate * 0.1, ini_learning_rate, ini_learning_rate * 0.1, ini_learning_rate,
-                  ini_learning_rate * 0.1]
+        self.values = [self.ini_learning_rate, self.ini_learning_rate * 0.1, self.ini_learning_rate, self.ini_learning_rate * 0.1, self.ini_learning_rate,
+                  self.ini_learning_rate * 0.1]
 
             # only for det_lesion_train
         self.det_batch_size = 64
@@ -122,17 +122,17 @@ class LiverLesion:
         
         print("Total time: " + str(sum(time_list)) + " seconds, " + str(sum(time_list)/60) + " minutes.\n")
 
-def train(self):
+    def train(self):
         """
             Driver code for training the model.
         """
         
         train_steps = [
             ['seg_liver_train', self.seg_liver_train], ## seg_liver_train.py
-            ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ## compute_3D_bbs_from_gt_liver.py
-            ['sample_bbs', self.sample_bbs], ### sample_bbs.py
-            ['det_lesion_train', self.det_lesion_train], ### det_lesion_train.py
-            ['seg_lesion_train', self.seg_lesion_train] ##### seg_lesion_train.py
+            #['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ## compute_3D_bbs_from_gt_liver.py
+            #['sample_bbs', self.sample_bbs], ### sample_bbs.py
+            #['det_lesion_train', self.det_lesion_train], ### det_lesion_train.py
+            #['seg_lesion_train', self.seg_lesion_train] ##### seg_lesion_train.py
 
         ]
 
@@ -161,7 +161,7 @@ if __name__ =='__main__':
     print(config.get_result_root('results'))
 
     liver_lesion = LiverLesion(config)
-    liver_lesion.test()
+    #liver_lesion.test()
 
     liver_lesion.train()
     
