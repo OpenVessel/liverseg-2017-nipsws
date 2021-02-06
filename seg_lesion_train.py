@@ -31,14 +31,13 @@ from config import Config
 # values = [ini_learning_rate, ini_learning_rate * 0.1, ini_learning_rate, ini_learning_rate * 0.1, ini_learning_rate,
 #         ini_learning_rate * 0.1]
 
-def seg_lesion_train(gpu_id, number_slices, batch_size, iter_mean_grad, max_training_iters_1,
+def seg_lesion_train(config, gpu_id, number_slices, batch_size, iter_mean_grad, max_training_iters_1,
                     max_training_iters_2, max_training_iters_3, save_step, display_step,
                     ini_learning_rate, boundaries, values):
 
     task_name = 'seg_lesion'
 
     ### config constants ###
-    config = Config()
     database_root = config.database_root
     logs_path = config.get_log(task_name)
     root_folder = config.root_folder

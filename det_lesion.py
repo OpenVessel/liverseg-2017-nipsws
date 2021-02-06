@@ -370,7 +370,7 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
                 acc = run_res[2]
                 if step % display_step == 0:
                     val_run_res = sess.run([total_loss, merged_summary_op, acc_op],
-                                           feed_dict={input_image: val_image, input_label: label_val, is_training: False})
+                                           feed_dict={input_image: val_image, input_label: label_val, is_training: True}) #!!! It was false in the original code. We set it to true. Need to look into it more.
                     val_batch_loss = val_run_res[0]
                     val_summary = val_run_res[1]
                     val_acc = val_run_res[2]
