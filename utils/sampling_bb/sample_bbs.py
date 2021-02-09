@@ -5,64 +5,64 @@ import os
 import pandas as pd
 #from utils.parse_result import parse_result
 
-def sample_bbs_test(crops_df, liver_masks_path ):
-    """Samples bounding boxes around liver region for a test image.
-    Args:
-    crops_df: DataFrame, each row with filename, boolean indicating if there is liver, x1, x2, y1, y2, zoom.
-    liver_masks_path: path to gt liver masks
+# def sample_bbs_test(crops_df, liver_masks_path ):
+#     """Samples bounding boxes around liver region for a test image.
+#     Args:
+#     crops_df: DataFrame, each row with filename, boolean indicating if there is liver, x1, x2, y1, y2, zoom.
+#     liver_masks_path: path to gt liver masks
 
-    Output: 
-    test_df: DataFrame with rows [x1, y1, 0]. (Then, each bb is of 80x80, and the 0 is related
-    to the data augmentation applied, which is none for test images)
-    """
+#     Output: 
+#     test_df: DataFrame with rows [x1, y1, 0]. (Then, each bb is of 80x80, and the 0 is related
+#     to the data augmentation applied, which is none for test images)
+#     """
 
-    # output
-    test_df_rows = []
+#     # output
+#     test_df_rows = []
 
-    for _, row in crops_df.iterrows():
+#     for _, row in crops_df.iterrows():
 
-        if row["is_liver"]:
+#         if row["is_liver"]:
 
-            # constants
-            file = row["liver_seg"].split('images_volumes/')[-1]
-            mask_filename = file.split('.')[0]
+#             # constants
+#             file = row["liver_seg"].split('images_volumes/')[-1]
+#             mask_filename = file.split('.')[0]
 
-            # binarize liver mask
-            print("Mask filename", mask_filename)
-            print("liver_masks_path", liver_masks_path)
-            mask_liver = scipy.misc.imread(os.path.join(liver_masks_path, mask_filename + '.png'))/255.0
-            mask_liver[mask_liver > 0.5] = 1.0
-            mask_liver[mask_liver < 0.5] = 0.0
+#             # binarize liver mask
+#             print("Mask filename", mask_filename)
+#             print("liver_masks_path", liver_masks_path)
+#             mask_liver = scipy.misc.imread(os.path.join(liver_masks_path, mask_filename + '.png'))/255.0
+#             mask_liver[mask_liver > 0.5] = 1.0
+#             mask_liver[mask_liver < 0.5] = 0.0
 
 
-            # add padding to the bounding box
-            padding = 25.0
+#             # add padding to the bounding box
+#             padding = 25.0
 
-            if row["total_mina"] > padding:
-                row["total_mina"] = row["total_mina"] - padding
-            if row["total_minb"] > padding:
-                row["total_minb"] = row["total_minb"] - padding
-            if row["total_maxb"] + padding < 512.0:
-                row["total_maxb"] = row["total_maxb"] + 25.0
-            if row["total_maxa"] + padding < 512.0:
-                row["total_maxa"] = row["total_maxa"] + padding
+#             if row["total_mina"] > padding:
+#                 row["total_mina"] = row["total_mina"] - padding
+#             if row["total_minb"] > padding:
+#                 row["total_minb"] = row["total_minb"] - padding
+#             if row["total_maxb"] + padding < 512.0:
+#                 row["total_maxb"] = row["total_maxb"] + 25.0
+#             if row["total_maxa"] + padding < 512.0:
+#                 row["total_maxa"] = row["total_maxa"] + padding
 
-            mult = 50.0
+#             mult = 50.0
 
-            max_bbs_a = int((row["total_maxa"]-row["total_mina"])/mult)
-            max_bbs_b = int((row["total_maxb"]-row["total_minb"])/mult)
+#             max_bbs_a = int((row["total_maxa"]-row["total_mina"])/mult)
+#             max_bbs_b = int((row["total_maxb"]-row["total_minb"])/mult)
 
-            for x in range (0, max_bbs_a):
-                for y in range (0, max_bbs_b):
-                    mask_liver_aux = mask_liver[int(row["total_mina"] + mult*x):int(row["total_mina"] + (x+1)*mult), int(row["total_minb"] + y*mult):int(row["total_minb"] + (y+1)*mult)]
-                    pos_liver = np.sum(mask_liver_aux)
-                    if pos_liver > (25.0*25.0):
-                        if (row["total_mina"] + mult*x) > 15.0 and ((row["total_mina"] + (x+1)*mult) < 512.0) and (row["total_minb"] + y*mult) > 15.0 and ((row["total_minb"] + (y+1)*mult) < 512.0):
-                            a1 = row["total_mina"] + mult*x - 15.0
-                            b1 = row["total_minb"] + y*mult - 15.0
-                        test_df_rows.append(['images_volumes/{}'.format(file), a1, b1])
-    test_df = pd.DataFrame(test_df_rows, columns=["file_name", "a1", "b1"])
-    return test_df
+#             for x in range (0, max_bbs_a):
+#                 for y in range (0, max_bbs_b):
+#                     mask_liver_aux = mask_liver[int(row["total_mina"] + mult*x):int(row["total_mina"] + (x+1)*mult), int(row["total_minb"] + y*mult):int(row["total_minb"] + (y+1)*mult)]
+#                     pos_liver = np.sum(mask_liver_aux)
+#                     if pos_liver > (25.0*25.0):
+#                         if (row["total_mina"] + mult*x) > 15.0 and ((row["total_mina"] + (x+1)*mult) < 512.0) and (row["total_minb"] + y*mult) > 15.0 and ((row["total_minb"] + (y+1)*mult) < 512.0):
+#                             a1 = row["total_mina"] + mult*x - 15.0
+#                             b1 = row["total_minb"] + y*mult - 15.0
+#                         test_df_rows.append(['images_volumes/{}'.format(file), a1, b1])
+#     test_df = pd.DataFrame(test_df_rows, columns=["file_name", "a1", "b1"])
+#     return test_df
 
 
 def sample_bbs(crops_df, data_aug_options, liver_masks_path):
@@ -74,7 +74,7 @@ def sample_bbs(crops_df, data_aug_options, liver_masks_path):
     Args:
     crops_df: DataFrame, each row with filename, boolean indicating if there is liver, x1, x2, y1, y2, zoom.
     data_aug_options: How many data augmentation options you want to generate for the training images. The maximum is 8.
-    liver_masks_path: path to gt lvier masks
+    liver_masks_path: path to gt liver masks
 
     Output:
     dict containing 4 dfs under the keys [test_pos, test_neg, train_pos, train_neg].

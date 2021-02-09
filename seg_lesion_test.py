@@ -21,9 +21,8 @@ def seg_lesion_test(config, number_slices=3):
 
     gpu_id = 0
 
-    #crops_list = 'crops_LiTS_gt.txt'
     crops_list = 'crops_predict_gt.txt'
-    #crops_predict_gt.tx
+
     det_results_list = 'detection_lesion_example'
 
     task_name = 'seg_lesion_ck'
@@ -34,7 +33,8 @@ def seg_lesion_test(config, number_slices=3):
     result_root = os.path.join(config.root_folder, 'results')
     root_folder = config.root_folder
     ###
-    #seg_liver_ck
+
+
     liver_results_path = os.path.join(database_root, 'seg_liver_ck')
     model_name = os.path.join(logs_path, "seg_lesion.ckpt")
     #D:\L_pipe\liver_open\liverseg-2017-nipsws\seg_DatasetList\testing_volume_105_OV.txt

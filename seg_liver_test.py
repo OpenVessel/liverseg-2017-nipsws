@@ -15,7 +15,7 @@ import seg_liver as segmentation
 from dataset.dataset_seg import Dataset
 from config import Config
 
-def seg_liver_test(config, number_slices=3):
+def seg_liver_test(config, test_volume_txt, number_slices=3):
     """
         segmentation of liver
     """
@@ -31,7 +31,7 @@ def seg_liver_test(config, number_slices=3):
 
     model_name = os.path.join(logs_path, "seg_liver.ckpt")
 
-    test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_OV.txt')
+    test_file = os.path.join(root_folder, testing_volume_txt)
 
     dataset = Dataset(None, test_file, None, database_root, number_slices, store_memory=False)
 

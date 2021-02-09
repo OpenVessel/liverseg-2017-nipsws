@@ -75,17 +75,17 @@ class Dataset:
 
         # Load validation images (path) and labels
         print('Started loading validation files...')
-        if val_list_pos is not None:
-            with open(val_list_pos) as t:
-                val_paths_positives = t.readlines()
-        else:
-            val_paths_positives = []
+        # if val_list_pos is not None:
+        #     with open(val_list_pos) as t:
+        #         val_paths_positives = t.readlines()
+        # else:
+        #     val_paths_positives = []
 
-        if val_list_neg is not None:
-            with open(val_list_neg) as t:
-                val_paths_negatives = t.readlines()
-        else:
-            val_paths_negatives = []
+        # if val_list_neg is not None:
+        #     with open(val_list_neg) as t:
+        #         val_paths_negatives = t.readlines()
+        # else:
+        #     val_paths_negatives = []
 
         self.images_val_positives = []
         self.images_val_path_positives = []
@@ -102,10 +102,10 @@ class Dataset:
         self.x_val_negatives = []
         self.y_val_negatives = []
 
-        for idx, line in enumerate(val_paths_positives):     
-            self.images_val_path_positives.append(os.path.join(database_root,str(line.split()[0])))
-            self.x_val_positives.append(str(line.split()[1]))
-            self.y_val_positives.append(str(line.split()[2]))
+        for idx, row in val_list_pos.iterrows():     
+            self.images_val_path_positives.append(os.path.join(database_root,str(row["file_name"])))
+            self.x_val_positives.append(str(row["a1"]))
+            self.y_val_positives.append(str(row["b1"]))
             self.labels_val_path_positives.append('1')
                 
         self.images_val_path_positives = np.array(self.images_val_path_positives)
@@ -113,12 +113,12 @@ class Dataset:
         self.x_val_positives = np.array(self.x_val_positives)
         self.y_val_positives = np.array(self.y_val_positives)
         
-        for idx, line in enumerate(val_paths_negatives):     
-            self.images_val_path_negatives.append(os.path.join(database_root,str(line.split()[0])))
-            self.x_val_negatives.append(str(line.split()[1]))
-            self.y_val_negatives.append(str(line.split()[2]))
+        for idx, row in val_list_neg.iterrows():     
+            self.images_val_path_negatives.append(os.path.join(database_root,str(row["file_name"])))
+            self.x_val_negatives.append(str(row["a1"]))
+            self.y_val_negatives.append(str(row["b1"]))
             self.labels_val_path_negatives.append('0')
-      
+    
         self.images_val_path_negatives = np.array(self.images_val_path_negatives)
         self.labels_val_path_negatives = np.array(self.labels_val_path_negatives)
         self.x_val_negatives = np.array(self.x_val_negatives)

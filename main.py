@@ -15,33 +15,27 @@ class LiverLesion:
         self.number_slices=number_slices
 
 
-    def seg_liver_test(self):
-        seg_liver_test(self.config, self.number_slices)
+    def seg_liver_test(self, testing_volume_txt):
+        return seg_liver_test(self.config, test_volume_txt, self.number_slices)
     
 
     def compute_3D_bbs_from_gt_liver(self):
-        compute_3D_bbs_from_gt_liver(self.config)
+        return compute_3D_bbs_from_gt_liver(self.config)
     
 
-    def sample_bbs_test(self):
+    def sample_bbs(self):
         liver_masks_path = os.path.join(self.config.database_root, 'liver_seg')
-        lesion_masks_path = os.path.join(self.config.database_root, 'item_seg')
-        output_folder_path =  './det_DatasetList/'
-        crops_list_sp = './utils/crops_list/crops_LiTS_gt_2.txt'
-        #crops_list_sp = '../crops_list/crops_LiTS_gt.txt'
-        output_file_name_sp = 'test_patches'
-
-        data_aug_options_sp = 8
-        sample_bbs_train(crops_list_sp, output_file_name_sp, data_aug_options_sp, liver_masks_path, lesion_masks_path, output_folder_path)
-        # sample_bbs_test(crops_list_sp, output_file_name_sp, liver_masks_path, lesion_masks_path, output_folder_path)
+        data_aug_options = 8
+        return sample_bbs(crops_list_sp, data_aug_options, liver_masks_path)
 
 
-    def det_lesion_test(self):
-        det_lesion_test(self.config)
+
+    def det_lesion_test(self, val_file_pos, val_file_neg):
+        return det_lesion_test(self.config, val_file_pos, val_file_neg)
 
 
     def seg_lesion_test(self):
-        seg_lesion_test(self.config, self.number_slices)
+        return seg_lesion_test(self.config, self.number_slices)
     
 
     def test(self):
@@ -55,20 +49,41 @@ class LiverLesion:
             ['sample_bbs_test', self.sample_bbs_test], ### sample_bbs.py
             ['det_lesion_test', self.det_lesion_test], ### det_lesion_test.py
             ['seg_lesion_test', self.seg_lesion_test] ##### seg_lesion_test.py
-
         ]
 
         time_list = []
+        last_step_output = None
 
-        for name, step in test_steps:
+        
+        def runStepWithTime(name, step):
+            # run step
             print('Running step: ' + name + "\n")
             start_time = time.time()
-            step()
-            tf.reset_default_graph()
+
+            step_output = step()
+            
             print('\nDone step: '+ name)
+
+            ## run time
             total_time = int(time.time() - start_time)
             time_list.append(total_time)
             print ("\nTime taken: " + str(total_time) + " seconds or, " + str(total_time/60) + " minutes to run\n")
+
+            # reset tf graph for memory purposes
+            tf.reset_default_graph()
+
+            return step_output
+
+
+        test_volume_txt = 'seg_DatasetList/testing_volume_OV.txt'
+
+        # run workflow
+        runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(test_volume_txt))
+        crops_df = runStepWithTime('compute_bbs_from_gt_liver', lambda: self.compute_3D_bbs_from_gt_liver())
+        patches =  runStepWithTime('sample_bbs_test', lambda: self.sample_bbs(crops_df))
+        runStepWithTime('det_lesion_test', lambda: self.det_lesion_test(patches["test_pos"], patches["test_neg"]))
+        runStepWithTime('seg_lesion_test', lambda: self.seg_lesion_test())
+
 
         print("Time for each function: ")
         for func in range(len(test_steps)):

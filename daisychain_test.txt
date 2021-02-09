@@ -25,17 +25,12 @@ O ->  crops_df
       bb_liver_seg_alldatabase3_gt_nozoom_common_bb/
       liver_results/
 
-      ## ARE THESE ever used?
-      bb_images_volumes_alldatabase3_gt_nozoom_common_bb/
-      bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/
-      bb_liver_seg_alldatabase3_gt_nozoom_common_bb/
 
 ### utils\sampling_bb\sample_bbs.py
 
-I -> images_volumes/, item_seg/, liver_seg/, crops_list.txt, output_file_name, 
-O -> test_patches.txt
+I -> images_volumes/, item_seg/, liver_seg/, crops_df, data_aug_options, liver_masks_path
+O -> dict of 4 DataFrames : test_pos_patches, test_neg_patches, train_pos_patches, train_neg_patches
 
---> we need to output the testing ->testing_positive_det_patches.txt, testing_negative_det_patches.txt
 
 ### det_lesion_test.py
 
