@@ -16,6 +16,7 @@ from seg_lesion_train import seg_lesion_train
 import time
 
 
+
 class LiverLesion:
     def __init__(self, config):
         self.config = config
@@ -128,11 +129,11 @@ class LiverLesion:
         """
         
         train_steps = [
-            ['seg_liver_train', self.seg_liver_train], ## seg_liver_train.py
-            ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ## compute_3D_bbs_from_gt_liver.py
-            ['sample_bbs', self.sample_bbs], ### sample_bbs.py
+            # ['seg_liver_train', self.seg_liver_train], ## seg_liver_train.py
+            # ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ## compute_3D_bbs_from_gt_liver.py
+            # ['sample_bbs', self.sample_bbs], ### sample_bbs.py
             ['det_lesion_train', self.det_lesion_train], ### det_lesion_train.py
-            ['seg_lesion_train', self.seg_lesion_train] ##### seg_lesion_train.py
+            # ['seg_lesion_train', self.seg_lesion_train] ##### seg_lesion_train.py
         ]
 
         time_list = []
