@@ -5,6 +5,9 @@ import glob
 import math
 import scipy.io 
 
+# This script computes the bounding boxes around the liver from the ground truth liver mask labels, computing
+    # a single 3D bb for all the volume of the liver. 
+
 def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
 
     MIN_AREA_SIZE = image_size*image_size 
@@ -18,20 +21,17 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
     #results_path = '../../results/'
     results_path = config.get_result_root('results')
 
-    # inputs
-    images_path = os.path.join(config.database_root, 'images_volumes') ##QUESTION: are these the matlab files? 
-    labels_path = os.path.join(config.database_root,  'item_seg/') ##GT liver mask labels
-    labels_liver_path = os.path.join(config.database_root,  'liver_seg/') ## GT liver lesion labels
+    # inputs: matlab files???, liver mask labels, lesion labels, DL model's predicted liver mask 
+    images_path = os.path.join(config.database_root, 'images_volumes') ##matlab files? 
+    labels_path = os.path.join(config.database_root,  'item_seg/') ##GT liver lesion  labels
+    labels_liver_path = os.path.join(config.database_root,  'liver_seg/') ## GT liver mask labels
     liver_results = os.path.join(config.database_root, 'seg_liver_ck/') ## DL predicted liver mask 
 
-    # outputs
+    # outputs: bounding boxes applied to all of the inputs and stored in these output paths 
     output_images_path_bb = os.path.join(config.database_root, 'bb_images_volumes_alldatabase3_gt_nozoom_common_bb')
     output_labels_path_bb = os.path.join(config.database_root,  'bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb')
     output_labels_liver_path_bb = os.path.join(config.database_root,  'bb_liver_seg_alldatabase3_gt_nozoom_common_bb')
-    output_liver_results_path_bb = os.path.join(config.database_root, 'liver_results/')
-
-    # This script computes the bounding boxes around the liver from the ground truth, computing
-    # a single 3D bb for all the volume. 
+    output_liver_results_path_bb = os.path.join(config.database_root, 'liver_results/')    
 
     ###checking to see whether the output folder paths exist, if not; then make it
     bb_paths = [output_labels_path_bb, output_images_path_bb, output_labels_liver_path_bb, output_liver_results_path_bb]
@@ -40,51 +40,56 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
         if not os.path.exists(bb_path):
             os.makedirs(bb_path)
 
-    ### used as a way to get the integer value of a patient 
+    ### used as a way to get the integer key value of a patient 
     def integerise(value):
         if value != '.DS_Store':
             return int(value) 
 
     ## If no labels, the masks_folder should contain the results of liver segmentation
-    # masks_folders = os.listdir(results_path + 'liver_seg/')
+        # masks_folders = os.listdir(results_path + 'liver_seg/')
 
-    ### labeled liver mask folder with many patients  
+    ### get the labeled liver mask folder which has many patients  
     masks_folders = os.listdir(labels_liver_path) # liver seg 
     
-    ### sort the patients 
+    ### sort the patients sequentially 
     sorted_mask_folder = sorted(masks_folders, key=integerise)
 
-    ### opens a new txt file called "crops_LiTS_gt_2.txt" that we will write within 
+    ### opens a new txt file called "crops_LiTS_gt_2.txt" that we will write our bounding box coordinates within (among other details)
     crops_file = open(os.path.join(utils_path, crops_list_name), 'w')
+    
+    ##binary variable that tracks whether (if len(np.where(img == 1)[0]) > 500:) is True or False 
     aux = 0 
 
+    ## we create a function that is used as a key to sequentially order the PNG's within our for loop 
     sort_by_path = lambda x: int(os.path.splitext(os.path.basename(x))[0])
-    ### sort_by_path = lambda x: int(os.path.splitext(os.path.basename(x))[0], print(os.path.splitext(os.path.basename(x)))
-    ### .DS_Store change? 
-
+        ### sort_by_path = lambda x: int(os.path.splitext(os.path.basename(x))[0], print(os.path.splitext(os.path.basename(x)))
+        
     ### for each ground truth labeled patient 
     for i in range(len(masks_folders)):
         ### if the folder within the patient folder ISN'T in the format of .DS_Store 
+            ###QUESTION: .DS_Store change? 
         if masks_folders[i] != '.DS_Store': 
-            ### if the patient's folder doesn't start with a "." or a tab then continue 
-            ### QUESTION: When DO they equal it?
+            
+            ### if the patient's folder doesn't start with a period or a tab then continue 
+                ### QUESTION: When DO they equal it?
             if not masks_folders[i].startswith(('.', '\t')):
-                ### get the patient's path 
+                
+                ### get the i-th patient's path 
                 dir_name = masks_folders[i] 
                 
-                ### gets all of the ground truth liver mask PNGs from i-th patient  
+                ### get all of the ground truth liver mask PNGs from i-th patient  
                 masks_of_volume = glob.glob(labels_liver_path + dir_name + '/*.png')
                 
-                ### sort the liver mask png's into proper sequential order 
+                ### sort the liver mask PNG's into proper sequential order utilizing our sort_by_path variable/function
                 file_names = (sorted(masks_of_volume, key=sort_by_path))
                 
-                ### answers the question of how many slices are within the ground truth liver mask folder? 
+                ### finds the # of PNG's/slices within the labeled liver mask folder 
+                    # that should (given good labeled data) find the depth of volume of the liver per patient
                 depth_of_volume = len(masks_of_volume)
 
             ### QUESTION: Didn't we just do this before this function? If we are looping through each mask folder 
                 # are we slowing down our computation time a lot by checking this everytime? Are there any differences at all? 
                 #Note: I labeled this chunk more nicely though. 
-            
             ### ouput paths in a list 
             bb_paths = [output_labels_path_bb, output_images_path_bb, output_labels_liver_path_bb, output_liver_results_path_bb]
             
@@ -187,7 +192,7 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
 
                     # constants
                     area = 1
-                    ###QUESTION: what's the purpose of the zoom & aux and why do they divide by 1? 
+                    ###QUESTION: is Zoom used anywhere else? and why do they divide by 1? 
                     zoom = math.sqrt(MIN_AREA_SIZE/area)
                     aux = 1
 
