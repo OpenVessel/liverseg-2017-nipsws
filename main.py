@@ -8,6 +8,7 @@ from det_lesion_test import det_lesion_test
 from seg_lesion_test import seg_lesion_test
 import time
 
+#hello from Raj
 
 class LiverLesion:
     def __init__(self, config, number_slices=3):
