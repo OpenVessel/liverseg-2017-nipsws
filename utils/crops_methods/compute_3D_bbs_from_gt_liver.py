@@ -87,10 +87,7 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
                     # that should (given good labeled data) find the depth of volume of the liver per patient
                 depth_of_volume = len(masks_of_volume)
 
-            ### QUESTION: Didn't we just do this before this function? If we are looping through each mask folder 
-                # are we slowing down our computation time a lot by checking this everytime? Are there any differences at all? 
-                #Note: I labeled this chunk more nicely though. 
-            ### ouput paths in a list 
+            ### output paths in a list 
             bb_paths = [output_labels_path_bb, output_images_path_bb, output_labels_liver_path_bb, output_liver_results_path_bb]
             
             ### check to see whether the output paths exist already; if not then create it 
@@ -110,13 +107,10 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
                 ### read the j-th png within the patient's ground truth liver mask folder 
                 img = misc.imread(file_names[j])
 
-                ### 255 * 2 = 510, the pngs should be 510 x 510 pixels, 
                 # 0 to 255 grey scale 
-                ### QUESTION: Does this have to do with normalizing the image? 
-                    #what values do the pixels have before this translation?
-                    #as we see in the next step, the pixels are supposed to be between 0 & 1 assumedly since they are 
-                    #trying to binarize the image and their threshold is 0.5 
+                ### QUESTION: what is the smallest grey pixel value? just to make sure we aren't cutting out any pieces of the liver (besides any noise)
                 img = img/255.0 
+                    
                 img[np.where(img > 0.5)] = 1
                 img[np.where(img < 0.5)] = 0
                 #QUESTION: are a & b lists of coordinates? 
@@ -124,21 +118,29 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
                 a, b = np.where(img == 1)
                 #print("a:", a, "b:", b)
                 
+                
+                ### If there are any truth values within the binarized liver mask (there are any values > 0.5 on the normalized pixel scale) then ...
+                    # basically: if the PNG is not completely black then ... 
                 ###QUESTION: what data type is "a"? 
-                ### If there are multiple truth values (there are values > 0.5 on the normalized pixel scale) then ...
+                    #  what happens if the PNG is completely black? would we want this to be deleted and/or will it mess up the model if it is passed in as an input? 
+                    #  are the bounding boxes going to be "too small" if one of the PNG's has only a small slice of the liver shown? 
+                
                 if len(a) > 0:
-                    
-                    ###find min & max of both a & b coordinate positions 
-                        #QUESTION: would the max values of a & b be the furthest truth values (1's; any pixel value > 0.5 
-                            # on the normalized grey matter pixel scale) from the center 
-                            # and therefore we would be grabbing the very outer edges of the liver mask so that we can make a clean liver mask bounding box 
+                    ### then find min & max of both a & b coordinate positions 
                     maxa = np.max(a)
                     maxb = np.max(b)
                     mina = np.min(a)
                     minb = np.min(b)
+                        #LOGIC: the max values of a & b should be the furthest relative truth values 
+                            #  (1's; any pixel value > 0.5 on the normalized grey matter pixel scale)
+                        # and therefore we would be grabbing the very outer edges of the liver mask 
+                        # so that we can make a clean liver mask bounding box 
                     
-                    ###total_maxa & total_maxb = 0 & total_mina & total_minb = 1,000,000
-                    ### see the questions that I have for when total_maxs & total_mins were made 
+                    ### Note: total_maxa & total_maxb = 0 & total_mina & total_minb = 1,000,000
+                            # see the questions that I have for when total_maxs & total_mins were made 
+                    ### if the max of coordinates are > 0 then we'll use that max 
+                    ### if the min of coordinates are < 1,000,000 then we'll use that min
+                    ### QUESTION: do we need else statements? if we don't then what is the purpose of the "total" variables and checking against them? 
                     if maxa > total_maxa:
                         total_maxa = maxa
                     if maxb > total_maxb:
@@ -148,23 +150,26 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
                     if minb < total_minb:
                         total_minb = minb
 
-            ### QUESTION: Do we have to do this first process again? (besides refiguring the img into a new image)      
+                 
+            ### we repeat the process of going through each patient, normalizing the data, 
+                # binarizing the data, & finding the coordinates of all the truth values.
+            ### QUESTION: Do we have to do this first process again? (besides refiguring the img into a new image) 
             for j in range(0, depth_of_volume):
                 img = misc.imread(file_names[j])
                 img = img/255.0
                 img[np.where(img > 0.5)] = 1
                 img[np.where(img < 0.5)] = 0
 
-                a, b = np.where(img == 1)
+                a, b = np.where(img == 1) 
                 
+                #if the PNG is not black then ...
                 if len(a) > 0:
-                    ### builds off of our last calculations and makes a bounding box? 
-                        ### this seems to say that the new_img will keep* anything that is between the total_mins & maxs 
-                    ###QUESTION: what is the difference between new_img and o_new? (new_img) is only called in the DEPRECATED section
+                    ### builds off of our last calculations of max & min and makes a bounding box on the PNG
+                        ### new_img will keep* anything that is between the total_mins & maxs 
+                    ###QUESTION: what is the difference between new_img and o_new? 
+                        # new_img is only called in the DEPRECATED section, and nowhere else 
                     new_img = img[total_mina:total_maxa, total_minb:total_maxb]
-                    ### print("new_img", new_img)
                     
-
                 # elements of txt line 
                 ### gets the current png file we are working and splits the .png part off so we can refer to this specific patient in other formats
                 current_file = file_names[j].split('.png')[0]
