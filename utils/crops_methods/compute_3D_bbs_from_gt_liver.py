@@ -45,6 +45,7 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
         if value != '.DS_Store':
             return int(value) 
 
+    ### QUESTION: 
     ## If no labels, the masks_folder should contain the results of liver segmentation
         # masks_folders = os.listdir(results_path + 'liver_seg/')
 
@@ -115,9 +116,9 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
                 img[np.where(img < 0.5)] = 0
                 #QUESTION: are a & b lists of coordinates? 
                     #they should be lists (len (a) is called right after) but what does this look like? 
+                
                 a, b = np.where(img == 1)
                 #print("a:", a, "b:", b)
-                
                 
                 ### If there are any truth values within the binarized liver mask (there are any values > 0.5 on the normalized pixel scale) then ...
                     # basically: if the PNG is not completely black then ... 
@@ -162,9 +163,9 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
 
                 a, b = np.where(img == 1) 
                 
-                #if the PNG is not black then ...
-                if len(a) > 0:
-                    ### builds off of our last calculations of max & min and makes a bounding box on the PNG
+                #if the PNG is not black then ... 
+                if len(a) > 0: 
+                    ### builds off of our last calculations of max & min and filters out anything that is not within the bounding box on the PNG (makes new_img)
                         ### new_img will keep* anything that is between the total_mins & maxs 
                     ###QUESTION: what is the difference between new_img and o_new? 
                         # new_img is only called in the DEPRECATED section, and nowhere else 

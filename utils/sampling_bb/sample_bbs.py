@@ -4,73 +4,108 @@ import scipy.io
 import os
 #from utils.parse_result import parse_result
 
-
-def parse_result(result):
-    if len(result) > 2:
-            id_img, bool_zoom, mina, maxa, minb, maxb = result # parsed line from txt file
-            mina = int(mina)
-            maxa = int(maxa)
-            minb = int(minb)
-            maxb = int(maxb)
-    else:
+#parses the crops list text file generated in 3D bb's 
+    #the parameter result = crops_list.txt file 
+def parse_result(result): 
+    # checking to see whether the parsed line from txt file has coordinates or else aux (bool_zoom) is = 0 
+    if len(result) > 2: 
+            # we extract all the values from the crops list text file and put them into variables 
+            id_img, bool_zoom, mina, maxa, minb, maxb = result 
+            # making sure the data type for the coordinates are integers 
+            mina = int(mina) 
+            maxa = int(maxa) 
+            minb = int(minb) 
+            maxb = int(maxb) 
+        # if there are no coordinates then extract only the necessary variables 
+    else: 
         id_img, bool_zoom = result
-        mina = minb = maxa = maxb = None
+        mina = minb = maxa = maxb = None    # no coordinates 
     
     return id_img, bool_zoom, mina, maxa, minb, maxb
+
 
 def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks_path, output_folder_path):
     """Samples bounding boxes around liver region for a test image.
     Args:
     crops_list: Textfile, each row with filename, boolean indicating if there is liver, x1, x2, y1, y2, zoom.
+    -output_folder_path = det_Dataset_list (where the output file sits)
     output_file_name: File name for the output file generated, that will be of the form file name, x1, y1, 0. (Then, each bb is of 80x80, and the 0 is related
-    to the data augmentation applied, which is none for test images)
+    to the data augmentation applied, which is *none* for test images)
     """
 
+    #opens in write mode the developed test patches files (within det_Datasetlist) 
+    # and specificies which data augmentation file to use 
     test_file = open(os.path.join(output_folder_path, output_file_name + '.txt'), 'w')
 
+    ### open crops_list text file and read it into a list 
     if crops_list is not None:
         with open(crops_list) as t:
             crops_lines = t.readlines()
 
+    ### for every line within the text file
     for i in range(len(crops_lines)):
+        
+        ### split by the space between each value within the text line 
         result = crops_lines[i].split(' ')
+        ### prints out each value 
+        ###QUESTION: why print? 
         print(result)
+        ###use parse_result function to extract values from text lines  
         id_img, bool_zoom, mina, maxa, minb, maxb = parse_result(result)
 
+        ### if within the liver 
         if bool_zoom == '1':
 
             # constants
+            # what is the value of id_img?
             file = id_img.split('images_volumes/')[-1]
             mask_filename = file.split('.')[0]
 
-            # binarize liver mask
+            # 
             print("Mask filename", mask_filename)
             print("liver_masks_path", liver_masks_path)
+            # normalize the liver mask PNG 
             mask_liver = scipy.misc.imread(os.path.join(liver_masks_path, mask_filename + '.png'))/255.0
+            # binarize liver mask 
             mask_liver[mask_liver > 0.5] = 1.0
             mask_liver[mask_liver < 0.5] = 0.0
 
             # add padding to the bounding box
-
             padding = 25.0
 
+            # re-create the mins & maxs with padding 
+            # make sure that the image minimums are above the padding 
+            # so that we don't go below the images' possible minimum (0) 
             if mina > padding:
                 mina = mina - padding
             if minb > padding:
                 minb = minb - padding
+            #make sure that the maximum image height/width is not crossed 
             if maxb + padding < 512.0:
-                maxb = maxb + 25.0
+                maxb = maxb + padding 
             if maxa + padding < 512.0:
                 maxa = maxa + padding
 
+            #multiplier 
             mult = 50.0
 
+            #example: max = 400 , min = 100, 
+                # 300/50 = 8 = max_bbs 
+            # find the height & width of the bounding box 
+            # then split the height & width into regions by dividing by 50 
+            # by dividing by 50 proportionally on both the x & y axis we create 50 x 50 samples of the liver's BB region  
             max_bbs_a = int((maxa-mina)/mult)
             max_bbs_b = int((maxb-minb)/mult)
 
+            # iterate through the amount of regions that there are in the x direction 
             for x in range (0, max_bbs_a):
                 for y in range (0, max_bbs_b):
+                    # Note: x = a & y = b 
+                    # x & y represent which region we are working within 
+                    # so we are going down the y axis for each of x's region 
+                    # the mask liver image is being sampledand limited by the 1st minimum of the x region and the 2nd minimum will 
                     mask_liver_aux = mask_liver[int(mina + mult*x):int(mina + (x+1)*mult), int(minb + y*mult):int(minb + (y+1)*mult)]
+                    # 
                     pos_liver = np.sum(mask_liver_aux)
                     if pos_liver > (25.0*25.0):
                         if (mina + mult*x) > 15.0 and ((mina + (x+1)*mult) < 512.0) and (minb + y*mult) > 15.0 and ((minb + (y+1)*mult) < 512.0):
