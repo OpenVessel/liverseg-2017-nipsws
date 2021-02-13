@@ -7,7 +7,8 @@ class Config:
     '''
 
     def __init__(self):
-        self.__database_root = 'predict_database'
+        self.__database_root = 'LiTS_database'
+        #self.__database_root = 'predict_database'
 
         self.root_folder = os.path.dirname(os.path.realpath(__file__))
         sys.path.append(os.path.abspath(self.root_folder))
@@ -18,6 +19,8 @@ class Config:
         self.imagenet_ckpt = os.path.join(self.root_folder, 'train_files', 'vgg_16.ckpt')
         
         self.debug = 0
+
+        self.phase = 'test' ## train or test 
 
 
     def get_log(self, task_name):

@@ -71,8 +71,18 @@ python sample_bbs.py
         config: Reference to a Configuration object used in the creation of a Session
         finetune: Use to select to select type of training, 0 for the parent network and 1 for finetunning
 
-    O-    
+    O-    nothing it just trains weights
+        tf.summary.histogram 
+        ## Define loss summary data 
+        ## visualize tensorboard 
 
+        loss, output, target = binary_cross_entropy(net, input_label)
+        total_loss = loss + tf.add_n(tf.losses.get_regularization_losses())
+        tf.summary.scalar('losses/total_loss', total_loss)
+        tf.summary.histogram('losses/output', output)
+        tf.summary.histogram('losses/target', target)
+
+        
 ### step 3. seg_lesion_train.py 
 
 I - 

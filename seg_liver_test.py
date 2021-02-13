@@ -31,7 +31,7 @@ def seg_liver_test(config, number_slices=3):
 
     model_name = os.path.join(logs_path, "seg_liver.ckpt")
 
-    test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_OV.txt')
+    test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_3.txt')
 
     dataset = Dataset(None, test_file, None, database_root, number_slices, store_memory=False)
 

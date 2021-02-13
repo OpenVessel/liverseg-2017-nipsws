@@ -11,7 +11,7 @@ def compute_3D_bbs_from_gt_liver(config):
 
     ## this file is generated at the end 
     crops_list_name = 'crops_LiTS_gt_2.txt'
-
+    phase = config.phase ## if/else 
 
     # 1/18/2021 change
     #utils_path = '../crops_list/'
@@ -47,9 +47,22 @@ def compute_3D_bbs_from_gt_liver(config):
 
     ## If no labels, the masks_folder should contain the results of liver segmentation
     # masks_folders = os.listdir(results_path + 'liver_seg/')
-    print(labels_liver_path)
-    masks_folders = os.listdir(labels_liver_path) # liver seg
-    sorted_mask_folder = sorted(masks_folders, key=integerise)
+    #print(labels_liver_path)
+    masks_folders = os.listdir(labels_liver_path) # liver seg 
+    masks_folders = sorted(masks_folders, key=integerise)
+
+    print(type(masks_folders))
+    ## alex code right 
+    if phase == 'test':
+#calc where the start of the testing files are because liver_results are only being generated on testing data 
+        print("mask folders", masks_folders)
+        start_test_dir = int(round(.8*len(masks_folders)))
+        print(start_test_dir)
+        masks_folders = masks_folders[start_test_dir:]
+        print(masks_folders)
+        #105 - 130 
+    if phase == 'train':
+        x = 1
 
     crops_file = open(os.path.join(utils_path, crops_list_name), 'w')
     aux = 0
@@ -62,7 +75,7 @@ def compute_3D_bbs_from_gt_liver(config):
         #what does the label data look like
         if masks_folders[i] != '.DS_Store':
             if not masks_folders[i].startswith(('.', '\t')):
-                dir_name = masks_folders[i]
+                dir_name = masks_folders[i] ## 0 = 130
                 ## If no labels, the masks_folder, should contain the results of liver segmentation
                 masks_of_volume = glob.glob(labels_liver_path + dir_name + '/*.png')
                 file_names = (sorted(masks_of_volume, key=sort_by_path))
@@ -83,7 +96,7 @@ def compute_3D_bbs_from_gt_liver(config):
                 
             for j in range(0, depth_of_volume):
                 img = misc.imread(file_names[j])
-                print(img)
+                #print(img)
                 img = img/255.0
                 img[np.where(img > 0.5)] = 1
                 img[np.where(img < 0.5)] = 0

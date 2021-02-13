@@ -23,7 +23,7 @@ O -> crops_LiTS_gt_2.txt normal name is crops_LiTS_gt.txt var = crops_list.txt
         bb_images_volumes_alldatabase3_gt_nozoom_common_bb/
         bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/
         bb_liver_seg_alldatabase3_gt_nozoom_common_bb/
-        liver_results/
+        liver_results/ ##'seg_liver_ck/
 
     ## ARE THESE ever used?
     bb_images_volumes_alldatabase3_gt_nozoom_common_bb/
