@@ -8,7 +8,6 @@ from det_lesion_test import det_lesion_test
 from seg_lesion_test import seg_lesion_test
 import time
 
-#hello from Raj
 
 class LiverLesion:
     def __init__(self, config, number_slices=3):
@@ -23,14 +22,14 @@ class LiverLesion:
     def compute_3D_bbs_from_gt_liver(self):
         compute_3D_bbs_from_gt_liver(self.config)
     
-
     def sample_bbs_test(self):
-        liver_masks_path = os.path.join(self.config.database_root, 'liver_seg')
-        lesion_masks_path = os.path.join(self.config.database_root, 'item_seg')
+        liver_masks_path = os.path.join(self.config.database_root, 'liver_seg') #labeled GT liver mask
+        lesion_masks_path = os.path.join(self.config.database_root, 'item_seg') #labeled GT lesions
         output_folder_path =  './det_DatasetList/'
+        output_file_name_sp = 'test_patches' #specific 
         crops_list_sp = './utils/crops_list/crops_LiTS_gt_2.txt'
         #crops_list_sp = '../crops_list/crops_LiTS_gt.txt'
-        output_file_name_sp = 'test_patches'
+        
 
         data_aug_options_sp = 8
         sample_bbs_train(crops_list_sp, output_file_name_sp, data_aug_options_sp, liver_masks_path, lesion_masks_path, output_folder_path)

@@ -28,13 +28,14 @@ def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks
     """Samples bounding boxes around liver region for a test image.
     Args:
     crops_list: Textfile, each row with filename, boolean indicating if there is liver, x1, x2, y1, y2, zoom.
-    -output_folder_path = det_Dataset_list (where the output file sits)
+    output_folder_path = det_Dataset_list (where the output file sits)
     output_file_name: File name for the output file generated, that will be of the form file name, x1, y1, 0. (Then, each bb is of 80x80, and the 0 is related
     to the data augmentation applied, which is *none* for test images)
+
     """
 
-    #opens in write mode the developed test patches files (within det_Datasetlist) 
-    # and specificies which data augmentation file to use 
+    #opens in write mode the developed test patches folder (det_Datasetlist) 
+    # so we can create a file that has ???? 
     test_file = open(os.path.join(output_folder_path, output_file_name + '.txt'), 'w')
 
     ### open crops_list text file and read it into a list 
@@ -56,12 +57,12 @@ def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks
         ### if within the liver 
         if bool_zoom == '1':
 
-            # constants
-            # what is the value of id_img?
+            # constants (OG comment)
+            # id_img should be the file path that comes out of the 
             file = id_img.split('images_volumes/')[-1]
             mask_filename = file.split('.')[0]
 
-            # 
+            
             print("Mask filename", mask_filename)
             print("liver_masks_path", liver_masks_path)
             # normalize the liver mask PNG 
@@ -86,7 +87,7 @@ def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks
             if maxa + padding < 512.0:
                 maxa = maxa + padding
 
-            #multiplier 
+            #this multiplier is equal to the height/width of the sample bounding box we want to create
             mult = 50.0
 
             #example: max = 400 , min = 100, 
@@ -98,23 +99,49 @@ def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks
             max_bbs_b = int((maxb-minb)/mult)
 
             # iterate through the amount of regions that there are in the x direction 
+            # Note: x = a & y = b 
             for x in range (0, max_bbs_a):
+                # for each x region we will get all of the bb's in the y direction and then move to the next x region 
                 for y in range (0, max_bbs_b):
-                    # Note: x = a & y = b 
-                    # x & y represent which region we are working within 
-                    # so we are going down the y axis for each of x's region 
-                    # the mask liver image is being sampledand limited by the 1st minimum of the x region and the 2nd minimum will 
+                    
+                    # the bounding box's height/width spacer is "mult" ( = 50 )
+                    # the region counter/tracker = value of x & y at the time 
+                    # the lower bound of the bounding box will be x & y (the first region) 
+                    # the upper bound of the bounding box will be x+1 & y+1 (the next region) 
+                    
+                    # we start at the min of the 1st region and create all of our sample bb's 
+                        # by working our way through each region by iterating through the for loop 
                     mask_liver_aux = mask_liver[int(mina + mult*x):int(mina + (x+1)*mult), int(minb + y*mult):int(minb + (y+1)*mult)]
-                    # 
-                    pos_liver = np.sum(mask_liver_aux)
-                    if pos_liver > (25.0*25.0):
+                    
+                    # example: mina = 125 & minb= 75, mult = 50, x region = 0 , y region = 3   
+                    
+                                # mask_liver_aux = mask_liver[125 + 50*0: 125 + 50*1, 75 + 50*3: 75 + 50*4]
+                                                # = mask_liver[125:175, 225:275] 
+
+                    #positive liver check (sum the # of True (= 1) pixels within the BB range) 
+                    pos_liver = np.sum(mask_liver_aux) 
+                    print("np.sum(mask_liver_aux)", np.sum(mask_liver_aux))
+
+                    #if over half of the pixels within the BB range are True 
+                        #then we categorize this a positive liver BB sample  
+                    if pos_liver > (25.0*25.0): 
+                        
+                        # if the mins are above 15 and the maxs are below 512 then ... 
+                        # 15 is the lower bound because we will be subtracting the minimums for the bounding box range by 15 
                         if (mina + mult*x) > 15.0 and ((mina + (x+1)*mult) < 512.0) and (minb + y*mult) > 15.0 and ((minb + (y+1)*mult) < 512.0):
-                            a1 = mina + mult*x - 15.0
+
+                            a1 = mina + mult*x - 15.0 
+
                             b1 = minb + y*mult - 15.0
+                        
+                        # we are writing to the output file we created 
+                        # we state the 
+                        # the 1 is to indicate that this is within the liver 
                         test_file.write('images_volumes/{} {} {} 1 \n'.format(file, a1, b1))
-    test_file.close()
+    test_file.close() 
 
 
+# the parameter difference between sample_bbs_test & sample_bbs_train is that train has data_aug_options extra 
 def sample_bbs_train(crops_list, output_file_name, data_aug_options, liver_masks_path, lesion_masks_path, output_folder_path):
 
     """
@@ -127,34 +154,53 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options, liver_masks
         In total 4 text files will be generated. For training, a positive and a negative file, and the same for testing.
     """
 
+    # opening training & testing files for both positive and negative sample bb's to use as our outputs
     train_positive_file = open(os.path.join(output_folder_path, 'training_positive_det_patches_' + output_file_name + '_dummy.txt'), 'w')
     train_negative_file = open(os.path.join(output_folder_path, 'training_negative_det_patches_' + output_file_name + '_dummy.txt'), 'w')
     test_positive_file = open(os.path.join(output_folder_path, 'testing_positive_det_patches_' + output_file_name + '_dummy.txt'), 'w')
     test_negative_file = open(os.path.join(output_folder_path, 'testing_negative_det_patches_' + output_file_name + '_dummy.txt'), 'w')
 
-    # read in bbs from txt file
+    # read in bbs from txt file 
     if crops_list is not None:
         with open(crops_list) as t:
             crops_lines = t.readlines()
     
+    # for every line within the txt file 
     for i in range(len(crops_lines)):
+        
+        #split the values into elements for a list 
         result = crops_lines[i].split(' ')
         
-        if len(result) > 2:
+        # if we are looking within the lung then 
+        if len(result) > 2: 
+            # place the values from the txt file within their proper variables 
             id_img, bool_zoom, mina, maxa, minb, maxb = result
+            # make the strings of mins/maxs into integers 
             mina = int(mina)
             maxa = int(maxa)
             minb = int(minb)
             maxb = int(maxb)
+        
+        # if we are not looking within the liver for this slice then 
         else:
+            # place those respective values from the txt file within their proper variables 
             id_img, bool_zoom = result
             
-        # constants
+        # constants (their OG comment)
+        #QUESTION: what does it mean to do os.path.splitext vs variable.split?
+        #QUESTION: what's the difference between mask_file_name and liver_seg_file?
+        # take the first element out of the split id_img variable's **path???** 
+            # which should be in the format "patient\slice#" 
+            # so seemingly we are extracting the patient's # 
         mask_filename = os.path.splitext(id_img)[0]
-        #print("Mask Filename:", mask_filename)
+            #print("Mask Filename:", mask_filename)
+        
+        # take the last element of the split test of id_img which should be in the format ??? 
         liver_seg_file = id_img.split('liver_seg/')[-1]
-        #print("Int Thing:", mask_filename.split(os.path.sep)[0], os.path.split(mask_filename)[1])
+            #print("Int Thing:", mask_filename.split(os.path.sep)[0], os.path.split(mask_filename)[1])
 
+        # QUESTION: are aux & bool_zoom truly synonymous? 
+        # if we are looking within the liver & the patient is not # 59 
         if bool_zoom == '1' and int(mask_filename.split(os.path.sep)[0])!= 59:
 
             # binarize masks

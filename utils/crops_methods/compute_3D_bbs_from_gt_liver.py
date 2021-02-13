@@ -21,7 +21,7 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
     #results_path = '../../results/'
     results_path = config.get_result_root('results')
 
-    # inputs: matlab files???, liver mask labels, lesion labels, DL model's predicted liver mask 
+    # inputs: matlab files, liver mask labels, lesion labels, DL model's predicted liver mask 
     images_path = os.path.join(config.database_root, 'images_volumes') ##matlab files? 
     labels_path = os.path.join(config.database_root,  'item_seg/') ##GT liver lesion  labels
     labels_liver_path = os.path.join(config.database_root,  'liver_seg/') ## GT liver mask labels
@@ -91,7 +91,8 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
             ### output paths in a list 
             bb_paths = [output_labels_path_bb, output_images_path_bb, output_labels_liver_path_bb, output_liver_results_path_bb]
             
-            ### check to see whether the output paths exist already; if not then create it 
+            ### check to see whether the output paths for the soon to be bounding boxed matlab files, lesion pngs, 
+                    # liver mask pngs, & predicted liver mask pngs exist already; if not then create them 
             for bb_path in bb_paths:
                 if not os.path.exists(os.path.join(bb_path, dir_name)):
                     os.makedirs(os.path.join(bb_path, dir_name))
@@ -162,14 +163,6 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
                 img[np.where(img < 0.5)] = 0
 
                 a, b = np.where(img == 1) 
-                
-                #if the PNG is not black then ... 
-                if len(a) > 0: 
-                    ### builds off of our last calculations of max & min and filters out anything that is not within the bounding box on the PNG (makes new_img)
-                        ### new_img will keep* anything that is between the total_mins & maxs 
-                    ###QUESTION: what is the difference between new_img and o_new? 
-                        # new_img is only called in the DEPRECATED section, and nowhere else 
-                    new_img = img[total_mina:total_maxa, total_minb:total_maxb]
                     
                 # elements of txt line 
                 ### gets the current png file we are working and splits the .png part off so we can refer to this specific patient in other formats
@@ -220,22 +213,19 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
                         print("mat", mat)
                         print("png", png)
 
-                    # .mat
+                    #
+
+                    # .mat 
                     ### QUESTION: what does 'section' do? 
                         # section is the name of the key from within a matlab dictionary in which we want to pull from and write to
                     ### makes a numpy array of the original matlab file input into this function 
                     original_img = np.array(scipy.io.loadmat(os.path.join(images_path, dir_name, mat))['section'], dtype = np.float32)
-                    ### altered original image where (I believe) that we crop out everything else outside of the min & max created bounding box 
+                    ### builds off of our last calculations of max & min and filters out anything that is not within the bounding box on the PNG (makes new_img)
                         ##QUESTION: what would be outside of the minimum and maximum? 
                     o_new = original_img[total_mina:total_maxa, total_minb:total_maxb] 
                     ### we save the original? matlab file to our OUTPUT path and make the new section variable key = to the new bounded box section
                     scipy.io.savemat(os.path.join(output_images_path_bb, dir_name, mat), mdict={'section': o_new})
 
-
-                    ### DEPRECATED: masked_original_img is never used
-                    masked_original_img = o_new
-                    masked_original_img[np.where(new_img == 0)] = 0
-                    ###
                 
                     ### lesion png, liver png, & results png: 
                         ### 1st- reads in the original png 
@@ -252,7 +242,7 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
                     lbl_liver_new = original_liver_label[total_mina:total_maxa, total_minb:total_maxb]
                     misc.imsave(os.path.join(output_labels_liver_path_bb, dir_name,  png), lbl_liver_new)
 
-                    # results png
+                    # results png 
                     original_results_label = misc.imread(os.path.join(liver_results, dir_name, png))
                     res_liver_new = original_results_label[total_mina:total_maxa, total_minb:total_maxb]
                     misc.imsave(os.path.join(output_liver_results_path_bb, dir_name, png), res_liver_new)
