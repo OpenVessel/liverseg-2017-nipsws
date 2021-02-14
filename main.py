@@ -15,7 +15,7 @@ class LiverLesion:
         self.number_slices=number_slices
 
 
-    def seg_liver_test(self, testing_volume_txt):
+    def seg_liver_test(self, test_volume_txt):
         return seg_liver_test(self.config, test_volume_txt, self.number_slices)
     
 
@@ -23,7 +23,7 @@ class LiverLesion:
         return compute_3D_bbs_from_gt_liver(self.config)
     
 
-    def sample_bbs(self):
+    def sample_bbs(self, crops_list_sp):
         liver_masks_path = os.path.join(self.config.database_root, 'liver_seg')
         data_aug_options = 8
         return sample_bbs(crops_list_sp, data_aug_options, liver_masks_path)
