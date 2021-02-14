@@ -22,8 +22,8 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
     results_path = config.get_result_root('results')
 
     # inputs: matlab files, liver mask labels, lesion labels, DL model's predicted liver mask 
-    images_path = os.path.join(config.database_root, 'images_volumes') ##matlab files? 
-    labels_path = os.path.join(config.database_root,  'item_seg/') ##GT liver lesion  labels
+    images_path = os.path.join(config.database_root, 'images_volumes') ## matlab files? 
+    labels_path = os.path.join(config.database_root,  'item_seg/') ## GT liver lesion  labels
     labels_liver_path = os.path.join(config.database_root,  'liver_seg/') ## GT liver mask labels
     liver_results = os.path.join(config.database_root, 'seg_liver_ck/') ## DL predicted liver mask 
 
@@ -33,7 +33,7 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
     output_labels_liver_path_bb = os.path.join(config.database_root,  'bb_liver_seg_alldatabase3_gt_nozoom_common_bb')
     output_liver_results_path_bb = os.path.join(config.database_root, 'liver_results/')    
 
-    ###checking to see whether the output folder paths exist, if not; then make it
+    ### checking to see whether the output folder paths exist, if not; then make it
     bb_paths = [output_labels_path_bb, output_images_path_bb, output_labels_liver_path_bb, output_liver_results_path_bb]
 
     for bb_path in bb_paths:
