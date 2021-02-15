@@ -89,7 +89,7 @@ def sample_bbs(crops_df, data_aug_options, liver_masks_path):
     # read in bbs from crops df
     for _, row in crops_df.iterrows():
         
-        if len(result) > 2:
+        if row["is_liver"]:
             row["total_mina"] = int(row["total_mina"])
             row["total_maxa"] = int(row["total_maxa"])
             row["total_minb"] = int(row["total_minb"])
@@ -101,7 +101,7 @@ def sample_bbs(crops_df, data_aug_options, liver_masks_path):
         mask_filename = os.path.splitext(row["liver_seg"])[0]
         liver_seg_file = row["liver_seg"].split('liver_seg/')[-1]
 
-        if row["is_liver"] == '1' and int(mask_filename.split(os.path.sep)[0])!= 59:
+        if row["is_liver"] and int(mask_filename.split(os.path.sep)[0])!= 59:
 
             # binarize masks
 

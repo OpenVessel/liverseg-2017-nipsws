@@ -156,7 +156,7 @@ def compute_3D_bbs_from_gt_liver(config):
                     print("Success", "Directory:", liver_results, "Patient:", dir_name, "File:", png)
 
                 else:
-                    crops_df_rows.append(crops_df_rows.append([liver_seg, is_liver, None, None, None, None]))
+                    crops_df_rows.append([liver_seg, is_liver, None, None, None, None])
 
     crops_df = pd.DataFrame(crops_df_rows, columns=["liver_seg", "is_liver", "total_mina", "total_maxa", "total_minb", "total_maxb"])
     return crops_df
