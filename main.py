@@ -3,7 +3,7 @@ import tensorflow as tf
 
 from seg_liver_test import seg_liver_test
 from utils.crops_methods.compute_3D_bbs_from_gt_liver import compute_3D_bbs_from_gt_liver
-from utils.sampling_bb.sample_bbs import sample_bbs_test, sample_bbs_train
+from utils.sampling_bb.sample_bbs import sample_bbs
 from det_lesion_test import det_lesion_test
 from seg_lesion_test import seg_lesion_test
 import time
@@ -15,7 +15,7 @@ class LiverLesion:
         self.number_slices=number_slices
 
 
-    def seg_liver_test(self, testing_volume_txt):
+    def seg_liver_test(self, test_volume_txt):
         return seg_liver_test(self.config, test_volume_txt, self.number_slices)
     
 
@@ -23,7 +23,7 @@ class LiverLesion:
         return compute_3D_bbs_from_gt_liver(self.config)
     
 
-    def sample_bbs(self):
+    def sample_bbs(self, crops_list_sp):
         liver_masks_path = os.path.join(self.config.database_root, 'liver_seg')
         data_aug_options = 8
         return sample_bbs(crops_list_sp, data_aug_options, liver_masks_path)
@@ -43,13 +43,7 @@ class LiverLesion:
             Driver code for testing the model.
         """
         
-        test_steps = [
-            ['seg_liver_test', self.seg_liver_test], ## seg_liver_test.py
-            ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ## compute_3D_bbs_from_gt_liver.py
-            ['sample_bbs_test', self.sample_bbs_test], ### sample_bbs.py
-            ['det_lesion_test', self.det_lesion_test], ### det_lesion_test.py
-            ['seg_lesion_test', self.seg_lesion_test] ##### seg_lesion_test.py
-        ]
+        
 
         time_list = []
         last_step_output = None
@@ -78,7 +72,7 @@ class LiverLesion:
         test_volume_txt = 'seg_DatasetList/testing_volume_OV.txt'
 
         # run workflow
-        runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(test_volume_txt))
+        #runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(test_volume_txt))
         crops_df = runStepWithTime('compute_bbs_from_gt_liver', lambda: self.compute_3D_bbs_from_gt_liver())
         patches =  runStepWithTime('sample_bbs_test', lambda: self.sample_bbs(crops_df))
         runStepWithTime('det_lesion_test', lambda: self.det_lesion_test(patches["test_pos"], patches["test_neg"]))
