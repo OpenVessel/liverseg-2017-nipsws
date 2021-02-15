@@ -24,14 +24,11 @@ def crop(base_root, input_config='lesion/', crops_list='./crops_list/crops_LiTS_
             ## 104 is specific to the dataset train/test split 
             training_set_cutoff = 104
             if int(id_img.split(os.path.sep)[0]) > training_set_cutoff:
-                if not os.path.exists(os.path.join(output_results_path, id_img.split('/')[0])):
-                    os.makedirs(os.path.join(output_results_path, id_img.split('/')[0]))
+                if not os.path.exists(os.path.join(output_results_path, id_img.split(os.path.sep)[0])):
+                    os.makedirs(os.path.join(output_results_path, id_img.split(os.path.sep)[0]))
 
                 mask = np.zeros([512, 512])
                 if bool_zoom == '1':
                     zoomed_mask = misc.imread(os.path.join(input_results_path, id_img + '.png'))
                     mask[mina:maxa, minb:maxb] = zoomed_mask
                 misc.imsave(os.path.join(output_results_path, id_img + '.png'), mask*255)
-
-        
-        

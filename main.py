@@ -54,8 +54,8 @@ class LiverLesion:
     
     def seg_liver_train(self):
         seg_liver_train(self.config, self.gpu_id, self.number_slices, self.batch_size, self.iter_mean_grad, 
-                    self.max_training_iters_1, self.max_training_iters_2, self.max_training_iters_3, 
-                    self.save_step, self.display_step, self.ini_learning_rate, self.boundaries, self.values)
+                        self.max_training_iters_1, self.max_training_iters_2, self.max_training_iters_3, 
+                        self.save_step, self.display_step, self.ini_learning_rate, self.boundaries, self.values)
     
 
     def compute_3D_bbs_from_gt_liver(self):
@@ -115,13 +115,13 @@ class LiverLesion:
             print('\nDone step: '+ name)
             total_time = int(time.time() - start_time)
             time_list.append(total_time)
-            print ("\nTime taken: " + str(total_time) + " seconds or, " + str(total_time/60) + " minutes to run\n")
+            print ("\nTime taken: " + str(total_time) + " seconds or,\t" + str(total_time/60) + " minutes to run\n")
 
-        print("Time for each function: ")
+        print("Times for all function: ")
         for func in range(len(test_steps)):
             print("\t" + str(test_steps[func][0]) + ": " + str(time_list[func]) + " seconds, " + str(time_list[func]/60) + " minutes.\n")
         
-        print("Total time: " + str(sum(time_list)) + " seconds, " + str(sum(time_list)/60) + " minutes.\n")
+        print("Total time: " + str(sum(time_list)) + " seconds,\t" + str(sum(time_list)/60) + " minutes.\n")
 
     def train(self):
         """
@@ -153,13 +153,13 @@ class LiverLesion:
             print('\nDone step: '+ name)
             total_time = int(time.time() - start_time)
             time_list.append(total_time)
-            print ("\nTime taken: " + str(total_time) + " seconds or, " + str(total_time/60) + " minutes to run\n")
+            print ("\nTime taken: " + str(total_time) + " seconds or,\t" + str(total_time/60) + " minutes to run\n")
 
-        print("Time for each function: ")
+        print("Times for all function: ")
         for func in range(len(train_steps)):
             print("\t" + str(train_steps[func][0]) + ": " + str(time_list[func]) + " seconds, " + str(time_list[func]/60) + " minutes.\n")
         
-        print("Total time: " + str(sum(time_list)) + " seconds, " + str(sum(time_list)/60) + " minutes.\n")
+        print("Total time: " + str(sum(time_list)) + " seconds,\t" + str(sum(time_list)/60) + " minutes.\n")
 
 if __name__ =='__main__':
     from config import Config
@@ -169,8 +169,4 @@ if __name__ =='__main__':
 
     liver_lesion = LiverLesion(config)
     liver_lesion.test()
-
     #liver_lesion.train()
-    
-
-
