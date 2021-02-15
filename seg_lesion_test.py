@@ -23,7 +23,7 @@ def seg_lesion_test(config, number_slices=3):
 
     #crops_list = 'crops_LiTS_gt.txt'
     crops_list = 'crops_predict_gt.txt'
-    #crops_predict_gt.tx
+    #crops_predict_gt.txt
     det_results_list = 'detection_lesion_example'
 
     task_name = 'seg_lesion_ck'
