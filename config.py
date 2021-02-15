@@ -7,7 +7,8 @@ class Config:
     '''
 
     def __init__(self):
-        self.__database_root = 'predict_database'
+        # self.__database_root = 'predict_database'
+        self.__database_root = 'LiTS_database'
 
         self.root_folder = os.path.dirname(os.path.realpath(__file__))
         sys.path.append(os.path.abspath(self.root_folder))
