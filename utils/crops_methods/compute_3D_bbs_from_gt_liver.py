@@ -10,7 +10,7 @@ def compute_3D_bbs_from_gt_liver(config):
     MIN_AREA_SIZE = 512.0*512.0
 
     ## this file is generated at the end 
-    crops_list_name = 'crops_LiTS_gt.txt'
+    crops_list_name = config.crops_list
     phase = config.phase ## if/else 
 
     # 1/18/2021 change
@@ -150,7 +150,6 @@ def compute_3D_bbs_from_gt_liver(config):
 
                     # write to crops txt file
                     line = ' '.join([str(x) for x in [liver_seg, aux, total_mina, total_maxa, total_minb, total_maxb]])
-                    print(line)
                     crops_file.write(line + '\n')
 
                     ######### apply 3Dbb to files ##########
