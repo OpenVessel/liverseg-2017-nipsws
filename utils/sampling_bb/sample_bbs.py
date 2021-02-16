@@ -22,7 +22,8 @@ def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks
     """Samples bounding boxes around liver region for a test image.
     Args:
     crops_list: Textfile, each row with filename, boolean indicating if there is liver, x1, x2, y1, y2, zoom.
-    output_file_name: File name for the output file generated, that will be of the form file name, x1, y1, 0. (Then, each bb is of 80x80, and the 0 is related
+    output_file_name: File name for the output file generated, that will be of the form file name, x1, y1, 0. 
+    (Then, each bb is of 80x80, and the 0 is related
     to the data augmentation applied, which is none for test images)
     """
 
