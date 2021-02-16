@@ -22,7 +22,6 @@ def seg_lesion_test(config, number_slices=3):
     gpu_id = 0
 
     #crops_list = 'crops_LiTS_gt.txt'
-    crops_list = 'crops_predict_gt.txt'
     #crops_predict_gt.txt
     det_results_list = 'detection_lesion_example'
 
@@ -33,6 +32,7 @@ def seg_lesion_test(config, number_slices=3):
     logs_path = config.get_log(task_name)
     result_root = config.get_result_root('results')
     root_folder = config.root_folder
+    crops_list = config.crops_list
     ###
     #seg_liver_ck
     liver_results_path = os.path.join(database_root, 'seg_liver_ck')

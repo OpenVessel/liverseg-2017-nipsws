@@ -2,6 +2,8 @@ import numpy as np
 import scipy.misc
 import scipy.io
 import os
+
+from config import Config
 #from utils.parse_result import parse_result
 
 
@@ -166,10 +168,6 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options, liver_masks
                             if (mina + mult*x) > 15.0 and ((mina + (x+1)*mult) < 490.0) and (minb + y*mult) > 15.0 and ((minb + (y+1)*mult) < 490.0):
                                 a1 = mina + mult*x - 15.0
                                 b1 = minb + y*mult - 15.0
-                                #print(train_negative_file)
-                                #print(train_positive_file)
-                                # print(liver_seg_file.split(os.path.sep))
-                                # print(liver_seg_file.split(os.path.sep))
                                 if pos_lesion > mult:
                                     if int(liver_seg_file.split(os.path.sep)[-2]) < 105:
                                         for j in range(data_aug_options):
@@ -193,6 +191,7 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options, liver_masks
 
 
 if __name__ == "__main__":
+    config = Config
 
     database_root = '../../LiTS_database/'
 
@@ -204,7 +203,8 @@ if __name__ == "__main__":
     output_folder_path =  '../../det_DatasetList/'
 
     # Example of sampling bounding boxes around liver for train images
-    crops_list_sp = '../crops_list/crops_LiTS_gt_2.txt'
+    # crops_list_sp = '../crops_list/crops_LiTS_gt_2.txt'
+    crops_list_sp = config.get_crops_list_path
     #crops_list_sp = '../crops_list/crops_LiTS_gt.txt'
     output_file_name_sp = 'example'
     # all possible combinations of data augmentation

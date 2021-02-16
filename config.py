@@ -20,11 +20,15 @@ class Config:
         
         self.debug = 0
 
-        self.phase = 'test' ## train or test 
+        self.phase = 'test' ## train or test
 
+        self.crops_list = 'crops_list_OV.txt'
 
     def get_log(self, task_name):
         return os.path.join(self.root_folder, 'train_files', task_name, 'networks')
 
     def get_result_root(self, result_name):
         return os.path.join(self.root_folder, result_name)
+
+    def get_crops_list_path(self):
+        return os.path.join(self.root_folder, 'utils', 'crops_list', self.crops_list)
