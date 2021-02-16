@@ -192,7 +192,7 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options, liver_masks
 if __name__ == "__main__":
     config = Config
 
-    database_root = config.database_root
+    database_root = '../../LiTS_database/'
 
     # Paths for Own Validation set
     images_path = os.path.join(database_root, 'images_volumes')
