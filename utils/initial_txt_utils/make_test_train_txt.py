@@ -121,7 +121,7 @@ def makeTestTXT():
 def makeTrainDF():
     lineList = makeTrainLine(listOfLists)
 
-    return pd.DataFrames(lineList)
+    return pd.DataFrame(lineList)
 
 # Makes testing DF
 def makeTestDF():
