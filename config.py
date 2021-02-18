@@ -10,7 +10,6 @@ class Config:
         self.__database_root = 'LiTS_database'
         #self.__database_root = 'predict_database'
 
-        self.root_folder = os.path.dirname(os.path.realpath(__file__))
         sys.path.append(os.path.abspath(self.root_folder))
 
         self.database_root = os.path.join(self.root_folder, self.__database_root)
@@ -22,7 +21,7 @@ class Config:
 
         self.phase = 'test' ## train or test
 
-        self.crops_list = 'crops_list_OV.txt'
+        self.crops_list = 'crops_LiTS_gt.txt'
 
     def get_log(self, task_name):
         return os.path.join(self.root_folder, 'train_files', task_name, 'networks')

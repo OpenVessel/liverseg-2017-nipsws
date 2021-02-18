@@ -67,6 +67,8 @@ def filter(base_root, crops_list='crops_LiTS_gt.txt', input_config='masked_out_l
                             aux_name = images[l].split()[0] + '.png'
 
                             #IOError: [Errno 2] No such file or directory: 'D:\\L_pipe\\liver_open\\liverseg-2017-nipsws\\results/masked_out_seg_lesion_ck\\106/359.png'
+                            #print(input_results_path)
+                            print(os.path.join(input_results_path, aux_name))
                             total_patch = (np.array(Image.open(os.path.join(input_results_path, aux_name)), dtype=np.uint8))/255.0
 
                             cropped_patch = total_patch[x_bb: (x_bb + 80), y_bb:(y_bb + 80)]

@@ -133,3 +133,4 @@ nifti_library/*
 *.local
 utils/crops_list/crops_LiTS_gt_2.txt
 utils/crops_list/crops_list_OV.txt
+crops_LiTS_gt.txt
