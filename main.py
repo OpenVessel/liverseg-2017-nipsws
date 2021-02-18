@@ -91,6 +91,7 @@ class LiverLesion:
                         self.display_step, self.ini_learning_rate, self.boundaries, self.values)
 
 
+
     def test(self):
         """
             Driver code for testing the model.
@@ -121,6 +122,8 @@ class LiverLesion:
             print("\t" + str(test_steps[func][0]) + ": " + str(time_list[func]) + " seconds, " + str(time_list[func]/60) + " minutes.\n")
         
         print("Total time: " + str(sum(time_list)) + " seconds,\t" + str(sum(time_list)/60) + " minutes.\n")
+
+
 
     def train(self):
         """
@@ -160,6 +163,11 @@ class LiverLesion:
         
         print("Total time: " + str(sum(time_list)) + " seconds,\t" + str(sum(time_list)/60) + " minutes.\n")
 
+
+
+
+
+# Global vars and driver
 if __name__ =='__main__':
     from config import Config
 
