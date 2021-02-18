@@ -5,7 +5,6 @@ Sergi Caelles (scaelles@vision.ee.ethz.ch)
 Modified code for liver and lesion segmentation:
 Miriam Bellver (miriam.bellver@bsc.es)
 """
-
 import os
 import sys
 import tensorflow as tf
@@ -36,10 +35,10 @@ def seg_lesion_test(config, number_slices=3):
     ###
     #seg_liver_ck
     liver_results_path = os.path.join(database_root, 'seg_liver_ck')
-    model_name = os.path.join(logs_path, "seg_lesion.ckpt")
+    model_name = os.path.join(logs_path, "seg_lesion.ckpt") 
     #D:\L_pipe\liver_open\liverseg-2017-nipsws\seg_DatasetList\testing_volume_105_OV.txt
     #testing_volume_3_crops.txt
-    test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_OV.txt')
+    test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_3_crops.txt')
 
     dataset = Dataset(None, test_file, None, database_root, number_slices, store_memory=False)
 
@@ -72,6 +71,7 @@ def seg_lesion_test(config, number_slices=3):
         input_config='out_' + task_name, 
         th=0.5)
         # O -> masked_out_seg_lesion_ck
+
 
     # 4. Checks positive detections of lesions in the liver. Remove those false positive of the segmentation network using the detection results.
     print("filtering results")

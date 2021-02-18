@@ -10,6 +10,7 @@ import scipy.io
 
 def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
 
+    #used in an used function 
     MIN_AREA_SIZE = image_size*image_size 
 
     ## this file is generated at the end 
@@ -17,12 +18,14 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
 
     # 1/18/2021 change 
     #utils_path = '../crops_list/'
+    
+    # where 'crops_LiTS_gt_2.txt' is created 
     utils_path = os.path.join(config.root_folder, 'utils/crops_list/' )
     #results_path = '../../results/'
     results_path = config.get_result_root('results')
 
     # inputs: matlab files, liver mask labels, lesion labels, DL model's predicted liver mask 
-    images_path = os.path.join(config.database_root, 'images_volumes') ## matlab files? 
+    images_path = os.path.join(config.database_root, 'images_volumes') ## matlab files 
     labels_path = os.path.join(config.database_root,  'item_seg/') ## GT liver lesion  labels
     labels_liver_path = os.path.join(config.database_root,  'liver_seg/') ## GT liver mask labels
     liver_results = os.path.join(config.database_root, 'seg_liver_ck/') ## DL predicted liver mask 
@@ -31,7 +34,7 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
     output_images_path_bb = os.path.join(config.database_root, 'bb_images_volumes_alldatabase3_gt_nozoom_common_bb')
     output_labels_path_bb = os.path.join(config.database_root,  'bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb')
     output_labels_liver_path_bb = os.path.join(config.database_root,  'bb_liver_seg_alldatabase3_gt_nozoom_common_bb')
-    output_liver_results_path_bb = os.path.join(config.database_root, 'liver_results/')    
+    output_liver_results_path_bb = os.path.join(config.database_root, 'liver_results/') 
 
     ### checking to see whether the output folder paths exist, if not; then make it
     bb_paths = [output_labels_path_bb, output_images_path_bb, output_labels_liver_path_bb, output_liver_results_path_bb]
@@ -45,11 +48,14 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
         if value != '.DS_Store':
             return int(value) 
 
-    ### QUESTION: 
+    ### QUESTION: is this sufficient for running the testing workflow with Dr.Jeph's unlabeled data? 
     ## If no labels, the masks_folder should contain the results of liver segmentation
         # masks_folders = os.listdir(results_path + 'liver_seg/')
 
-    ### get the labeled liver mask folder which has many patients  
+    ### put into a list the patients from the labeled liver mask folder 
+        #Note: comment this line of code out if we are using unlabeled data? 
+            #QUESTION: is there a way can we use both labeled and unlabeled pngs to create bounding box
+                # append the labeled pngs to the unlabeled liver mask list created in the step before? 
     masks_folders = os.listdir(labels_liver_path) # liver seg 
     
     ### sort the patients sequentially 
@@ -84,9 +90,9 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
                 ### sort the liver mask PNG's into proper sequential order utilizing our sort_by_path variable/function
                 file_names = (sorted(masks_of_volume, key=sort_by_path))
                 
-                ### finds the # of PNG's/slices within the labeled liver mask folder 
+                ### finds the # of PNG's/slices within the patient 
                     # that should (given good labeled data) find the depth of volume of the liver per patient
-                depth_of_volume = len(masks_of_volume)
+                depth_of_volume = len(masks_of_volume) 
 
             ### output paths in a list 
             bb_paths = [output_labels_path_bb, output_images_path_bb, output_labels_liver_path_bb, output_liver_results_path_bb]
@@ -104,7 +110,7 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
             total_maxb = 0
             total_minb = 10000000
             
-            ### loop through the whole liver mask folder for each patient
+            ### loop through the each patient's PNGs
             for j in range(0, depth_of_volume):
                 ### read the j-th png within the patient's ground truth liver mask folder 
                 img = misc.imread(file_names[j])
@@ -185,21 +191,28 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
                 liver_seg = current_file.split('liver_seg/')[-1]
                 
                 ###QUESTION: why 500 and what does [0] mean? and of what are we looking through? 
-                #print("len(np.where(img == 1)[0])", len(np.where(img == 1)[0]))
-                #print("np.where(img == 1)[0]", np.where(img == 1)[0])
-                if len(np.where(img == 1)[0]) > 500:
+                ## 512 * 512 = 250,000+ 
+                ## width of the liver has to be > 500 pixels to have bounding boxes applied to the png 
+                        ## and for the bounding box coordinates to be written within the crops_list.txt file 
+                ##  500 / 250,000+ = ~ %? 
+                ## is 500 arbitrary? seems to be the threshold between useless liver mask pngs 
+                    # (no room for lesion information) and useful liver mask pngs
+                    
+                if len(np.where(img == 1)[0]) > 500: 
 
-                    # constants
-                    area = 1
+                    # constants (their OG comment)
+                    area = 1 
                     ###QUESTION: is Zoom used anywhere else? and why do they divide by 1? 
                     zoom = math.sqrt(MIN_AREA_SIZE/area)
-                    aux = 1
+                    # indicates that we are looking at a useful liver mask png 
+                    aux = 1 
 
                     # write to crops txt file 
                     ###(this is an ouput correct?)
                     ###QUESTION: what does aux represent & what is liver_seg? 
                         ## aux seems to be a binary operator that just represents whether the metric of: 
                             ## "len(np.where(img == 1)[0]) > 500" was true or not 
+                            ## which is calculating the condition of whether we are within the liver or not 
                     ### Note: do we really still want to write to this crops_file text file if we are transitioning out of the text file system?
                     line = ' '.join([str(x) for x in [liver_seg, aux, total_mina, total_maxa, total_minb, total_maxb]])
                     crops_file.write(line + '\n')
@@ -225,14 +238,14 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
                     o_new = original_img[total_mina:total_maxa, total_minb:total_maxb] 
                     ### we save the original? matlab file to our OUTPUT path and make the new section variable key = to the new bounded box section
                     scipy.io.savemat(os.path.join(output_images_path_bb, dir_name, mat), mdict={'section': o_new})
-
                 
-                    ### lesion png, liver png, & results png: 
+                    ### for each useful liver mask slice, crop the lesion pngs, liver pngs, 
+                        # & liver mask predicted results pngs by the bounding box range: 
                         ### 1st- reads in the original png 
                         ### 2nd- makes a new variable to put the bounding box filter on it  
                         ### 3rd- saves it to the respective output path 
-
-                    # lesion png
+                    
+                    # lesion png 
                     original_label = misc.imread(os.path.join(labels_path, dir_name, png))
                     lbl_new = original_label[total_mina:total_maxa, total_minb:total_maxb]
                     misc.imsave(os.path.join(output_labels_path_bb, dir_name, png), lbl_new)
