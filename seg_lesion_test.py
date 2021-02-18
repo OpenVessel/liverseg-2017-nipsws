@@ -46,6 +46,7 @@ def seg_lesion_test(config, number_slices=3):
     print(result_root)
     print(crops_list)
     
+    #test
     test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_3_crops.txt')
     print(test_file)
     dataset = Dataset(None, test_file, None, database_root, number_slices, store_memory=False)
@@ -64,7 +65,7 @@ def seg_lesion_test(config, number_slices=3):
     ## 'crops_LiTS_gt.txt'
     ### D:\L_pipe\liver_open\liverseg-2017-nipsws\utils\crops_list\crops_predict_gt.tx
     ### I ->  
-    # print("uncropping results")
+    print("uncropping results")
     # utils.crop_to_image.crop(
     #     base_root=root_folder, 
     #     input_config=task_name, 
