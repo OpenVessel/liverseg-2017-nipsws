@@ -39,7 +39,7 @@ def seg_lesion_test(config, number_slices=3):
     model_name = os.path.join(logs_path, "seg_lesion.ckpt")
     #D:\L_pipe\liver_open\liverseg-2017-nipsws\seg_DatasetList\testing_volume_105_OV.txt
     #testing_volume_3_crops.txt
-    test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_OV.txt')
+    test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_OV_OG.txt')
 
     dataset = Dataset(None, test_file, None, database_root, number_slices, store_memory=False)
 

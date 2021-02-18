@@ -133,3 +133,5 @@ nifti_library/*
 *.local
 utils/crops_list/crops_LiTS_gt_2.txt
 utils/crops_list/crops_list_OV.txt
+seg_DatasetList/testing_volume_OV_OG.txt
+seg_DatasetList/training_volume_OV_OG.txt

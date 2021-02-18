@@ -185,7 +185,8 @@ def compute_3D_bbs_from_gt_liver(config):
                     res_liver_new = original_results_label[total_mina:total_maxa, total_minb:total_maxb]
                     misc.imsave(os.path.join(output_liver_results_path_bb, dir_name, png), res_liver_new)
 
-                    print("Success", "Directory:", liver_results, "Patient:", dir_name, "File:", png)
+                    if config.debug:
+                        print("Success", "Directory:", liver_results, "Patient:", dir_name, "File:", png)
 
                 else:
                     aux = 0
