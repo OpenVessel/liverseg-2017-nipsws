@@ -44,8 +44,8 @@ def seg_lesion_train(config, gpu_id, number_slices, batch_size, iter_mean_grad, 
     imagenet_ckpt = config.imagenet_ckpt
     ###
 
-    train_file = os.path.join(root_folder, 'seg_DatasetList', 'training_lesion_commonbb_nobackprop_3.txt')
-    val_file = os.path.join(root_folder, 'seg_DatasetList', 'testing_lesion_commonbb_nobackprop_3.txt')
+    train_file = os.path.join(root_folder, 'seg_DatasetList', 'training_lesion_commonbb_nobackprop_3.txt') #!!! Same file as training_volume_3_crops.txt ???
+    val_file = os.path.join(root_folder, 'seg_DatasetList', 'testing_lesion_commonbb_nobackprop_3.txt') #!!! Same file as testing_volume_3_crops.txt ???
 
     dataset = Dataset(train_file, None, val_file, database_root, number_slices, store_memory=False)
 

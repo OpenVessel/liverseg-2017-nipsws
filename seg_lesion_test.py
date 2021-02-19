@@ -40,7 +40,7 @@ def seg_lesion_test(config, number_slices=3):
     liver_results_path = os.path.join(database_root, 'seg_liver_ck')
     model_name = os.path.join(logs_path, "seg_lesion.ckpt")
     #test
-    test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_3_crops.txt')
+    test_file = os.path.join(root_folder, 'seg_DatasetList', 'testing_volume_3_crops.txt')
     dataset = Dataset(None, test_file, None, database_root, number_slices, store_memory=False)
 
     result_path = os.path.join(result_root, task_name)

@@ -10,7 +10,7 @@ def compute_3D_bbs_from_gt_liver(config):
     MIN_AREA_SIZE = 512.0*512.0
 
     ## this file is generated at the end 
-    crops_list_name = config.crops_list
+    crops_list_name = config.crops_list # crops_list_OV.txt
     phase = config.phase ## if/else 
 
     # 1/18/2021 change
@@ -51,7 +51,7 @@ def compute_3D_bbs_from_gt_liver(config):
     masks_folders = os.listdir(labels_liver_path) # liver seg 
     masks_folders = sorted(masks_folders, key=integerise)
 
-    print(type(masks_folders))
+    # print(type(masks_folders))
     ## alex code right 
     if phase == 'test':
 #calc where the start of the testing files are because liver_results are only being generated on testing data 
@@ -186,7 +186,7 @@ def compute_3D_bbs_from_gt_liver(config):
                     misc.imsave(os.path.join(output_liver_results_path_bb, dir_name, png), res_liver_new)
 
                     if config.debug:
-                        print("Success", "Directory:", liver_results, "Patient:", dir_name, "File:", png)
+                        print("Success" + "Directory:" + str(liver_results) + "Patient:" + str(dir_name) + "File:" + str(png))
 
                 else:
                     aux = 0

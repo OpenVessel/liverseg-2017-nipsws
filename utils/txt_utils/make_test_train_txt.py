@@ -101,9 +101,9 @@ def makeTrainTXT():
     lineList = makeTrainLine(listOfLists)
 
     if platform.system == "Windows":
-        TXTname = r"..\..\seg_DatasetList\training_volume_OV_OG_test.txt"
+        TXTname = r"..\..\seg_DatasetList\training_volume_OV.txt"
     else:
-        TXTname = "../../seg_DatasetList/training_volume_OV_OG.txt"
+        TXTname = "../../seg_DatasetList/training_volume_OV.txt"
 
     TXTfile = open(TXTname, "w")
 
@@ -117,9 +117,9 @@ def makeTestTXT():
     lineList = makeTestLine(listOfLists)
 
     if platform.system == "Windows":
-        TXTname = r"..\..\seg_DatasetList\testing_volume_OV_OG_test.txt"
+        TXTname = r"..\..\seg_DatasetList\testing_volume_OV.txt"
     else:
-        TXTname = "../../seg_DatasetList/testing_volume_OV_OG.txt"
+        TXTname = "../../seg_DatasetList/testing_volume_OV.txt"
 
     TXTfile = open(TXTname, "w")
     
