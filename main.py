@@ -21,7 +21,7 @@ class LiverLesion:
 
     def compute_3D_bbs_from_gt_liver(self):
         return compute_3D_bbs_from_gt_liver(self.config)
-    
+
 
     def sample_bbs(self, crops_list_sp):
         liver_masks_path = os.path.join(self.config.database_root, 'liver_seg')
