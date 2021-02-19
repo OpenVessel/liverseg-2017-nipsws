@@ -25,8 +25,9 @@ class LiverLesion:
 
     def sample_bbs(self, crops_list_sp):
         liver_masks_path = os.path.join(self.config.database_root, 'liver_seg')
+        lesion_masks_path = os.path.join(self.config.database_root, 'item_seg')
         data_aug_options = 8
-        return sample_bbs(crops_list_sp, data_aug_options, liver_masks_path)
+        return sample_bbs(crops_list_sp, data_aug_options, liver_masks_path, lesion_masks_path)
 
 
 
