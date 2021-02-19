@@ -1,4 +1,5 @@
 import os
+import platform
 import pandas as pd
 
 def listSort():
@@ -99,7 +100,12 @@ def makeTestLine(list):
 def makeTrainTXT():
     lineList = makeTrainLine(listOfLists)
 
-    TXTfile = open("../../seg_DatasetList/training_volume_OV_OG.txt", "w")
+    if platform.system() == "Windows":
+        TXTname = r"..\..\seg_DatasetList\training_volume_OV.txt"
+    else:
+        TXTname = "../../seg_DatasetList/training_volume_OV.txt"
+
+    TXTfile = open(TXTname, "w")
 
     for line in lineList:
         TXTfile.write(str(line) + "\n")
@@ -110,7 +116,12 @@ def makeTrainTXT():
 def makeTestTXT():
     lineList = makeTestLine(listOfLists)
 
-    TXTfile = open("../../seg_DatasetList/testing_volume_OV_OG.txt", "w")
+    if platform.system() == "Windows":
+        TXTname = r"..\..\seg_DatasetList\testing_volume_OV.txt"
+    else:
+        TXTname = "../../seg_DatasetList/testing_volume_OV.txt"
+
+    TXTfile = open(TXTname, "w")
     
     for line in lineList:
         TXTfile.write(str(line) + "\n")
@@ -131,11 +142,15 @@ def makeTestDF():
 
 # Header
 if __name__ == "__main__":
-    root_dataset = "../../LiTS_database/"
 
-    images_volumes = "images_volumes/"
-    item_seg = "item_seg/"
-    liver_seg = "liver_seg/"
+    if platform.system() == "Windows":
+        root_dataset = r"..\..\LiTS_database"
+    else:
+        root_dataset = "../../LiTS_database"
+
+    images_volumes = "images_volumes"
+    item_seg = "item_seg"
+    liver_seg = "liver_seg"
 
     listOfLists = listSort()
     makeTestTXT()

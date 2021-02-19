@@ -66,7 +66,7 @@ class LiverLesion:
         liver_masks_path = os.path.join(self.config.database_root, 'liver_seg')
         lesion_masks_path = os.path.join(self.config.database_root, 'item_seg')
         output_folder_path =  './det_DatasetList/'
-        crops_list_sp = './utils/crops_list/crops_LiTS_gt.txt'
+        crops_list_sp = os.path.join("utils", "crops_list", config.crops_list) # './utils/crops_list/crops_LiTS_gt.txt'
         #crops_list_sp = '../crops_list/crops_LiTS_gt.txt'
         output_file_name_sp = 'test_patches'
 
