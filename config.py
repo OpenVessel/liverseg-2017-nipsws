@@ -19,7 +19,7 @@ class Config:
         
         self.debug = 0
 
-        self.patient_range = [105,108]
+        self.patient_range = [105,108] # inclusive
 
 
     def get_log(self, task_name):

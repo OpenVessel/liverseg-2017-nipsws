@@ -37,7 +37,7 @@ def filter(base_root, config, crops_list='crops_LiTS_gt.txt', input_config='mask
 ## hard range input assoicated with error on line 60 #IOError:
 ## 105 131
 ## what are the inputs to this?
-    for i in range(config.patient_range[0], config.patient_range[1]):
+    for i in range(config.patient_range[0], config.patient_range[1] + 1):
         if i != 106: ## we did this skip of 106 because we test code on 1/19/2021
             print(i)
             folder_name = str(i)
