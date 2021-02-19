@@ -22,7 +22,7 @@ class Config:
 
         self.phase = 'test' ## train or test
 
-        self.crops_list = 'crops_list_OV.txt'
+        self.crops_list = 'crops_LiTS_gt.txt'
 
     def get_log(self, task_name):
         return os.path.join(self.root_folder, 'train_files', task_name, 'networks')

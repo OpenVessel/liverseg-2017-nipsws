@@ -20,6 +20,7 @@ import utils.det_filter
 def seg_lesion_test(config, number_slices=3):
 
     gpu_id = 0
+    number_slices = 3
 
     #crops_list = 'crops_LiTS_gt.txt'
     #crops_predict_gt.txt
@@ -29,18 +30,17 @@ def seg_lesion_test(config, number_slices=3):
 
     ### config constants ###
     database_root = config.database_root
+    ##
     logs_path = config.get_log(task_name)
     result_root = config.get_result_root('results')
-    root_folder = config.root_folder
+    root_folder = config.root_folder ### root folder?
     crops_list = config.crops_list
-    ###
+
     #seg_liver_ck
     liver_results_path = os.path.join(database_root, 'seg_liver_ck')
     model_name = os.path.join(logs_path, "seg_lesion.ckpt")
-    #D:\L_pipe\liver_open\liverseg-2017-nipsws\seg_DatasetList\testing_volume_105_OV.txt
-    #testing_volume_3_crops.txt
-    test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_OV_OG.txt')
-
+    #test
+    test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_3_crops.txt')
     dataset = Dataset(None, test_file, None, database_root, number_slices, store_memory=False)
 
     result_path = os.path.join(result_root, task_name)
@@ -49,18 +49,19 @@ def seg_lesion_test(config, number_slices=3):
     # 1. Does inference with the lesion segmentation network
     #testing_volume_105_OV.txt
     print("segmenting lesions")
-    segmentation.test(dataset, checkpoint_path, result_path, number_slices) 
+    #segmentation.test(dataset, checkpoint_path, result_path, number_slices) 
         # O -> results/seg_lesion_ck/.png
 
 
     # 2. Returns results to the original size (from cropped slices to 512x512)
     ## 'crops_LiTS_gt.txt'
     ### D:\L_pipe\liver_open\liverseg-2017-nipsws\utils\crops_list\crops_predict_gt.tx
+    ### I ->  
     print("uncropping results")
-    utils.crop_to_image.crop(
-        base_root=root_folder, 
-        input_config=task_name, 
-        crops_list=crops_list)
+    # utils.crop_to_image.crop(
+    #     base_root=root_folder, 
+    #     input_config=task_name, 
+    #     crops_list=crops_list)
         # O -> results/out_seg_lesion_ck/.png
 
 

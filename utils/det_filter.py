@@ -38,40 +38,42 @@ def filter(base_root, crops_list='crops_LiTS_gt.txt', input_config='masked_out_l
 ## 105 131
 ## what are the inputs to this?
     for i in range(105, 131):
-        if i != 106: ## we did this skip of 106 because we test code on 1/19/2021
-            print(i)
-            folder_name = str(i)
-            images = []
-            nm = folder_name + '/'
-            for x in results_lines:
-                if nm in x:
-                    images.append(x)
+        #if i != 106: ## we did this skip of 106 because we test code on 1/19/2021
+        print(i)
+        folder_name = str(i)
+        images = []
+        nm = folder_name + '/'
+        for x in results_lines:
+            if nm in x:
+                images.append(x)
 
-            slices_names = []
+        slices_names = []
 
-            if not os.path.exists(os.path.join(output_results_path, folder_name)):
-                os.makedirs(os.path.join(output_results_path, folder_name))
+        if not os.path.exists(os.path.join(output_results_path, folder_name)):
+            os.makedirs(os.path.join(output_results_path, folder_name))
 
-            for j in range(len(images)):
-                slices_names.append(images[j].split()[0])
+        for j in range(len(images)):
+            slices_names.append(images[j].split()[0])
 
-            unique_slices_names = np.unique(slices_names)
-            for x in range(len(unique_slices_names)):
-                total_mask = []
-                for l in range(len(slices_names)):
-                    if slices_names[l] == unique_slices_names[x]:
-                        if float(images[l].split()[3]) > th:
-                            aux_mask = np.zeros([512, 512])
-                            x_bb = int(float(images[l].split()[1]))
-                            y_bb = int(float(images[l].split()[2].split('\n')[0]))
-                            aux_name = images[l].split()[0] + '.png'
+        unique_slices_names = np.unique(slices_names)
+        for x in range(len(unique_slices_names)):
+            total_mask = []
+            for l in range(len(slices_names)):
+                if slices_names[l] == unique_slices_names[x]:
+                    if float(images[l].split()[3]) > th:
+                        aux_mask = np.zeros([512, 512])
+                        x_bb = int(float(images[l].split()[1]))
+                        y_bb = int(float(images[l].split()[2].split('\n')[0]))
+                        aux_name = images[l].split()[0] + '.png'
 
-                            #IOError: [Errno 2] No such file or directory: 'D:\\L_pipe\\liver_open\\liverseg-2017-nipsws\\results/masked_out_seg_lesion_ck\\106/359.png'
-                            total_patch = (np.array(Image.open(os.path.join(input_results_path, aux_name)), dtype=np.uint8))/255.0
+                        #IOError: [Errno 2] No such file or directory: 'D:\\L_pipe\\liver_open\\liverseg-2017-nipsws\\results/masked_out_seg_lesion_ck\\106/359.png'
+                        #print(input_results_path)
+                        print(os.path.join(input_results_path, aux_name))
+                        total_patch = (np.array(Image.open(os.path.join(input_results_path, aux_name)), dtype=np.uint8))/255.0
 
-                            cropped_patch = total_patch[x_bb: (x_bb + 80), y_bb:(y_bb + 80)]
-                            aux_mask[x_bb: (x_bb + 80), y_bb:(y_bb + 80)] = cropped_patch
-                            total_mask.append(aux_mask)
+                        cropped_patch = total_patch[x_bb: (x_bb + 80), y_bb:(y_bb + 80)]
+                        aux_mask[x_bb: (x_bb + 80), y_bb:(y_bb + 80)] = cropped_patch
+                        total_mask.append(aux_mask)
                 if len(total_mask) > 0:
                     if len(total_mask) > 1:
                         summed_mask = np.sum(total_mask, axis=0)
