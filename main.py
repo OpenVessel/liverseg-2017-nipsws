@@ -30,7 +30,6 @@ class LiverLesion:
         return sample_bbs(crops_list_sp, data_aug_options, liver_masks_path, lesion_masks_path)
 
 
-
     def det_lesion_test(self, val_file_pos, val_file_neg):
         return det_lesion_test(self.config, val_file_pos, val_file_neg)
 
@@ -76,6 +75,14 @@ class LiverLesion:
         #runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(test_volume_txt))
         crops_df = runStepWithTime('compute_bbs_from_gt_liver', lambda: self.compute_3D_bbs_from_gt_liver())
         patches =  runStepWithTime('sample_bbs_test', lambda: self.sample_bbs(crops_df))
+
+        print("----- WHAT GREG CARES ABOUT -----")
+        print('TEST POSITIVE DATAFRAME')
+        print(patches["test_pos"].head())
+        print('-'*40)
+        print('TEST NEGATIVE DATAFRAME')
+        print(patches["test_neg"].head())
+
         runStepWithTime('det_lesion_test', lambda: self.det_lesion_test(patches["test_pos"], patches["test_neg"]))
         runStepWithTime('seg_lesion_test', lambda: self.seg_lesion_test())
 
