@@ -100,7 +100,7 @@ def makeTestLine(list):
 def makeTrainTXT():
     lineList = makeTrainLine(listOfLists)
 
-    if platform.system == "Windows":
+    if platform.system() == "Windows":
         TXTname = r"..\..\seg_DatasetList\training_volume_OV.txt"
     else:
         TXTname = "../../seg_DatasetList/training_volume_OV.txt"
@@ -116,7 +116,7 @@ def makeTrainTXT():
 def makeTestTXT():
     lineList = makeTestLine(listOfLists)
 
-    if platform.system == "Windows":
+    if platform.system() == "Windows":
         TXTname = r"..\..\seg_DatasetList\testing_volume_OV.txt"
     else:
         TXTname = "../../seg_DatasetList/testing_volume_OV.txt"
@@ -143,7 +143,7 @@ def makeTestDF():
 # Header
 if __name__ == "__main__":
 
-    if platform.system == "Windows":
+    if platform.system() == "Windows":
         root_dataset = r"..\..\LiTS_database"
     else:
         root_dataset = "../../LiTS_database"
