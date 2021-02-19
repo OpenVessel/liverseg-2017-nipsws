@@ -164,10 +164,10 @@ def sample_bbs(crops_df, data_aug_options, liver_masks_path):
     # make dfs
     cols = ["file_name", "a1", "b1", "data_aug_option"]
     return {
-        "test_pos":  pd.DataFrame(test_positive_df_rows, columns=col), 
-        "test_neg":  pd.DataFrame(test_negative_df_rows, columns=col),
-        "train_pos": pd.DataFrame(train_positive_df_rows, columns=col), 
-        "train_neg": pd.DataFrame(train_negative_df_rows, columns=col)
+        "test_pos":  pd.DataFrame(test_positive_df_rows, columns=cols), 
+        "test_neg":  pd.DataFrame(test_negative_df_rows, columns=cols),
+        "train_pos": pd.DataFrame(train_positive_df_rows, columns=cols), 
+        "train_neg": pd.DataFrame(train_negative_df_rows, columns=cols)
     }
     
 
