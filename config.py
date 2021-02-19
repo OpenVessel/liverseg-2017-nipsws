@@ -19,6 +19,8 @@ class Config:
         
         self.debug = 0
 
+        self.patient_range = [105,108]
+
 
     def get_log(self, task_name):
         return os.path.join(self.root_folder, 'train_files', task_name, 'networks')

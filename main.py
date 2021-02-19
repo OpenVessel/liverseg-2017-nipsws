@@ -7,6 +7,7 @@ from utils.sampling_bb.sample_bbs import sample_bbs
 from det_lesion_test import det_lesion_test
 from seg_lesion_test import seg_lesion_test
 import time
+import math
 
 
 class LiverLesion:
@@ -54,14 +55,17 @@ class LiverLesion:
             print('Running step: ' + name + "\n")
             start_time = time.time()
 
-            step_output = step()
+            try:
+                step_output = step()
+            except:
+                raise Exception('ERROR running')
             
             print('\nDone step: '+ name)
 
             ## run time
             total_time = int(time.time() - start_time)
-            time_list.append(total_time)
-            print ("\nTime taken: " + str(total_time) + " seconds or, " + str(total_time/60) + " minutes to run\n")
+            time_list.append({'name': name, 'time', total_time})
+            print("\nTime taken: {} seconds or {} minutes {}s to run\n".format(total_time, math.floor(total_time/60)), total_time % 60))
 
             # reset tf graph for memory purposes
             tf.reset_default_graph()
@@ -72,26 +76,21 @@ class LiverLesion:
         test_volume_txt = 'seg_DatasetList/testing_volume_OV.txt'
 
         # run workflow
-        #runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(test_volume_txt))
+        runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(test_volume_txt))
         crops_df = runStepWithTime('compute_bbs_from_gt_liver', lambda: self.compute_3D_bbs_from_gt_liver())
         patches =  runStepWithTime('sample_bbs_test', lambda: self.sample_bbs(crops_df))
-
-        print("----- WHAT GREG CARES ABOUT -----")
-        print('TEST POSITIVE DATAFRAME')
-        print(patches["test_pos"].head())
-        print('-'*40)
-        print('TEST NEGATIVE DATAFRAME')
-        print(patches["test_neg"].head())
-
         runStepWithTime('det_lesion_test', lambda: self.det_lesion_test(patches["test_pos"], patches["test_neg"]))
-        runStepWithTime('seg_lesion_test', lambda: self.seg_lesion_test())
+        runStepWithTime('seg_lesion_test', lambda: self.seg_lesion_test()) ## TODO: crops_list_gt.txt --> df
 
 
-        print("Time for each function: ")
-        for func in range(len(test_steps)):
-            print("\t" + str(test_steps[func][0]) + ": " + str(time_list[func]) + " seconds, " + str(time_list[func]/60) + " minutes.\n")
+        print("---SUMMARY---")
+        for step in time_list:
+            print("Step: ", step['name'])
+            step_time = step['time']
+            print("\nTime taken: {} seconds or {} minutes {}s to run\n".format(step_time, math.floor(step_time/60)), step_time % 60))
         
-        print("Total time: " + str(sum(time_list)) + " seconds, " + str(sum(time_list)/60) + " minutes.\n")
+        total_time = sum(time_list)
+        print("\nTotal time taken: {} seconds or {} minutes {}s to run\n".format(total_time, math.floor(total_time/60)), total_time % 60))
 
 if __name__ =='__main__':
     from config import Config
