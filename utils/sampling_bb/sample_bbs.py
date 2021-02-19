@@ -144,15 +144,15 @@ def sample_bbs(crops_df, data_aug_options, liver_masks_path, lesion_masks_path):
                             if pos_lesion > mult:
                                 if int(liver_seg_file.split(os.path.sep)[-2]) < 105:
                                     for j in range(data_aug_options):
-                                        train_positive_df_rows.append(['images_volumes/{}'.format(file), a1, b1, j+1])
+                                        train_positive_df_rows.append(['images_volumes/{}'.format(liver_seg_file), a1, b1, j+1])
                                 else:
-                                    test_positive_df_rows.append(['images_volumes/{}'.format(file), a1, b1, 1])
+                                    test_positive_df_rows.append(['images_volumes/{}'.format(liver_seg_file), a1, b1, 1])
                             else:
                                 if int(liver_seg_file.split(os.path.sep)[-2]) < 105:
                                     for j in range(data_aug_options):
-                                        train_negative_df_rows.append(['images_volumes/{}'.format(file), a1, b1, j+1])
+                                        train_negative_df_rows.append(['images_volumes/{}'.format(liver_seg_file), a1, b1, j+1])
                                 else:
-                                    test_negative_df_rows.append(['images_volumes/{}'.format(file), a1, b1, 1])
+                                    test_negative_df_rows.append(['images_volumes/{}'.format(liver_seg_file), a1, b1, 1])
 
     # make dfs
     cols = ["file_name", "a1", "b1", "data_aug_option"]
