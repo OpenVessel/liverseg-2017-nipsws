@@ -136,3 +136,12 @@ utils/crops_list/crops_list_OV.txt
 crops_LiTS_gt.txt
 seg_DatasetList/testing_volume_OV_OG.txt
 seg_DatasetList/training_volume_OV_OG.txt
+seg_DatasetList/testing_volume_OV_OG_test.txt
+seg_DatasetList/training_volume_OV_OG_test.txt
+detection_results/det_lesion_ck/hard_results.txt
+detection_results/det_lesion_ck/soft_results.txt
+det_DatasetList/testing_positive_det_patches_test_patches_dummy.txt
+det_DatasetList/testing_negative_det_patches_test_patches_dummy.txt
+predict_database/liver_results/105.rar
+predict_database/seg_liver_ck/105.rar
+utils/crops_list/crops_LiTS_gt.txt

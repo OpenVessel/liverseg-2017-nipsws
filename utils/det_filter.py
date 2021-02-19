@@ -38,7 +38,6 @@ def filter(base_root, crops_list='crops_LiTS_gt.txt', input_config='masked_out_l
 ## 105 131
 ## what are the inputs to this?
     for i in range(105, 131):
-        #if i != 106: ## we did this skip of 106 because we test code on 1/19/2021
         print(i)
         folder_name = str(i)
         images = []
