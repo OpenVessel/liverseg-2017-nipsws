@@ -49,7 +49,7 @@ def seg_lesion_test(config, number_slices=3):
     # 1. Does inference with the lesion segmentation network
     #testing_volume_105_OV.txt
     print("segmenting lesions")
-    #segmentation.test(dataset, checkpoint_path, result_path, number_slices) 
+    segmentation.test(dataset, checkpoint_path, result_path, number_slices) 
         # O -> results/seg_lesion_ck/.png
 
 
@@ -58,10 +58,10 @@ def seg_lesion_test(config, number_slices=3):
     ### D:\L_pipe\liver_open\liverseg-2017-nipsws\utils\crops_list\crops_predict_gt.tx
     ### I ->  
     print("uncropping results")
-    # utils.crop_to_image.crop(
-    #     base_root=root_folder, 
-    #     input_config=task_name, 
-    #     crops_list=crops_list)
+    utils.crop_to_image.crop(
+        base_root=root_folder, 
+        input_config=task_name, 
+        crops_list=crops_list)
         # O -> results/out_seg_lesion_ck/.png
 
 

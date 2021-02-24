@@ -632,10 +632,10 @@ def test(dataset, checkpoint_path, result_path, number_slices=1, volume=False, c
 
                 aux_var = curr_frames[number_of_slices / 2][0]
                 scipy.misc.imsave(os.path.join(result_path, curr_ct_scan, aux_var), res_np)
-                print 'Saving ' + os.path.join(result_path, curr_ct_scan, aux_var)
+                print ('Saving ' + os.path.join(result_path, curr_ct_scan, aux_var))
                 for i in range(number_of_slices):
                     aux_var = curr_frames[i][0]
                     if not os.path.exists(os.path.join(result_path, curr_ct_scan, aux_var)):
                         res_np = res.astype(np.float32)[0, :, :, i]
                         scipy.misc.imsave(os.path.join(result_path, curr_ct_scan, aux_var), res_np)
-                        print 'Saving ' + os.path.join(result_path, curr_ct_scan, aux_var)
+                        print ('Saving ' + os.path.join(result_path, curr_ct_scan, aux_var))
