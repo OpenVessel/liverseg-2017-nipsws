@@ -1,7 +1,0 @@
-images_volumes/129/105 97.0 329.0
-images_volumes/129/105 147.0 329.0
-images_volumes/129/105 147.0 379.0
-images_volumes/129/105 347.0 229.0
-images_volumes/129/105 347.0 279.0
-images_volumes/129/105 397.0 229.0
-images_volumes/129/105 397.0 279.0

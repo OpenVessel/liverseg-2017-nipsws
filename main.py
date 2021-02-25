@@ -99,10 +99,6 @@ class LiverLesion:
         
         test_steps = [
             ['seg_liver_test', self.seg_liver_test], ## seg_liver_test.py ## OUTPUT SEG_LIVER_ck
-            ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ## compute_3D_bbs_from_gt_liver.py ## 
-            ['sample_bbs', self.sample_bbs], ### sample_bbs.py
-            ['det_lesion_test', self.det_lesion_test], ### det_lesion_test.py
-            ['seg_lesion_test', self.seg_lesion_test] ##### seg_lesion_test.py
         ]
 
         time_list = []
@@ -133,16 +129,6 @@ class LiverLesion:
         train_steps = [
             ['seg_liver_train', self.seg_liver_train], ### seg_liver_train.py
             ['seg_liver_test', self.seg_liver_test], ### seg_liver_test.py
-
-            ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ### compute_3D_bbs_from_gt_liver.py
-
-            ['sample_bbs', self.sample_bbs], ### sample_bbs.py
-
-            ['det_lesion_train', self.det_lesion_train], ### det_lesion_train.py
-            ['det_lesion_test', self.det_lesion_test], ### det_lesion_test.py
-
-            ['seg_lesion_train', self.seg_lesion_train], ##### seg_lesion_train.py
-            ['seg_lesion_test', self.seg_lesion_test] ##### seg_lesion_test.py
         ]
 
         time_list = []
