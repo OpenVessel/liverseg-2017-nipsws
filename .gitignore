@@ -145,3 +145,4 @@ det_DatasetList/testing_negative_det_patches_test_patches_dummy.txt
 predict_database/liver_results/105.rar
 predict_database/seg_liver_ck/105.rar
 utils/crops_list/crops_LiTS_gt.txt
+LiTS_database/liver_seg.zip
