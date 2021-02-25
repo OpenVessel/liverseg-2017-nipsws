@@ -17,12 +17,13 @@ import scipy.misc
 from PIL import Image
 slim = tf.contrib.slim
 from tensorflow.contrib.slim.nets import resnet_v1
-import scipy.io
+import scipy.io 
 import scipy.misc
 
 DTYPE = tf.float32
 
-### Function from old tensorflow that wan't working
+
+### Function from old tensorflow that wan't working (their comments or ours?)
 def upsample_filt(size):
     """
     Make a 2D bilinear kernel suitable for upsampling of the given (h, w) size.
@@ -35,11 +36,11 @@ def upsample_filt(size):
     og = np.ogrid[:size, :size]
     return (1 - abs(og[0] - center) / factor) * \
            (1 - abs(og[1] - center) / factor)
-### Ignore it. We can find a way to remove this
+### Ignore it. We can find a way to remove this (their comments or ours?)
 
 
-# set parameters s.t. deconvolutional layers compute bilinear interpolation
-# N.B. this is for deconvolution without groups
+# set parameters so that DEconvolutional layers compute bilinear interpolation
+# Note: this is for deconvolution without groups
 def interp_surgery(variables):
     interp_tensors = []
     for v in variables:
@@ -89,14 +90,13 @@ def binary_cross_entropy(output, target, epsilon=1e-8, name='bce_loss'):
     with tf.name_scope(name):
         return tf.reduce_mean(-(target * tf.log(output + epsilon) +
                               (1. - target) * tf.log(1. - output + epsilon))), output, target
-                              
 
 def preprocess_img(image, x_bb, y_bb, ids=None):
     """Preprocess the image to adapt it to network requirements
-    Args:
+    Args: 
     Image we want to input the network (W,H,3) numpy array
-    Returns:
-    Image ready to input the network (1,W,H,3)
+    Returns: 
+    Image ready to input the network (1,W,H,3) 
     """
     if ids == None:
 
@@ -162,14 +162,14 @@ def preprocess_labels(label):
         
         
 def det_lesion_resnet(inputs, is_training_option=False, scope='det_lesion'):
-    """Defines the network
+    """ Defines the network
     Args:
     inputs: Tensorflow placeholder that contains the input image
     scope: Scope name for the network
     Returns:
     net: Output Tensor of the network
     end_points: Dictionary with all Tensors of the network
-    """
+    """ 
 
     with tf.variable_scope(scope, 'det_lesion', [inputs]) as sc:
         end_points_collection = sc.name + '_end_points'
@@ -461,7 +461,7 @@ def validate(dataset, checkpoint_path, result_path, number_slices=1, config=None
             image = preprocess_img(img, x_bb, y_bb)
             res = sess.run(probabilities, feed_dict={input_image: image})
             label = np.array(label).astype(np.float32).reshape(batch_size, 1)
-           
+            
             for i in range(0, batch_size):
                 count_patches +=1
                 img_part = img[i]
@@ -511,6 +511,7 @@ def test(dataset, checkpoint_path, result_path, number_slices=1, volume=False, c
     Returns:
     net:
     """
+
     if config is None:
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
