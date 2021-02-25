@@ -89,10 +89,10 @@ class LiverLesion:
         for step in time_list:
             print("Step: ", step['name'])
             step_time = step['time']
-            print("\nTime taken: {} seconds or {} minutes {}s to run\n".format(step_time, math.floor(step_time/60)), step_time % 60))
+            print("\nTime taken: {} seconds or {} minutes {}s to run\n".format(step_time, math.floor(step_time/60), step_time % 60))
         
         total_time = sum(time_list)
-        print("\nTotal time taken: {} seconds or {} minutes {}s to run\n".format(total_time, math.floor(total_time/60)), total_time % 60))
+        print("\nTotal time taken: {} seconds or {} minutes {}s to run\n".format(total_time, math.floor(total_time/60), total_time % 60))
 
 if __name__ =='__main__':
     from config import Config
