@@ -97,8 +97,8 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options, liver_masks
 
     train_positive_file = open(os.path.join(output_folder_path, 'training_positive_det_patches_' + output_file_name + '_OV.txt'), 'w')
     train_negative_file = open(os.path.join(output_folder_path, 'training_negative_det_patches_' + output_file_name + '_OV.txt'), 'w')
-    test_positive_file = open(os.path.join(output_folder_path, 'testing_positive_det_patches_' + output_file_name + '_OVxt'), 'w')
-    test_negative_file = open(os.path.join(output_folder_path, 'testing_negative_det_patches_' + output_file_name + '_OVxt'), 'w')
+    test_positive_file = open(os.path.join(output_folder_path, 'testing_positive_det_patches_' + output_file_name + '_OV.txt'), 'w')
+    test_negative_file = open(os.path.join(output_folder_path, 'testing_negative_det_patches_' + output_file_name + '_OV.txt'), 'w')
 
     # read in bbs from txt file
     if crops_list is not None:

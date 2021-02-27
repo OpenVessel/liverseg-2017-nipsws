@@ -34,7 +34,7 @@ def det_lesion_test(config):
     val_file_pos = os.path.join(root_folder, 'det_DatasetList', 'testing_positive_det_patches_test_patches_OV.txt')
     val_file_neg = os.path.join(root_folder, 'det_DatasetList', 'testing_negative_det_patches_test_patches_OV.txt')
 
-
+#D:\L_pipe\liver_open\liverseg-2017-nipsws\det_DatasetList\testing_positive_det_patches_test_patches_OVxt
     # val_file_pos = os.path.join(root_folder, 'det_DatasetList', 'testing_positive_det_patches.txt')
     # val_file_neg = os.path.join(root_folder, 'det_DatasetList', 'testing_negative_det_patches.txt')
 
