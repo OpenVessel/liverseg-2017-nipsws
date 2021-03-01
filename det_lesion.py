@@ -39,22 +39,52 @@ def upsample_filt(size):
 ### Ignore it. We can find a way to remove this (their comments or ours?)
 
 
-# set parameters so that DEconvolutional layers compute bilinear interpolation
-# Note: this is for deconvolution without groups
+# set parameters so that Deconvolutional layers compute bilinear interpolation
+# Note: this is for deconvolution without groups 
+# this function reassigns some of our "-up" global tf variables into being able to be bilinearly interpolated 
+#QUESTION: #what goes into variables? 
+    #global variables that come form tf.global_variables_initializer()
 def interp_surgery(variables):
+    # this will be our outputs 
     interp_tensors = []
     for v in variables:
+        #QUESTION: what variables have in their name "-up"? 
+        # for all variables with "-up" in their name 
         if '-up' in v.name:
+            #we are getting the shape of the variable which should be 4D 
+                #k & m are inputs and output channels 
+                #h & w are filters that we want to be square  
             h, w, k, m = v.get_shape()
-            tmp = np.zeros((m, k, h, w))
+            
+            #creates a temporary variable that has the same shape as the variable 
+                #  except everything inside are 0's and now they switch the order of the variable shape 
+                # instead of h,w,k,m it's now m,k,h,w 
+            tmp = np.zeros((m, k, h, w)) 
+
+            # checks to see that m & k are the same (since they are apparently input & output channels)
             if m != k:
                 print('input + output channels need to be the same')
                 raise
+            # filters need to be square so the lengths of the filters need to be the same 
+                #raises an error if condition not met 
             if h != w:
                 print('filters need to be square')
                 raise
+
+            #this makes a 2D* bilinear kernel suitable for upsampling* 
+            #QUESTION: what is upsampling? what is bilinear interpolation? 
+            #QUESTION: it's supposed to be given an (h,w) size parameter but it is only given h
             up_filter = upsample_filt(int(h))
+            
+            # the up_filter is a 4D input except the 3D & 4D are 0's since these are the filter lengths
+            # what is the difference between tmp = np.zeroes((m,k,h,w)) & tmp[range(m), range(k), :, :]
+                # but really the better question is, what's the difference between range(m) & : in displaying/accessing a columns' values
             tmp[range(m), range(k), :, :] = up_filter
+            
+            #appending the newly assigned variables (that were taken in as inputs) into the output list (interp_sensors)
+            #How: changes the shape with tmp.transpose 
+            # use_locking = Passing use_locking=True when creating a TensorFlow optimizer, or a variable assignment op, causes a lock to be acquired around the relevant updates to the variable. Other optimizers/assignments on the same variable also created with use_locking=True will be serialized. 2 caveats to keep in mind. 
+            # validate_shape = True means that we have to pass in a specified shape of a specific input which is apparently the tmp.transpose variable 
             interp_tensors.append(tf.assign(v, tmp.transpose((2, 3, 1, 0)), validate_shape=True, use_locking=True))
     return interp_tensors
 
@@ -62,12 +92,14 @@ def interp_surgery(variables):
 def det_lesion_arg_scope(weight_decay=0.0002):
     """Defines the arg scope.
     Args:
-    weight_decay: The l2 regularization coefficient.
-    Returns:
-    An arg_scope.
+    weight_decay: The l2 regularization coefficient. 
+        #Small values of L2 can help prevent overfitting the training data.
+    Returns: An arg_scope.
     """
     with slim.arg_scope([slim.conv2d, slim.convolution2d_transpose],
+                        # relu is our activation function 
                         activation_fn=tf.nn.relu,
+                        # 
                         weights_initializer=tf.random_normal_initializer(stddev=0.001),
                         weights_regularizer=slim.l2_regularizer(weight_decay),
                         biases_initializer=tf.zeros_initializer,
@@ -75,41 +107,62 @@ def det_lesion_arg_scope(weight_decay=0.0002):
                         padding='SAME') as arg_sc:
         return arg_sc
         
-        
+    #Defines the binary cross entropy loss        
 def binary_cross_entropy(output, target, epsilon=1e-8, name='bce_loss'):
     """Defines the binary cross entropy loss
     Args:
     output: the output of the network
     target: the ground truth
+    epsilon: what does the variable epsilon 
+    name: what do you want to name the output?? 
     Returns:
     A scalar with the loss, the output and the target
     """
+    #cast the ground truth target value in the format of a float 
     target = tf.cast(target, tf.float32)
+    #cast the output of the deep learning model variable in the format of a float 
+    #QUESTION: what is tf.squeeze? 
     output = tf.cast(tf.squeeze(output), tf.float32)
     
+    # name the output ? 
     with tf.name_scope(name):
+        # calculate the loss based off of binary cross-entropy mathematics 
+        #QUESTION: what is tf.reduce_mean? 
         return tf.reduce_mean(-(target * tf.log(output + epsilon) +
                               (1. - target) * tf.log(1. - output + epsilon))), output, target
 
+#Preprocess the image to adapt it to network requirements
+# sample bounding boxes are manipulated here 
 def preprocess_img(image, x_bb, y_bb, ids=None):
     """Preprocess the image to adapt it to network requirements
     Args: 
-    Image we want to input the network (W,H,3) numpy array
+    image: Image we want to input the network (W,H,3) numpy array (W= width = x_bb, H= height = y_bb)
+    ids: number of flips that you want the image to go through 
     Returns: 
     Image ready to input the network (1,W,H,3) 
     """
+    #if ids= None then it is assumed we don't want any flips 
     if ids == None:
-
+        #makes an array of 1's in the shape of the width of the image 
         ids = np.ones(np.array(image).shape[0])
 
+    # this variable is a list that creates a list of lists that has the same width as the image 
+        # this seems to create a 2d array of lists 
     images = [[] for i in range(np.array(image).shape[0])]
     
+    # for loop that goes through the width of the image 
     for j in range(np.array(image).shape[0]):
+        
+        #QUESTION: why is this a static 3? for what reason 3? 
+            # is it about 3 dimensions of the image? 
         for i in range(3):
             aux = np.array(scipy.io.loadmat(image[j])['section'], dtype=np.float32)
             crop = aux[int(float(x_bb[j])):int((float(x_bb[j])+80)), int(float(y_bb[j])): int((float(y_bb[j])+80))]
-            """Different data augmentation options
-                """
+            """Different data augmentation options"""
+            # I believe this section is set up like this because our txt files that come out of sample_BBs 
+            # have the same information patient and slice information and coordinates for as many data augmentation options we wanted at the time 
+            # this is shown within this function by the fact that they are all elif statements and will only do that data augmentation option that is correlated with it's number and won't do all of the data augmentations at once.  
+            
             if id == '2':
                 crop = np.fliplr(crop)
             elif id == '3':
@@ -276,7 +329,7 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
         tf.summary.scalar('learning_rate', learning_rate)
         optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
         grads_and_vars = optimizer.compute_gradients(total_loss)
-        with tf.name_scope('grad_accumulator'):
+        with tf.name_scope('grad_accumulator'): 
             grad_accumulator = []
             for ind in range(0, len(grads_and_vars)):
                 if grads_and_vars[ind][0] is not None:

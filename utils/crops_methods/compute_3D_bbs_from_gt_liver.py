@@ -4,13 +4,15 @@ import os
 import glob
 import math
 import scipy.io 
+import visualize_np as viz 
 
 # This script computes the bounding boxes around the liver from the ground truth liver mask labels, computing
     # a single 3D bb for all the volume of the liver. 
+    
 
 def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
 
-    #used in an used function 
+    #used in an un-used function 
     MIN_AREA_SIZE = image_size*image_size 
 
     ## this file is generated at the end 
@@ -114,18 +116,23 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
             for j in range(0, depth_of_volume):
                 ### read the j-th png within the patient's ground truth liver mask folder 
                 img = misc.imread(file_names[j])
+                print(img)
+                viz.save_np(img, os.path.join('/Users/alexschweizer/Documents/GitHub/liverseg-2017-nipsws/visualized_data_results', dir_name, file_names[j])) 
 
                 # 0 to 255 grey scale 
-                ### QUESTION: what is the smallest grey pixel value? just to make sure we aren't cutting out any pieces of the liver (besides any noise)
+                #normalization (spectrum between 0 & 1)
+                ### QUESTION: what is the smallest grey pixel value?4 just to make sure we aren't cutting out any pieces of the liver (besides any noise)
                 img = img/255.0 
-                    
+
+                #binarization on 0.5 (127.5 on grey scale) threshold 
                 img[np.where(img > 0.5)] = 1
                 img[np.where(img < 0.5)] = 0
+                print(img)
                 #QUESTION: are a & b lists of coordinates? 
                     #they should be lists (len (a) is called right after) but what does this look like? 
                 
                 a, b = np.where(img == 1)
-                #print("a:", a, "b:", b)
+                print("a:", a, "b:", b)
                 
                 ### If there are any truth values within the binarized liver mask (there are any values > 0.5 on the normalized pixel scale) then ...
                     # basically: if the PNG is not completely black then ... 
