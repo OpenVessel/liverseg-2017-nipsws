@@ -43,8 +43,7 @@ class LiverLesion:
         """
             Driver code for testing the model.
         """
-        
-        
+
 
         time_list = []
         last_step_output = None
