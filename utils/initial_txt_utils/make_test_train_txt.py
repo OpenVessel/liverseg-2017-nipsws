@@ -107,18 +107,18 @@ def generate_test_train_volume_dfs(dataset_root, images_volumes, item_seg, liver
 
 if __name__ == "__main__":
 
-    if platform.system() == "Windows":
-        dataset_root = r"..\..\LiTS_database"
-    else:
-        dataset_root = "../../LiTS_database"
+    # if platform.system() == "Windows":
+    #     dataset_root = r"..\..\LiTS_database"
+    # else:
+    #     dataset_root = "../../LiTS_database"
 
-    images_volumes = "images_volumes"
-    item_seg = "item_seg"
-    liver_seg = "liver_seg"
+    # images_volumes = "images_volumes"
+    # item_seg = "item_seg"
+    # liver_seg = "liver_seg"
 
-    listOfLists = sort_list(dataset_root, images_volumes, item_seg, liver_seg)
-    generate_test_txt(lol)
-    generate_train_txt(lol)
+    # listOfLists = sort_list(dataset_root, images_volumes, item_seg, liver_seg)
+    # generate_test_txt(lol)
+    # generate_train_txt(lol)
 
-    testDF = generate_testing_volume_df(lol)
-    trainDF = generate_training_volume_df(lol)
+    # testDF = generate_testing_volume_df(lol)
+    # trainDF = generate_training_volume_df(lol)

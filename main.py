@@ -4,6 +4,7 @@ import tensorflow as tf
 from seg_liver_test import seg_liver_test
 from utils.crops_methods.compute_3D_bbs_from_gt_liver import compute_3D_bbs_from_gt_liver
 from utils.sampling_bb.sample_bbs import sample_bbs
+from utils.initial_txt_utils.make_test_train_txt import generate_test_train_volume_dfs
 from det_lesion_test import det_lesion_test
 from seg_lesion_test import seg_lesion_test
 import time
@@ -39,7 +40,7 @@ class LiverLesion:
         return seg_lesion_test(self.config, self.number_slices)
     
 
-    def test(self):
+    def test(self, images_volumes, item_seg, liver_seg):
         """
             Driver code for testing the model.
         """
@@ -73,11 +74,11 @@ class LiverLesion:
 
             return step_output
 
-
-        test_volume_txt = 'seg_DatasetList/testing_volume_OV.txt'
+        print('Generating training/testing volumes')
+        training_volume, testing_volume = generate_test_train_volume_dfs(self.config.database_root, images_volumes, item_seg, liver_seg)
 
         # run workflow
-        runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(test_volume_txt))
+        runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(testing_volume))
         crops_df = runStepWithTime('compute_bbs_from_gt_liver', lambda: self.compute_3D_bbs_from_gt_liver())
         patches =  runStepWithTime('sample_bbs_test', lambda: self.sample_bbs(crops_df))
         runStepWithTime('det_lesion_test', lambda: self.det_lesion_test(patches["test_pos"], patches["test_neg"]))
@@ -99,7 +100,7 @@ if __name__ =='__main__':
     config = Config()
 
     liver_lesion = LiverLesion(config)
-    liver_lesion.test()
+    liver_lesion.test('images_volumes', 'item_seg', 'liver_seg')
     
 
 
