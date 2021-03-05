@@ -3,7 +3,6 @@ import scipy.misc
 import scipy.io
 import os
 #from utils.parse_result import parse_result
-
     #create a function that parses out only the slices with useful liver mask pngs from 
         # the crops_list.txt file generated in 3D bb's 
 def parse_result(result): 
@@ -36,7 +35,7 @@ def parse_result(result):
         # check the ASSUMPTION about where we use the test_patches.txt outputs from this function
 def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks_path, output_folder_path):
     """Samples bounding boxes around liver region for a test image.
-    Args:
+    Args: 
     crops_list: Textfile, each row with filename, boolean indicating if there is liver, x1, x2, y1, y2, zoom.
     output_file_name: File name for the output file generated, that will be of the form file name, x1, y1, 0. (Then, each bb is of 80x80, and the 0 is related
     to the data augmentation applied, which is *none* for test images)
@@ -162,7 +161,6 @@ def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks
                         if (mina + mult*x) > 15.0 and ((mina + (x+1)*mult) < 512.0) and (minb + y*mult) > 15.0 and ((minb + (y+1)*mult) < 512.0):
                             #recalculate 
                             a1 = mina + mult*x - 15.0 
-
                             b1 = minb + y*mult - 15.0
                         
                         # we write our new outputs to the output file we created 
@@ -171,6 +169,7 @@ def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks
                         #QUESTION: instead of putting the string images_volumes/ and then the variable "file" would it be more simple & efficient
                             # to just get rid of the string and use the variable "id_img" instead? 
                         #QUESTION: why not include the maxes as well? Where is this file being translated (probably Liver Lesion)?  
+                        # we are writing each bounding box mina & minb starting point for each patient and each slice that is within the liver's slice range
                         test_file.write('images_volumes/{} {} {} 1 \n'.format(file, a1, b1))
                             
     test_file.close() 

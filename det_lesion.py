@@ -96,14 +96,24 @@ def det_lesion_arg_scope(weight_decay=0.0002):
         #Small values of L2 can help prevent overfitting the training data.
     Returns: An arg_scope.
     """
-    with slim.arg_scope([slim.conv2d, slim.convolution2d_transpose],
+    with slim.arg_scope(
+                        #List or tuple of operations to set argument scope
+                        #QUESTION: what is slim.conv2d, convolution2d_transpose ? 
+                        [slim.conv2d, slim.convolution2d_transpose], 
                         # relu is our activation function 
+                        # QUESTION: can we get the leaky activation function or others? 
                         activation_fn=tf.nn.relu,
-                        # 
+                        # looks like we are going to start with random "normal" weights
+                        # QUESTION: what other options are there for starting weights?  
                         weights_initializer=tf.random_normal_initializer(stddev=0.001),
+                        # QUESTION: what do different weight decays do to the weight regularizer and what are our options? 
                         weights_regularizer=slim.l2_regularizer(weight_decay),
+                        # QUESTION: what is this and what are our options? 
                         biases_initializer=tf.zeros_initializer,
+                        # QUESTION: what is this? and what are our options? 
                         biases_regularizer=None,
+                        # padding = SAME means we will pad the input with the needed extra 0's in order to make sure all values within the input are accounted for 
+                            # https://stackoverflow.com/questions/37674306/what-is-the-difference-between-same-and-valid-padding-in-tf-nn-max-pool-of-t
                         padding='SAME') as arg_sc:
         return arg_sc
         
@@ -131,15 +141,17 @@ def binary_cross_entropy(output, target, epsilon=1e-8, name='bce_loss'):
         return tf.reduce_mean(-(target * tf.log(output + epsilon) +
                               (1. - target) * tf.log(1. - output + epsilon))), output, target
 
-#Preprocess the image to adapt it to network requirements
+#Pre-process the image to adapt it to network requirements
 # sample bounding boxes are manipulated here 
 def preprocess_img(image, x_bb, y_bb, ids=None):
     """Preprocess the image to adapt it to network requirements
     Args: 
-    image: Image we want to input the network (W,H,3) numpy array (W= width = x_bb, H= height = y_bb)
+    image: Image we want to input the network (W,H,3) numpy array (W= width, H= height, 3 = ??)
+    x_bb: ?? 
+    y_bb: ?? 
     ids: number of flips that you want the image to go through 
     Returns: 
-    Image ready to input the network (1,W,H,3) 
+    Image ready to input the network (1,W,H,3) (1 = ???)
     """
     #if ids= None then it is assumed we don't want any flips 
     if ids == None:
@@ -150,19 +162,25 @@ def preprocess_img(image, x_bb, y_bb, ids=None):
         # this seems to create a 2d array of lists 
     images = [[] for i in range(np.array(image).shape[0])]
     
-    # for loop that goes through the width of the image 
+    # for loop that goes through the length of the width of the image 
+    #QUESTION: what does j really represent? are we going through the width of the image? 
     for j in range(np.array(image).shape[0]):
         
         #QUESTION: why is this a static 3? for what reason 3? 
             # is it about 3 dimensions of the image? 
         for i in range(3):
+            #get matlab file into a numpy array 
+            #QUESTION: how does image[j] & x_bb[j] work? 
             aux = np.array(scipy.io.loadmat(image[j])['section'], dtype=np.float32)
+            
+            #cropping the data arrays into proper bounding box shape (80 x 80)
             crop = aux[int(float(x_bb[j])):int((float(x_bb[j])+80)), int(float(y_bb[j])): int((float(y_bb[j])+80))]
-            """Different data augmentation options"""
+            """Different data augmentation options""" 
             # I believe this section is set up like this because our txt files that come out of sample_BBs 
             # have the same information patient and slice information and coordinates for as many data augmentation options we wanted at the time 
             # this is shown within this function by the fact that they are all elif statements and will only do that data augmentation option that is correlated with it's number and won't do all of the data augmentations at once.  
-            
+            #QUESTION: how are we using this function? are we looping through the sample BB generated text files?
+                # 
             if id == '2':
                 crop = np.fliplr(crop)
             elif id == '3':
@@ -181,14 +199,22 @@ def preprocess_img(image, x_bb, y_bb, ids=None):
                 crop = np.fliplr(crop)
                 crop = np.rot90(crop, 2)
 
+            #add to the images list of lists each crop, the crop for that pixel(?? again what is j?) 
+            #QUESTION: How does this account for how many flips we get? 
+            #QUESTION: why again do we have a for loop of 3? does this same crop need to exist for 3 dimensions? 
             images[j].append(crop)
+    #
     in_ = np.array(images)
+    #QUESTION: w
     in_ = in_.transpose((0,2,3,1))
+    #QUESTION: why? why these specific numbers? 
     in_ = np.subtract(in_, np.array((104.00699, 116.66877, 122.67892), dtype=np.float32))
 
     return in_
     
-
+# i believe we are now correlating all of our inputs with their proper labels 
+#QUESTION: how are we calling preprocess_labels? what do our labels look like? 
+    #probably within a for loop that sends in a ??? each time  
 def preprocess_labels(label):
     """Preprocess the labels to adapt them to the loss computation requirements
     Args:
@@ -196,24 +222,45 @@ def preprocess_labels(label):
     Returns:
     Label ready to compute the loss (1,W,H,1)
     """
+     # this variable is a list that creates a list of lists that has the same width as the image 
+        # this seems to create a 2d array of lists in the same shape of the label
+         
     labels = [[] for i in range(np.array(label).shape[0])]  
     
+    # for loop that goes through the length of the width of the image 
+    #QUESTION: again what does j really mean? 
+    print("label.shape[0]=",np.array(label).shape[0])
+
     for j in range(np.array(label).shape[0]):
+        #make sure that label is not a multidimensional array 
         if type(label) is not np.ndarray:
-            for i in range(3):
-                aux = np.array(Image.open(label[j][i]), dtype=np.uint8)
-                crop = aux[int(float(x_bb[j])):int((float(x_bb[j])+80)), int(float(y_bb[j])): int((float(y_bb[j])+80))]
-                labels[j].append(crop)
             
+            for i in range(3):
+                print("label=", label)
+                print("label[j][i] =", label[j][i])
+                #QUESTION: what is a np.uint8?
+                aux = np.array(Image.open(label[j][i]), dtype=np.uint8)
+                #QUESTION: where does x_bb come from? is this legal? 
+                crop = aux[int(float(x_bb[j])):int((float(x_bb[j])+80)), int(float(y_bb[j])): int((float(y_bb[j])+80))]
+                #QUESTION: for every ??? append a bounding box  
+                labels[j].append(crop)
+    
+    # we grab the first label from the labels list 
     label = np.array(labels[0])
+    # make the 3rd dimension the 1st, the 1st the 2nd, and the 2nd the 3rd 
     label = label.transpose((1,2,0))
+    # get the max of the label array
     max_mask = np.max(label) * 0.5
+    # returns a True/False array in the same shape as the inputs depending on whether the label 
     label = np.greater(label, max_mask)
+    #make a new axis placed as the first dimension now on top of the previous np.greater(label)/True/False array
+        #QUESTION: this new 1st dimension is ??? 0's? nothing (just a placeholder)? 
     label = np.expand_dims(label, axis=0)
 
     return label
         
-        
+
+#defines the network (but what does this entail??)
 def det_lesion_resnet(inputs, is_training_option=False, scope='det_lesion'):
     """ Defines the network
     Args:
@@ -224,12 +271,24 @@ def det_lesion_resnet(inputs, is_training_option=False, scope='det_lesion'):
     end_points: Dictionary with all Tensors of the network
     """ 
 
+    #this var_scope defines the variable end_points_collection below it 
+    # QUESTION: do all of the variables below this arg_scope get included under this one 
+    #       #probably yes  
+    # scope is defined as 
     with tf.variable_scope(scope, 'det_lesion', [inputs]) as sc:
         end_points_collection = sc.name + '_end_points'
+        
+        #I think we are pulling the argument scope from resnet_v1 
+        #resnet_v1 is imported from tf at the top 
+            # I believe this could be a variable file 
         with slim.arg_scope(resnet_v1.resnet_arg_scope()):
-
+            # resnet takes our input of an image and specifies to our net (Tensor) and end_points (Tensor dictionary) trains if we specify that it should be training 
             net, end_points = resnet_v1.resnet_v1_50(inputs, is_training=is_training_option)
+            #QUESTION: what does scope = flatten5 mean? 
+                # I believe this is a specific type of flattening method that is named as the variable "flatten5"
+                # might be a tf.Variable, but where are these variables held? Hint: they are apparently global 
             net = slim.flatten(net, scope='flatten5')
+            #our fully connected layer (actual neural network) has an sigmoid activation function (define?), it's weights 
             net = slim.fully_connected(net, 1, activation_fn=tf.nn.sigmoid,
                                        weights_initializer=initializers.xavier_initializer(), scope='output')
             utils.collect_named_outputs(end_points_collection, 'det_lesion/output', net)
