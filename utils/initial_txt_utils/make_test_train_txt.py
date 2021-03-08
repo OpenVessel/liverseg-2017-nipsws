@@ -99,13 +99,13 @@ def generate_test_train_volume_dfs(dataset_root, images_volumes, item_seg, liver
     """
     
     lol = sort_list(dataset_root, images_volumes, item_seg, liver_seg)
-    testing_volume = pd.DataFrame(makeTestLine(lol))
-    training_volume = pd.DataFrame(makeTrainLine(lol))
+    testing_volume = pd.DataFrame(generate_testing_df_data(lol))
+    training_volume = pd.DataFrame(generate_training_df_data(lol))
 
     return training_volume, testing_volume
 
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
 
     # if platform.system() == "Windows":
     #     dataset_root = r"..\..\LiTS_database"

@@ -97,6 +97,8 @@ ENV/
 # mkdocs documentation
 /site
 
+/data
+
 # mypy
 .mypy_cache/
 *.mat

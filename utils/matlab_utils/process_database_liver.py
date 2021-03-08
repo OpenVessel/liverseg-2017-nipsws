@@ -80,8 +80,8 @@ for filename in filenames:
             os.mkdir(folder_seg_liver_num)
         
         # save images
-        for k in range(1, img_seg_item.shape[2]):
-
+        for k in range(0, img_seg_item.shape[2]):
+            print(filename, ", ", k)
             # item
             item_seg_section = np.fliplr(np.flipud(img_seg_item[:,:,k]*255)) # flip on both axes
             item_seg_filename = os.path.join(folder_seg_item_num, str(k+1) + '.png')
