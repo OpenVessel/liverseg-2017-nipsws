@@ -6,18 +6,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
 from PIL import Image
-import time 
-start = time.time()
+
+
 # path constants
-niftis_path = 'E:\Datasets\LiTS_liver_lesion\LITS17'
-root_process_database = '../../output_folder/'
+niftis_path = '../../Database/media/nas/01_Datasets/CT/LITS/Training Batch 1/'
+root_process_database = '../../LiTS_database/'
 
-## WINDOWS STRINGS
-# niftis_path = r'E:\Datasets\LiTS_liver_lesion\LITS17'
-# root_process_database = r'D:\L_pipe\liver_open\liverseg-2017-nipsws\output_folder'
+niftis_path = r'E:\Datasets\LiTS_liver_lesion\LITS17'
+root_process_database = r'../../LiTS_database/'
 
-
-## Folders to be created
 folder_volumes = os.path.join(root_process_database, 'images_volumes/')
 folder_seg_liver = os.path.join(root_process_database, 'liver_seg/')
 folder_seg_item = os.path.join(root_process_database, 'item_seg/')
@@ -83,8 +80,8 @@ for filename in filenames:
             os.mkdir(folder_seg_liver_num)
         
         # save images
-        for k in range(1, img_seg_item.shape[2]):
-
+        for k in range(0, img_seg_item.shape[2]):
+            print(filename, ", ", k)
             # item
             item_seg_section = np.fliplr(np.flipud(img_seg_item[:,:,k]*255)) # flip on both axes
             item_seg_filename = os.path.join(folder_seg_item_num, str(k+1) + '.png')
@@ -96,7 +93,3 @@ for filename in filenames:
             liver_seg_filename = os.path.join(folder_seg_liver_num, str(k+1) + '.png')
             im_liver = Image.fromarray(liver_seg_section)
             im_liver.save(liver_seg_filename)
-
-
-end = time.time()
-print("Elapsed Time is:", end - start)
