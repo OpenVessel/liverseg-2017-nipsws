@@ -108,7 +108,7 @@ def det_lesion_arg_scope(weight_decay=0.0002):
                         weights_initializer=tf.random_normal_initializer(stddev=0.001),
                         # QUESTION: what do different weight decays do to the weight regularizer and what are our options? 
                         weights_regularizer=slim.l2_regularizer(weight_decay),
-                        # QUESTION: what is this and what are our options? 
+                        # QUESTION: what is this and what are our options?  
                         biases_initializer=tf.zeros_initializer,
                         # QUESTION: what is this? and what are our options? 
                         biases_regularizer=None,
@@ -137,7 +137,7 @@ def binary_cross_entropy(output, target, epsilon=1e-8, name='bce_loss'):
     # name the output ? 
     with tf.name_scope(name):
         # calculate the loss based off of binary cross-entropy mathematics 
-        #QUESTION: what is tf.reduce_mean? 
+        #QUESTION: what is tf.reduce_mean? describe the math going on here.
         return tf.reduce_mean(-(target * tf.log(output + epsilon) +
                               (1. - target) * tf.log(1. - output + epsilon))), output, target
 
@@ -153,6 +153,7 @@ def preprocess_img(image, x_bb, y_bb, ids=None):
     Returns: 
     Image ready to input the network (1,W,H,3) (1 = ???)
     """
+
     #if ids= None then it is assumed we don't want any flips 
     if ids == None:
         #makes an array of 1's in the shape of the width of the image 
@@ -213,7 +214,7 @@ def preprocess_img(image, x_bb, y_bb, ids=None):
     return in_
     
 # i believe we are now correlating all of our inputs with their proper labels 
-#QUESTION: how are we calling preprocess_labels? what do our labels look like? 
+#QUESTION: how are we calling pre-process_labels? what do our labels look like? 
     #probably within a for loop that sends in a ??? each time  
 def preprocess_labels(label):
     """Preprocess the labels to adapt them to the loss computation requirements
@@ -222,9 +223,10 @@ def preprocess_labels(label):
     Returns:
     Label ready to compute the loss (1,W,H,1)
     """
-     # this variable is a list that creates a list of lists that has the same width as the image 
+
+    # this variable is a list that creates a list of lists that has the same width as the image 
         # this seems to create a 2d array of lists in the same shape of the label
-         
+    
     labels = [[] for i in range(np.array(label).shape[0])]  
     
     # for loop that goes through the length of the width of the image 
@@ -273,9 +275,11 @@ def det_lesion_resnet(inputs, is_training_option=False, scope='det_lesion'):
 
     #this var_scope defines the variable end_points_collection below it 
     # QUESTION: do all of the variables below this arg_scope get included under this one 
-    #       #probably yes  
-    # scope is defined as 
+    #    #probably yes  
+    # scope is defined as ()
     with tf.variable_scope(scope, 'det_lesion', [inputs]) as sc:
+        
+        #sets the end point dictionary's name within the variable scope of "det_lesion" (??)
         end_points_collection = sc.name + '_end_points'
         
         #I think we are pulling the argument scope from resnet_v1 
@@ -289,14 +293,27 @@ def det_lesion_resnet(inputs, is_training_option=False, scope='det_lesion'):
                 # might be a tf.Variable, but where are these variables held? Hint: they are apparently global 
             net = slim.flatten(net, scope='flatten5')
             #our fully connected layer (actual neural network) has an sigmoid activation function (define?), it's weights 
-            net = slim.fully_connected(net, 1, activation_fn=tf.nn.sigmoid,
-                                       weights_initializer=initializers.xavier_initializer(), scope='output')
+            net = slim.fully_connected(net, 1, 
+                                        #this is where a sigmoid activation function is being applied 
+                                        #QUESTION: what is a sigmoid? 
+                                        activation_fn=tf.nn.sigmoid,
+                                        #QUESTION: how does this weights initializer 
+                                        weights_initializer=initializers.xavier_initializer(), 
+                                        # QUESTION: does scope NAME this scope or does it PULL a scope that already has this name 
+                                        scope='output')
+                    #QUESTION: what does this do? how? why do we do both this and return outputs from this method? 
+                        #SEEMS to be a Tensorflow method to package outputs in *some kind of way* 
             utils.collect_named_outputs(end_points_collection, 'det_lesion/output', net)
-
+        # make a dictionary from the end_points_collection 
+        #QUESTION: what is a collection? what is in end_points_collection? 
     end_points = slim.utils.convert_collection_to_dict(end_points_collection)
+
+    #return the network & the end_points collection 
+    # Note: describe what these are specifically. 
     return net, end_points
 
-
+# Initialize the network parameters from the Resnet-50 pre-trained model provided by TF-SLIM\
+#Note: describe further 
 def load_resnet_imagenet(ckpt_path):
     """Initialize the network parameters from the Resnet-50 pre-trained model provided by TF-SLIM
     Args:
@@ -304,17 +321,28 @@ def load_resnet_imagenet(ckpt_path):
     Returns:
     Function that takes a session and initializes the network
     """
+    # read in the checkpoint of the Resnet-50 pre-trained model 
     reader = tf.train.NewCheckpointReader(ckpt_path)
+    # QUESTION: what is a variable_to_shape_map? and how does it work? 
     var_to_shape_map = reader.get_variable_to_shape_map()
+    # create a dictionary 
+    #QUESTION: for what? 
     vars_corresp = dict()
     
+    # for each *object* in var_to_shape_map (what is an object in var_to_shape_map?)
     for v in var_to_shape_map:
+        # if we see bottleneck_v1 or conv1 as our object then continue 
         if "bottleneck_v1" in v or "conv1" in v:
+            
+            #QUESTION: if v is a string, how does the indexing work exactly here? what does [0] result in here from the output of .get_model_variables? 
+            # gets the model variables from v and changes the variable name into our style so that this variable sits inside 
             vars_corresp[v] = slim.get_model_variables(v.replace("resnet_v1_50", "det_lesion/resnet_v1_50"))[0]
-    init_fn = slim.assign_from_checkpoint_fn(ckpt_path, vars_corresp)
+        # QUESTION: what does fn stand for? what it going on with this method? what is the relationship between ckpt_path & vars_corresp? 
+    init_fn = slim.assign_from_checkpoint_fn(ckpt_path, vars_corresp) 
     return init_fn
 
-
+# uses Binary cross entropy to calculate the accuracy and defines it as a variable name called accuracy
+#QUESTION: what is the difference between this and binary_cross_entropy function we created? 
 def my_accuracy(output, target, name='accuracy'):
     """Accuracy for detection
     Args:
@@ -323,10 +351,15 @@ def my_accuracy(output, target, name='accuracy'):
     The accuracy based on the binary cross entropy
     """
 
-
+    # make the target (prediction) into a float 
     target = tf.cast(target, tf.float32)
+    
+    #QUESTION: what does tf.squeeze do? what are we sending in for the output parameter? 
     output = tf.squeeze(output)
+    
+    #return the accuracy score under the name of "accuracy"
     with tf.name_scope(name):
+        #QUESTION: what does reduce_mean do? what is the math going on here? 
         return tf.reduce_mean((target * output) + (1. - target) * (1. - output))
 
 
@@ -343,21 +376,26 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
     max_training_iters: Number of training iterations
     save_step: A checkpoint will be created every save_steps
     display_step: Information of the training will be displayed every display_steps
-    global_step: Reference to a Variable that keeps track of the training steps
+    global_step: Reference to a Variable that keeps track of the training steps (what are training steps?)
     iter_mean_grad: Number of gradient computations that are average before updating the weights
-    batch_size:
-    momentum: Value of the momentum parameter for the Momentum optimizer
+    batch_size: (???) 
+    momentum: Value of the momentum parameter for the Momentum optimizer (what is a Momentum optimizer?)
     resume_training: Boolean to try to restore from a previous checkpoint (True) or not (False)
     config: Reference to a Configuration object used in the creation of a Session
     finetune: Use to select to select type of training, 0 for the parent network and 1 for finetunning
     Returns:
     """
+    # creating the path for this checkpoint 
+    #QUESTION: do we always want to overwrite this checkpoint or make new checkpoints for each training session (what are the repurcussions of this?)
     model_name = os.path.join(logs_path, "det_lesion.ckpt")
+    
+    # set configurations if there are None 
     if config is None:
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
         config.allow_soft_placement = True
 
+    # start spittin facts 
     tf.logging.set_verbosity(tf.logging.INFO)
 
     # Prepare the input data
@@ -365,55 +403,109 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
     input_label = tf.placeholder(tf.float32, [batch_size])
     is_training = tf.placeholder(tf.bool, shape=())
     
+    # input_label = 1 or is re-defined from batch_size parameter 
+    # QUESTION: what are parameters for histogram and what is being output for this histogram?  
     tf.summary.histogram('input_label', input_label)
 
     # Create the network
+    # we use our det_lesion_arg_scope function to pass in the arg_scope 
     with slim.arg_scope(det_lesion_arg_scope()):
+        # defines the network, acquiring locations? of the nets and end_points (describe further?)
         net, end_points = det_lesion_resnet(input_image, is_training_option=is_training)
 
-    # Initialize weights from pre-trained model
+    # Initialize weights from pre-trained model 
+    # if we are not finetuning then we have to initalize the weights of the model from Resnet
     if finetune == 0:
         init_weights = load_resnet_imagenet(initial_ckpt)
 
     # Define loss
+    #outputs loss scores to variable losses
     with tf.name_scope('losses'):
+        #uses the net as the output to calculate the binary_cross_entropy based on the target (input_label)
+        #QUESTION: input_label is defined from batch_size and it's default is 1, is this a proper target? 
+            #my assumption is that we use the det_lesion_positive_patches as our target but I guess
+            #that we are aiming to get the prediction score to 1 and that's why the target is 1 
         loss, output, target = binary_cross_entropy(net, input_label)
+        
+        #QUESTION: what does tf.add_n do? what are regularization losses? 
         total_loss = loss + tf.add_n(tf.losses.get_regularization_losses())
+        
+        #QUESTION: what do the histograms look like? why? what does tf.summary.scalar do? 
         tf.summary.scalar('losses/total_loss', total_loss)
         tf.summary.histogram('losses/output', output)
         tf.summary.histogram('losses/target', target)
 
     # Define optimization method
     with tf.name_scope('optimization'):
+        # output the learning_rate 
+        #QUESTION: does it matter for this input whether learning rate is an instance or constant?  
         tf.summary.scalar('learning_rate', learning_rate)
-        optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
-        grads_and_vars = optimizer.compute_gradients(total_loss)
-        with tf.name_scope('grad_accumulator'): 
-            grad_accumulator = []
-            for ind in range(0, len(grads_and_vars)):
-                if grads_and_vars[ind][0] is not None:
-                    grad_accumulator.append(tf.ConditionalAccumulator(grads_and_vars[0][0].dtype))
-        with tf.name_scope('apply_gradient'):
-            grad_accumulator_ops = []
-            for ind in range(0, len(grad_accumulator)):
-                if grads_and_vars[ind][0] is not None:
-                    var_name = str(grads_and_vars[ind][1].name).split(':')[0]
-                    var_grad = grads_and_vars[ind][0]
 
+        # QUESTION: what does MomentumOptimizer output exactly? how do learning rate & momentum work together? 
+        optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
+
+        # uses total_loss to compute the gradient 
+        #QUESTION: how does .compute_gradients work? 
+        grads_and_vars = optimizer.compute_gradients(total_loss) 
+
+        #QUESTION: what is the point of a gradient accumulator? 
+        with tf.name_scope('grad_accumulator'): 
+            #create gradient accumulator list 
+            grad_accumulator = []
+
+            # for the length of each grads_and_vars (write out what it is)
+            for ind in range(0, len(grads_and_vars)):
+                #QUESTION: what is in grads_and_vars[ind][0]? 
+                if grads_and_vars[ind][0] is not None:
+                    #QUESTION: what is .dtype? why are we doing only grads_and_vars[0][0].dtype? 
+                        # what does ConditionalAccumulator do? what's the point? 
+                    grad_accumulator.append(tf.ConditionalAccumulator(grads_and_vars[0][0].dtype))
+        
+        #apply the gradients 
+        with tf.name_scope('apply_gradient'):
+            #create the gradient accumulator operations list 
+            grad_accumulator_ops = []
+
+            #for the length of the gradient accumalator 
+            for ind in range(0, len(grad_accumulator)):
+                
+                # if the ???? is not None 
+                if grads_and_vars[ind][0] is not None:
+                    # QUESTION: what is in grads_and_vars[ind][1]? what are we getting out of this? 
+                        # what does this say about the total loss values that we put into this variable with optimizer.compute_gradients(total_loss)? 
+                    var_name = str(grads_and_vars[ind][1].name).split(':')[0]
+                    
+                    #Note: fill in from previous questions  
+                        #seems to be the gradient part of grads_and_vars 
+                    var_grad = grads_and_vars[ind][0]
+                    
+                    # if the variable name that we pulled represent weights 
                     if "weights" in var_name:
+                        #QUESTION: what does this mean/do? 
                         aux_layer_lr = 1.0
+
+                    # if the variable name that we pulled represents biases 
                     elif "biases" in var_name:
+                        #QUESTION: what does this mean/do? 
                         aux_layer_lr = 2.0
                     
+                    # append to the gradient accumulator the applied gradient that multiplies the gradient * the aux_layer_lr
+                    #QUESTION: how does aux_layer_lr impact the gradient, why? what does ConditionalAccumulator.apply_grad do? 
                     grad_accumulator_ops.append(grad_accumulator[ind].apply_grad(var_grad*aux_layer_lr,
-                                                                                 local_step=global_step))
+                                                                                local_step=global_step))
+        # 
         with tf.name_scope('take_gradients'):
-            mean_grads_and_vars = []
+            # create the list that will hold the ??? 
+            mean_grads_and_vars = [] 
+
             for ind in range(0, len(grad_accumulator)):
                 if grads_and_vars[ind][0] is not None:
+                    # QUESTION: what does ConditionalAccumulator.take_grad do? 
+                    # iter_mean_grad: Number of gradient computations that are average before updating the weights
                     mean_grads_and_vars.append((grad_accumulator[ind].take_grad(iter_mean_grad), grads_and_vars[ind][1]))
+            # apply the gradients on the mean_grad_and_vars 
             apply_gradient_op = optimizer.apply_gradients(mean_grads_and_vars, global_step=global_step)
-
+    
     with tf.name_scope('metrics'):
         acc_op = my_accuracy(net, input_label)
         tf.summary.scalar('metrics/accuracy', acc_op)
