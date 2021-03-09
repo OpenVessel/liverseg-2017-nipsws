@@ -169,11 +169,22 @@ class LiverLesion:
 
 # Global vars and driver
 if __name__ =='__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description="Train or Test the Liver Lesion Segmentation Model")
+    parser.add_argument('mode', help="'test' or 'train' depending on what you wish to do.")
+    cmdline = parser.parse_args()
+
     from config import Config
 
     config = Config()
     print(config.get_result_root('results'))
 
     liver_lesion = LiverLesion(config)
-    liver_lesion.test()
-    #liver_lesion.train()
+
+    if cmdline.mode is "test":
+        liver_lesion.test()
+    elif cmdline.mode is "train":
+        liver_lesion.train()
+    else:
+        liver_lesion.train()
+        liver_lesion.test()
