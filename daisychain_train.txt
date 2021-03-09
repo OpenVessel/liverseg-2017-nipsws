@@ -84,6 +84,6 @@ python sample_bbs.py
 
         
 ### step 3. seg_lesion_train.py 
-
+## training automation broken?
 I - 
     train_file - 
