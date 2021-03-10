@@ -184,7 +184,7 @@ if __name__ == "__main__":
     item_seg = "item_seg"
     liver_seg = "liver_seg"
 
-    listOfLists = sort_list(dataset_root, images_volumes, item_seg, liver_seg)
+    lol = sort_list(dataset_root, images_volumes, item_seg, liver_seg)
     generate_test_txt(lol)
     generate_train_txt(lol)
 

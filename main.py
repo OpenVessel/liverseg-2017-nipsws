@@ -96,13 +96,13 @@ class LiverLesion:
         """
             Driver code for testing the model.
         """
-        
+
         test_steps = [
-            ['seg_liver_test', self.seg_liver_test], ## seg_liver_test.py ## OUTPUT SEG_LIVER_ck
+            # ['seg_liver_test', self.seg_liver_test], ## seg_liver_test.py ## OUTPUT SEG_LIVER_ck
             ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ## compute_3D_bbs_from_gt_liver.py ## 
-            ['sample_bbs', self.sample_bbs], ### sample_bbs.py
-            ['det_lesion_test', self.det_lesion_test], ### det_lesion_test.py
-            ['seg_lesion_test', self.seg_lesion_test] ##### seg_lesion_test.py
+            # ['sample_bbs', self.sample_bbs], ### sample_bbs.py
+            # ['det_lesion_test', self.det_lesion_test], ### det_lesion_test.py
+            # ['seg_lesion_test', self.seg_lesion_test] ##### seg_lesion_test.py
         ]
 
         time_list = []
@@ -179,12 +179,9 @@ if __name__ =='__main__':
     config = Config()
     print(config.get_result_root('results'))
 
-    liver_lesion = LiverLesion(config)
-
-    if cmdline.mode is "test":
+    liver_lesion = LiverLesion(config
+    )
+    if cmdline.mode == "test":
         liver_lesion.test()
-    elif cmdline.mode is "train":
+    elif cmdline.mode == "train":
         liver_lesion.train()
-    else:
-        liver_lesion.train()
-        liver_lesion.test()
