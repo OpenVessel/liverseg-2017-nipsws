@@ -3,6 +3,10 @@ import nibabel as nib # pip install nibabel
 # https://nipy.org/nibabel/nifti_images.html
 
 import numpy as np
+
+## this matplot libe only works python -m pip install matplotlib==3.2
+#python -m pip install matplotlib==3.2
+
 import matplotlib.pyplot as plt
 import scipy.io
 from PIL import Image

@@ -163,3 +163,5 @@ if __name__ =='__main__':
     liver_lesion = LiverLesion(config)
     liver_lesion.test()
     #liver_lesion.train()
+
+#updating tensorflow 1.0 to 2.0 
