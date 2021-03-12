@@ -4,6 +4,7 @@ import tensorflow as tf
 from seg_liver_test import seg_liver_test
 from utils.crops_methods.compute_3D_bbs_from_gt_liver import compute_3D_bbs_from_gt_liver
 from utils.sampling_bb.sample_bbs import sample_bbs
+from utils.train_test_split import TrainTestSplit
 from det_lesion_test import det_lesion_test
 from seg_lesion_test import seg_lesion_test
 from utils.train_test_split import TrainTestSplit
@@ -14,6 +15,9 @@ import math
 class LiverLesion:
     def __init__(self, config):
         self.config = config
+
+        tts = TrainTestSplit(self.config)
+        self.training_volume, self.testing_volume = tts.split(self.config.images_volumes, self.config.item_seg, self.config.liver_seg)
 
 
     def seg_liver_test(self, test_volume_txt):
@@ -39,11 +43,10 @@ class LiverLesion:
         return seg_lesion_test(self.config, self.config.num_slices)
     
 
-    def test(self, images_volumes, item_seg, liver_seg):
+    def test(self):
         """
             Driver code for testing the model.
         """
-
 
         time_list = []
         last_step_output = None
@@ -73,12 +76,8 @@ class LiverLesion:
 
             return step_output
 
-        print('Splitting training/testing volumes')
-        tts = TrainTestSplit(self.config)
-        training_volume, testing_volume = tts.split(images_volumes, item_seg, liver_seg)
-
         # run workflow
-        runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(testing_volume))
+        runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(self.testing_volume))
         crops_df = runStepWithTime('compute_bbs_from_gt_liver', lambda: self.compute_3D_bbs_from_gt_liver())
         patches =  runStepWithTime('sample_bbs_test', lambda: self.sample_bbs(crops_df))
         runStepWithTime('det_lesion_test', lambda: self.det_lesion_test(patches["test_pos"], patches["test_neg"]))
@@ -100,10 +99,7 @@ if __name__ =='__main__':
 
     config = Config()
 
-
-
-    # liver_lesion = LiverLesion(config)
-    # liver_lesion.test('images_volumes', 'item_seg', 'liver_seg')
+    liver_lesion = LiverLesion(config)
     
 
 

@@ -1,7 +1,6 @@
 import os
 import platform
 import pandas as pd
-import numpy as np
 import math
 from pprint import pprint
 
@@ -17,6 +16,14 @@ class TrainTestSplit:
         liver_seg: name of liver folder
 
         return: list of lists that will be fed into a pandas DataFrame
+
+        [
+            [
+                [images1.mat, images2.mat], [item1.png, item2.png], [liver1.png, liver2.png]
+            ], 
+            [..]
+        ]
+        
         """
 
         def get_sorted_dir(dir):
@@ -24,56 +31,53 @@ class TrainTestSplit:
             dirContents.sort()
             return sorted(dirContents, key=len)
 
-
         # ground truths
         images_volumes_fold = os.path.join(self.config.database_root, images_volumes)
-        images_volumes_patID = get_sorted_dir(images_volumes_fold)
+        patient_ids = get_sorted_dir(images_volumes_fold)
 
-        # lesions
-        item_seg_fold = os.path.join(self.config.database_root, item_seg)
-        item_seg_patID = get_sorted_dir(item_seg_fold)
+        patients = []
 
-        # liver
-        liver_seg_fold = os.path.join(self.config.database_root, liver_seg)
-        liver_seg_patID = get_sorted_dir(liver_seg_fold)
+        for patient_id in patient_ids:
 
-        all_paths = []
+            patient_fold = os.path.join(images_volumes_fold, patient_id)
+            num_patient_slices = len(os.listdir(patient_fold))
 
-        for i, patientID in enumerate(images_volumes_patID): # loop through each patient
-            if self.config.debug:
-                print('(Train Test Split) Sorting patient {}'.format(patientID))
-            
-            all_patient_data = [[], [], []]
+            mats = []
+            items = []
+            livers = []
 
-            for j, id in enumerate([images_volumes_patID, item_seg_patID, liver_seg_patID]):
-                if id[i] != ".DS_Store":
-                    
-                    patient_path = os.path.join(images_volumes_fold, images_volumes_patID[i])
-                    patient_slices = get_sorted_dir(patient_path)
+            for i in range(1, num_patient_slices+1):
+                file_id = os.path.join(patient_id, str(i))
+                mats.append(os.path.join(images_volumes, file_id + '.mat'))
+                items.append(os.path.join(item_seg, file_id + '.png'))
+                livers.append(os.path.join(liver_seg, file_id + '.png'))
 
-                    for pat_slice in patient_slices:
-                        pat_slice_path = os.path.join(patient_path, pat_slice).split(os.path.sep)[self.config.num_slices:]
-                        pat_slice_path = os.path.sep.join(pat_slice_path)
-                        all_patient_data[j].append(pat_slice_path)
+            patients.append([mats, items, livers])
 
-            all_paths.append(all_patient_data)
-
-        return all_paths[0]
+        return patients
 
 
     def get_data_volume(self, lol):
 
         rows = []
 
+        # PatientID-105 mat1 item1 liver1 mat2 item2 liver 2 ... matn itemn livern  3 * num_slices
+        # PatientID-105 
+
         for pat in range(len(lol)):
             # construct row for given num_slices
-            num_patSlices = len(lol[pat][1]) - (self.config.num_slices - 1)
-            for patSlice in range(num_patSlices):
+            num_pat_rows = len(lol[pat][0]) - self.config.num_slices
+            for i in range(0, num_pat_rows + 1):
                 row = []
-                for i in range(self.config.num_slices):
-                    row.append( str(lol[pat][patSlice+i]) )
+                mats = lol[pat][0]
+                items = lol[pat][1]
+                livers = lol[pat][2]
+
+                for j in range(0, self.config.num_slices):
+                    row.extend([ mats[j + i], items[j + i], livers[j + i] ]) # 1.mat 1.itempng 1.liverpng
                 rows.append(row)
-        return pd.DataFrame(rows, columns=['slice {}'.format(i) for i in range(1, self.config.num_slices+1)])
+
+        return pd.DataFrame(rows)
 
 
     def split(self, images_volumes, item_seg, liver_seg, train_test_split_ratio = 0.8):
@@ -89,9 +93,10 @@ class TrainTestSplit:
         
         lol = self.sort_list(images_volumes, item_seg, liver_seg)
 
+
         # split data
-        num_patients = np.array(lol).shape[0]
-        split_point = int(math.floor( num_patients * train_test_split_ratio )) - 1
+        num_patients = len(lol)
+        split_point = int(math.floor( num_patients * train_test_split_ratio ))
         training_set = lol[:split_point]
         testing_set = lol[split_point:]
 
@@ -99,11 +104,11 @@ class TrainTestSplit:
         print('# patients in dataset: {}'.format(num_patients))
         print('Splitting on patient {}'.format(split_point))
         print('-'*40)
-        print('First row of training set')
-        print(training_set[0][0]) # patient 0, row 0
+        print('First row of training set patient 0')
+        print(training_set[0][0][0]) # patient 0, row 0
         print('')
-        print('First row of testing set')
-        print(testing_set[0][0])
+        print('First row of testing set patient 0')
+        print(testing_set[0][0][0])
         print('-'*40)
 
 

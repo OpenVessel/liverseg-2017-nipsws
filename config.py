@@ -17,6 +17,10 @@ class Config:
         
         self.resnet_ckpt = os.path.join(self.root_folder, 'train_files', 'resnet_v1_50.ckpt')
         self.imagenet_ckpt = os.path.join(self.root_folder, 'train_files', 'vgg_16.ckpt')
+
+        self.images_volumes = 'images_volumes'
+        self.item_seg = 'item_seg'
+        self.liver_seg = 'liver_seg'
         
         self.debug = 0
 
