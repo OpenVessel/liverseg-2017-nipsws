@@ -179,8 +179,8 @@ if __name__ =='__main__':
     config = Config()
     print(config.get_result_root('results'))
 
-    liver_lesion = LiverLesion(config
-    )
+    liver_lesion = LiverLesion(config)
+    
     if cmdline.mode == "test":
         liver_lesion.test()
     elif cmdline.mode == "train":
