@@ -43,9 +43,9 @@ def upsample_filt(size):
 # Note: this is for deconvolution without groups 
 # this function reassigns some of our "-up" global tf variables into being able to be bilinearly interpolated 
 #QUESTION: #what goes into variables? 
-    #global variables that come form tf.global_variables_initializer()
+    # global variables that come form tf.global_variables_initializer() 
 def interp_surgery(variables):
-    # this will be our outputs 
+    # initate the list that we will return as outputs 
     interp_tensors = []
     for v in variables:
         #QUESTION: what variables have in their name "-up"? 
@@ -181,7 +181,8 @@ def preprocess_img(image, x_bb, y_bb, ids=None):
             # have the same information patient and slice information and coordinates for as many data augmentation options we wanted at the time 
             # this is shown within this function by the fact that they are all elif statements and will only do that data augmentation option that is correlated with it's number and won't do all of the data augmentations at once.  
             #QUESTION: how are we using this function? are we looping through the sample BB generated text files?
-                # 
+            #HUGE QUESTION: id is the name of a function that returns the "identity" of an object that is passed into it but there's no object being passed into it 
+                        #do they mean ids? when this is implemented ids = 0.5 so do they just put that number as a placeholder to say they don't want any flips? 
             if id == '2':
                 crop = np.fliplr(crop)
             elif id == '3':
@@ -204,9 +205,9 @@ def preprocess_img(image, x_bb, y_bb, ids=None):
             #QUESTION: How does this account for how many flips we get? 
             #QUESTION: why again do we have a for loop of 3? does this same crop need to exist for 3 dimensions? 
             images[j].append(crop)
-    #
+    # make the image into an array 
     in_ = np.array(images)
-    #QUESTION: w
+    #QUESTION: just describe this out, might have to look at it's implementation to understand why
     in_ = in_.transpose((0,2,3,1))
     #QUESTION: why? why these specific numbers? 
     in_ = np.subtract(in_, np.array((104.00699, 116.66877, 122.67892), dtype=np.float32))
@@ -368,7 +369,14 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
 
     """Train network
     Args:
-    dataset: Reference to a Dataset object instance
+    dataset: Reference to a Dataset object instance 
+        - dataset as defined in det_lesion_train.py = 
+            Dataset(train_file_pos, train_file_neg, val_file_pos, val_file_neg, None, None, database_root=database_root, store_memory=False)
+            - train_file_pos = os.path.join(root_folder, 'det_DatasetList', 'training_positive_det_patches_data_aug.txt')
+            - train_file_neg = os.path.join(root_folder, 'det_DatasetList', 'training_negative_det_patches_data_aug.txt')
+            - val_file_pos = os.path.join(root_folder, 'det_DatasetList', 'testing_positive_det_patches_data_aug.txt')
+            - val_file_neg = os.path.join(root_folder, 'det_DatasetList', 'testing_negative_det_patches_data_aug.txt')
+    
     initial_ckpt: Path to the checkpoint to initialize the network (May be parent network or pre-trained Imagenet)
     supervison: Level of the side outputs supervision: 1-Strong 2-Weak 3-No supervision
     learning_rate: Value for the learning rate. It can be number or an instance to a learning rate object.
@@ -376,7 +384,7 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
     max_training_iters: Number of training iterations
     save_step: A checkpoint will be created every save_steps
     display_step: Information of the training will be displayed every display_steps
-    global_step: Reference to a Variable that keeps track of the training steps (what are training steps?)
+    global_step: Reference to a Variable that keeps track of the training steps (what are training steps? iterations?)
     iter_mean_grad: Number of gradient computations that are average before updating the weights
     batch_size: (???) 
     momentum: Value of the momentum parameter for the Momentum optimizer (what is a Momentum optimizer?)
@@ -415,6 +423,7 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
 
     # Initialize weights from pre-trained model 
     # if we are not finetuning then we have to initalize the weights of the model from Resnet
+        #initial_ckpt in this case would have to be the pre-trained resnet model path 
     if finetune == 0:
         init_weights = load_resnet_imagenet(initial_ckpt)
 
@@ -493,9 +502,9 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
                     #QUESTION: how does aux_layer_lr impact the gradient, why? what does ConditionalAccumulator.apply_grad do? 
                     grad_accumulator_ops.append(grad_accumulator[ind].apply_grad(var_grad*aux_layer_lr,
                                                                                 local_step=global_step))
-        # 
+        # QUESTION: what does it mean to take gradients? 
         with tf.name_scope('take_gradients'):
-            # create the list that will hold the ??? 
+            # create the list that will hold the mean gradients and vars  
             mean_grads_and_vars = [] 
 
             for ind in range(0, len(grad_accumulator)):
@@ -503,111 +512,187 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
                     # QUESTION: what does ConditionalAccumulator.take_grad do? 
                     # iter_mean_grad: Number of gradient computations that are average before updating the weights
                     mean_grads_and_vars.append((grad_accumulator[ind].take_grad(iter_mean_grad), grads_and_vars[ind][1]))
-            # apply the gradients on the mean_grad_and_vars 
+            # apply the gradients on the mean_gradients_and_vars for each global step (training iteration?)
             apply_gradient_op = optimizer.apply_gradients(mean_grads_and_vars, global_step=global_step)
-    
-    with tf.name_scope('metrics'):
+
+    # get the metrics 
+    with tf.name_scope('metrics'): 
+        #finding the accuracy of the nets 
         acc_op = my_accuracy(net, input_label)
+        #plot it 
         tf.summary.scalar('metrics/accuracy', acc_op)
-        
+    
+    #QUESTION: what does update ops look for? what is the exact definition of an op (operation)? 
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     if update_ops:
+        # show in the logs that there were updatable 
         tf.logging.info('Gathering update_ops')
+
+        #QUESTION: are we changing our dependencies to the updated operations? what does this mean? 
         with tf.control_dependencies(tf.tuple(update_ops)):
+            #QUESTION: why is it that we need to identify total_loss and why is total_loss an important factor after we update ops? 
             total_loss = tf.identity(total_loss)
-       
+    
+    # merge all summaries 
     merged_summary_op = tf.summary.merge_all()
 
     # Initialize variables
     init = tf.global_variables_initializer()
 
+    #start running the training model
+    # Note: from this point forward all comments with ### in front will represent their comments, ours will remain as # 
     with tf.Session(config=config) as sess:
         print('Init variable')
         sess.run(init)
 
-        # op to write logs to Tensorboard
+        ### op to write logs to Tensorboard
         summary_writer = tf.summary.FileWriter(logs_path + '/train', graph=tf.get_default_graph())
+            #QUESTION: why are we creating test_writer in train? what is the difference between the purpose of these 2 writers?  
         test_writer = tf.summary.FileWriter(logs_path + '/test')
 
-        # Create saver to manage checkpoints
+        ### Create saver to manage checkpoints
         saver = tf.train.Saver(max_to_keep=None)
 
+        #check logs_path to check to see if there is a previous checkpoint
         last_ckpt_path = tf.train.latest_checkpoint(logs_path)
+
+        #if there is a previous checkpoint and we changed the resume_training parameter to True then ...
         if last_ckpt_path is not None and resume_training:
-            # Load last checkpoint
+            ### Load last checkpoint 
             print('Initializing from previous checkpoint...')
             saver.restore(sess, last_ckpt_path)
+            # take a step forward 
+            # QUESTION: why take a step forward? what does this indicate about global steps? 
             step = global_step.eval() + 1
+        
+        #if resume_training is False &/or there is no previous checkpoint then .. . 
         else:
-            # Load pre-trained model
+            ### Load pre-trained model #if we are not finetunning the model 
             if finetune == 0:
                 print('Initializing from pre-trained imagenet model...')
+                #if finetune == 0 then we already made init_weights = to  
                 init_weights(sess)
+            
+            #if we are finetunning 
             else:
                 print('Initializing from pre-trained model...')
-                # init_weights(sess)
+                ### init_weights(sess)  # does this make sense? I don't think init_weights would exist because it's only created when finetunning == 0 so maybe that's why they commented it out
+                
+                #create a list to store the variables 
+                #QUESTION: why? 
                 var_list = []
+
+                # for each variable within our global_variables 
                 for var in tf.global_variables():
+                    # grab the actual variable type (not the det_lesion identifier part)
                     var_type = var.name.split('/')[-1]
+
+                    # if the variable type is a weight or bias 
                     if 'weights' in var_type or 'bias' in var_type:
-                        var_list.append(var)
+                        # put the whole variable within the variable list 
+                        #QUESTION: why do we only want weight and bias variables? 
+                        var_list.append(var) 
+                
+                #QUESTION: define these TF methods further. are we actually saving or what?
+                # save the training sessions based on the weight and bias variables 
                 saver_res = tf.train.Saver(var_list=var_list)
+                
+                # restore the training session 
                 saver_res.restore(sess, initial_ckpt)
-            step = 1
+            step = 1 
+        
+        # int
         sess.run(interp_surgery(tf.global_variables()))
         print('Weights initialized')
 
         print('Start training')
+        #while we haven't reached our chosen max number of iterations for training 
         while step < max_training_iters + 1:
-            # Average the gradient
+            ### Average the gradient (descent)
+                # we average the gradient descent in order to get a calculated gradient descent to use while ??
+                    #QUESTION: what does gradient descent help accomplish? 
             for iter_steps in range(0, iter_mean_grad):
+                    # we get the image, the label of the image (train vs val- what's the difference between their labels?), 
+                        #   the training/validation bounding box coordinate for x & y, & ids_train/ids_test 
+                        #batch_size indicates how many batches of rows we want and we just want 1 to get each row separately
+                    # 
+                    # QUESTION: how does Dataset.next_batch use 'train' and val to just get the training files or validation files?
+                                # what does ids_train & ids_val do? why 0.5?
+                                    #  it's passed into preprocess image and ids are supposed to let us know how many flips we want on an image
+                                # if we want to change the number of flips we want on an image...
+                                    # do we have to go here and change these static 0.5's? 
+                                # what is batch label & batch label val? 
                 batch_image, batch_label, x_bb_train, y_bb_train, ids_train = dataset.next_batch(batch_size, 'train', 0.5)
                 batch_image_val, batch_label_val, x_bb_val, y_bb_val, ids_val = dataset.next_batch(batch_size, 'val', 0.5)
+                
+                #we use our previously defined preprocess_img to extract the training & validation bounding box for each flip we do to an image based on the input of ids_train
                 image = preprocess_img(batch_image, x_bb_train, y_bb_train, ids_train)
-                label = batch_label
                 val_image = preprocess_img(batch_image_val, x_bb_val, y_bb_val)
+                
+                # just re_name the labels although it shouldn't matter 
+                # QUESTION: what are batch_label & batch_label_val when they come out of Dataset.next_batch? 
+                label = batch_label
                 label_val = batch_label_val
+                
+                #run the resnet model 
+                #QUESTION: how does this work? --> [total_loss, merged_summary_op, acc_op] + grad_accumulator_ops
+                    #it's some way of combining the loss metrics to but how and why do they do it this way? 
+                    # how does the feed_dict know how to handle the feed_dict? 
                 run_res = sess.run([total_loss, merged_summary_op, acc_op] + grad_accumulator_ops,
-                                   feed_dict={input_image: image, input_label: label, is_training: True})
+                                    feed_dict={input_image: image, input_label: label, is_training: True})
+                
+                #QUESTIONS: are these values changed after the session runs? where are these used? 
+                        # it seems that the values are changed since we input the same values in the val_run_suss and we extract the values again as validation versions of those values 
+                # will get the total loss from the first list
                 batch_loss = run_res[0]
+                # will get the summary from the acc_op value within the list 
                 summary = run_res[1]
+                # will get the summary from the acc_op value within the list
                 acc = run_res[2]
+
+                # is this modulus, when does the modulus of another number = 0 
                 if step % display_step == 0:
+                    # run the validation session 
                     val_run_res = sess.run([total_loss, merged_summary_op, acc_op],
-                                           feed_dict={input_image: val_image, input_label: label_val, is_training: False})
+                                            feed_dict={input_image: val_image, input_label: label_val, is_training: False})
+                    # will get the total loss from the first list
                     val_batch_loss = val_run_res[0]
+                    # will get the summary from the acc_op value within the list
                     val_summary = val_run_res[1]
+                    # will get the summary from the acc_op value within the list
                     val_acc = val_run_res[2]
 
-            # Apply the gradients
+            ### Apply the gradients 
+            # QUESTION: officially apply the gradients/ apply the gradients on this training session? what's the differnce between how we acquired this value and how it is ran? 
             sess.run(apply_gradient_op)
 
-            # Save summary reports
+            ### Save summary reports
             summary_writer.add_summary(summary, step)
+            # how does this play into the overall 
             if step % display_step == 0:
                 test_writer.add_summary(val_summary, step)
 
-            # Display training status
+            ### Display training status
             if step % display_step == 0:
                 print >> sys.stderr, "{} Iter {}: Training Loss = {:.4f}".format(datetime.now(), step, batch_loss)
                 print >> sys.stderr, "{} Iter {}: Validation Loss = {:.4f}".format(datetime.now(), step, val_batch_loss)
                 print >> sys.stderr, "{} Iter {}: Training Accuracy = {:.4f}".format(datetime.now(), step, acc)
                 print >> sys.stderr, "{} Iter {}: Validation Accuracy = {:.4f}".format(datetime.now(), step, val_acc)
 
-            # Save a checkpoint
+            ### Save a checkpoint
             if step % save_step == 0:
                 save_path = saver.save(sess, model_name, global_step=global_step)
                 print "Model saved in file: %s" % save_path
 
             step += 1
-
+        # 
         if (step-1) % save_step != 0:
             save_path = saver.save(sess, model_name, global_step=global_step)
             print "Model saved in file: %s" % save_path
 
         print('Finished training.')
 
-
+#QUESTION: what is the difference between this validation and the validation that goes on within the training session? 
 def validate(dataset, checkpoint_path, result_path, number_slices=1, config=None):
     """Test one sequence
     Args:
@@ -625,27 +710,35 @@ def validate(dataset, checkpoint_path, result_path, number_slices=1, config=None
         config.allow_soft_placement = True
     tf.logging.set_verbosity(tf.logging.INFO)
 
-    # Input data
+    ### Input data
+    #QUESTION: why is the batch_size 64? 
     batch_size = 64
+    #QUESTION: is this necessary to do this? 
     number_of_slices = number_slices
     depth_input = number_of_slices
     if number_of_slices < 3:
         depth_input = 3
 
+    # get the number of positive and negative pieces 
     pos_size = dataset.get_val_pos_size()
     neg_size = dataset.get_val_neg_size()
-        
+    
+    #provide the framework for the input image 
+    #QUESTION: 
     input_image = tf.placeholder(tf.float32, [batch_size, None, None, depth_input])
 
-    # Create the cnn
+    ### Create the cnn
     with slim.arg_scope(det_lesion_arg_scope()):
         net, end_points = det_lesion_resnet(input_image, is_training_option=False)
+    
     probabilities = end_points['det_lesion/output']
+    #QUESTION: where and how is this used? 
     global_step = tf.Variable(0, name='global_step', trainable=False)
 
     # Create a saver to load the network
     saver = tf.train.Saver([v for v in tf.global_variables() if '-up' not in v.name and '-cr' not in v.name])
 
+    #Note: understand this whole session workflow
     with tf.Session(config=config) as sess:
         sess.run(tf.global_variables_initializer())
         sess.run(interp_surgery(tf.global_variables()))
@@ -656,34 +749,54 @@ def validate(dataset, checkpoint_path, result_path, number_slices=1, config=None
         results_file_soft = open(os.path.join(result_path, 'soft_results.txt'), 'w')
         results_file_hard = open(os.path.join(result_path, 'hard_results.txt'), 'w')
         
-        # Test positive windows
+        ### Test positive windows 
         count_patches = 0
+        
+        # QUESTION: how is this range being calculated? 
         for frame in range(0, pos_size/batch_size + (pos_size % batch_size > 0)):
+            # get the validation images, labels, and bounding box starting coordinates 
             img, label, x_bb, y_bb = dataset.next_batch(batch_size, 'val', 1)
+            
+            #get the first image to indicate at what point within the validation session we are running in? 
             curr_ct_scan = img[0]
-            print('Testing ' + curr_ct_scan)
-            image = preprocess_img(img, x_bb, y_bb)
+            print('Testing ' + curr_ct_scan) 
+            #preprocess the image for running 
+            image = preprocess_img(img, x_bb, y_bb) 
+            
+            #QUESTION: what are the parameters for sess.run? 
+                # it seems like there are different things being passed in everytime we call sess.run, does it run based on the argument scope? 
+                # what does res stand for/represent? 
             res = sess.run(probabilities, feed_dict={input_image: image})
+            
+            # puts the label into an array 
+            # QUESTION is this a ground truth label? why reshape into what shape (adding a column?) 
             label = np.array(label).astype(np.float32).reshape(batch_size, 1)
             
+            #goes through the whole batch 
             for i in range(0, batch_size):
                 count_patches +=1
+                #grabs the i-th image within the batch 
                 img_part = img[i]
+                #QUESTION: what is in res & label? 
+                #grabs the i-th res_part? within the batch. 
                 res_part = res[i][0]
+                ##grabs the i-th label_part? within the batch.
                 label_part = label[i][0]
+                # as long as we are within the range of positive samples we will write the results of the 
                 if count_patches < (pos_size + 1):
                     results_file_soft.write(img_part.split('images_volumes/')[-1] + ' ' + str(x_bb[i]) + ' ' +
                                             str(y_bb[i]) + ' ' + str(res_part) + ' ' + str(label_part) + '\n')
                     if res_part > 0.5:
                         results_file_hard.write(img_part.split('images_volumes/')[-1] + ' ' +
                                                 str(x_bb[i]) + ' ' + str(y_bb[i]) + '\n')
-
-        # Test negative windows
+        
+        ### Test negative windows 
+        #same process except 
         count_patches = 0
         for frame in range(0, neg_size/batch_size + (neg_size % batch_size > 0)):
             img, label, x_bb, y_bb = dataset.next_batch(batch_size, 'val', 0)
             curr_ct_scan = img[0]
-            print('Testing ' + curr_ct_scan)
+            print('Testing' + curr_ct_scan)
             image = preprocess_img(img, x_bb, y_bb)
             res = sess.run(probabilities, feed_dict={input_image: image})
             label = np.array(label).astype(np.float32).reshape(batch_size, 1)

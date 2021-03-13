@@ -18,7 +18,7 @@ from config import Config
 def det_lesion_test(config):
 
     gpu_id = 0
-
+    
     task_name = 'det_lesion_ck'
 
     ### config constants ###

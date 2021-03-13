@@ -142,7 +142,6 @@ def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks
                     
                                 # mask_liver_aux = mask_liver[125 + 50*0: 125 + 50*1, 75 + 50*3: 75 + 50*4]
                                                 # = mask_liver[125:175, 225:275] 
-
                     #we check to see whether the liver is more positive or negative within the bounding box 
                         #  we do this by taking the sum of the # of True (= 1) pixels within the range of the BB's 2D array of 1's & 0's 
                     pos_liver = np.sum(mask_liver_aux) 
