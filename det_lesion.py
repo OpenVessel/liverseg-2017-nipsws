@@ -749,12 +749,15 @@ def validate(dataset, checkpoint_path, result_path, number_slices=1, config=None
         results_file_soft = open(os.path.join(result_path, 'soft_results.txt'), 'w')
         results_file_hard = open(os.path.join(result_path, 'hard_results.txt'), 'w')
         
-        ### Test positive windows 
         count_patches = 0
         
+        ### Test positive windows 
         # QUESTION: how is this range being calculated? 
+            # does this range or anything inside the for loop really ever distinguish between positive and negative windows? 
+            
         for frame in range(0, pos_size/batch_size + (pos_size % batch_size > 0)):
             # get the validation images, labels, and bounding box starting coordinates 
+            # QUESTION: does
             img, label, x_bb, y_bb = dataset.next_batch(batch_size, 'val', 1)
             
             #get the first image to indicate at what point within the validation session we are running in? 
@@ -779,19 +782,26 @@ def validate(dataset, checkpoint_path, result_path, number_slices=1, config=None
                 img_part = img[i]
                 #QUESTION: what is in res & label? 
                 #grabs the i-th res_part? within the batch. 
+                    # res_part must be probability
                 res_part = res[i][0]
                 ##grabs the i-th label_part? within the batch.
                 label_part = label[i][0]
-                # as long as we are within the range of positive samples we will write the results of the 
+                # as long as we are within the range of positive samples we will write the results of the predictions
                 if count_patches < (pos_size + 1):
+                    #we write all predictions within soft_results 
+                    # we include in soft_results: the patient and slice, the x & y minimum BB coordinate, the res_part (something like 3.159811e-06, what does it represent?), the label_part (1 or 0 based on ???)
                     results_file_soft.write(img_part.split('images_volumes/')[-1] + ' ' + str(x_bb[i]) + ' ' +
                                             str(y_bb[i]) + ' ' + str(res_part) + ' ' + str(label_part) + '\n')
+                    
+                    # if the predicted probability of a lesion is > 50%, write that prediction to hard_results
                     if res_part > 0.5:
+                        # we include in hard_results: patient & slice, BB coordinates 
                         results_file_hard.write(img_part.split('images_volumes/')[-1] + ' ' +
                                                 str(x_bb[i]) + ' ' + str(y_bb[i]) + '\n')
         
         ### Test negative windows 
-        #same process except 
+        #same process as before except ??? 
+        # QUESTION: what is the difference between the positive and negative windows?  
         count_patches = 0
         for frame in range(0, neg_size/batch_size + (neg_size % batch_size > 0)):
             img, label, x_bb, y_bb = dataset.next_batch(batch_size, 'val', 0)
@@ -800,7 +810,8 @@ def validate(dataset, checkpoint_path, result_path, number_slices=1, config=None
             image = preprocess_img(img, x_bb, y_bb)
             res = sess.run(probabilities, feed_dict={input_image: image})
             label = np.array(label).astype(np.float32).reshape(batch_size, 1)
-           
+
+        
             for i in range(0, batch_size):
                 count_patches += 1
                 img_part = img[i]
@@ -817,7 +828,7 @@ def validate(dataset, checkpoint_path, result_path, number_slices=1, config=None
         results_file_soft.close()
         results_file_hard.close()
 
-
+#everything is the same as train except for the positive vs negative 
 def test(dataset, checkpoint_path, result_path, number_slices=1, volume=False, config=None):
     """Test one sequence
     Args:
@@ -843,6 +854,7 @@ def test(dataset, checkpoint_path, result_path, number_slices=1, volume=False, c
     if number_of_slices < 3:
         depth_input = 3
 
+    #QUESTION: does positive patches = test patches? 
     total_size = dataset.get_val_pos_size()
         
     input_image = tf.placeholder(tf.float32, [batch_size, None, None, depth_input])
