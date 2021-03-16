@@ -4,8 +4,11 @@ import os
 import glob
 import math
 import scipy.io
+import pandas as pd
 
 def compute_3D_bbs_from_gt_liver(config):
+
+    path_list = []
 
     MIN_AREA_SIZE = 512.0*512.0
 
@@ -53,7 +56,7 @@ def compute_3D_bbs_from_gt_liver(config):
 
     # print(type(masks_folders))
     ## alex code right 
-    if phase == 'test':
+    if phase == 'train':
 #calc where the start of the testing files are because liver_results are only being generated on testing data 
         print("mask folders", masks_folders)
         start_test_dir = int(round(.8*len(masks_folders)))
@@ -151,6 +154,7 @@ def compute_3D_bbs_from_gt_liver(config):
                     # write to crops txt file
                     line = ' '.join([str(x) for x in [liver_seg, aux, total_mina, total_maxa, total_minb, total_maxb]])
                     crops_file.write(line + '\n')
+                    path_list.append(line)
 
                     ######### apply 3Dbb to files ##########
                     if config.debug:
@@ -193,6 +197,8 @@ def compute_3D_bbs_from_gt_liver(config):
                     crops_file.write(current_file.split('liver_seg/')[-1]  + ' ' + str(aux) + '\n')
 
     crops_file.close()
+
+    pd.DataFrame(path_list)
 
 if __name__ =='__main__':
     from config import Config
