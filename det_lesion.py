@@ -83,13 +83,17 @@ def binary_cross_entropy(output, target, epsilon=1e-8, name='bce_loss'):
     Returns:
     A scalar with the loss, the output and the target
     """
-    target = tf.cast(target, tf.float32)
+    # input_label is our target, input_label = tf.placeholder([batch])
+    # output - net
+    # target - input_label - batch_size
+
+    target = tf.cast(target, tf.float32) #casting as float
     output = tf.cast(tf.squeeze(output), tf.float32)
-    output = tf.log(output + 1e-8) ## Added this 2/14
     
     with tf.name_scope(name):
-        return tf.reduce_mean(-(target * tf.log(output + epsilon) +
-                              (1. - target) * tf.log(1. - output + epsilon))), output, target
+        ## forumla BCE 
+        loss = tf.reduce_mean(-(target * tf.log(output + epsilon) + (1. - target) * tf.log(1. - output + epsilon)))
+        return loss, output, target
                               
 
 def preprocess_img(image, x_bb, y_bb, ids=None):
@@ -235,6 +239,8 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
     global_step: Reference to a Variable that keeps track of the training steps
     iter_mean_grad: Number of gradient computations that are average before updating the weights
     batch_size:
+    What is batch_size? refers to number of training examples utilized in one iteration - batch size equal to the total dataset
+    thus masking the iteration and epoch values equivalent
     momentum: Value of the momentum parameter for the Momentum optimizer
     resume_training: Boolean to try to restore from a previous checkpoint (True) or not (False)
     config: Reference to a Configuration object used in the creation of a Session
@@ -250,8 +256,8 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
     tf.logging.set_verbosity(tf.logging.INFO)
 
     # Prepare the input data
-    input_image = tf.placeholder(tf.float32, [batch_size, 80, 80, 3]) # input_image: val_image
-    input_label = tf.placeholder(tf.float32, [batch_size]) # input_label: label_val
+    input_image = tf.placeholder(tf.float32, [batch_size, 80, 80, 3]) # input_image: val_image # batch_size 16 64
+    input_label = tf.placeholder(tf.float32, [batch_size])  # input_label: label_val
     is_training = tf.placeholder(tf.bool, shape=()) # is_training: False
     # feed_dict = {input_image: val_image, input_label: label_val, is_training: False})
     
@@ -267,7 +273,7 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
 
     # Define loss
     with tf.name_scope('losses'):
-        loss, output, target = binary_cross_entropy(net, input_label)
+        loss, output, target = binary_cross_entropy(net, input_label) #output,target 
         total_loss = loss + tf.add_n(tf.losses.get_regularization_losses())
         tf.summary.scalar('losses/total_loss', total_loss)
         tf.summary.histogram('losses/output', output)
@@ -370,14 +376,24 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
                 # print('val_image', val_image)
                 label_val = batch_label_val
                 # print('label_val', label_val)
+                print(total_loss)
+                print("merged_summary", merged_summary_op)
+                print("acc_op",acc_op)
+                print("grad ",grad_accumulator_ops)
                 run_res = sess.run([total_loss, merged_summary_op, acc_op] + grad_accumulator_ops,
-                                   feed_dict={input_image: image, input_label: label, is_training: True})
-                batch_loss = run_res[0]
+                                feed_dict={input_image: image, input_label: label, is_training: True})
+                                
+
+                print("batch_loss", run_res[0])
+                print("summary ",run_res[1])
+                print("acc ",run_res[2])
+                batch_loss = run_res[0] # batch loss gave us NaN
                 summary = run_res[1]
                 acc = run_res[2]
                 if step % display_step == 0:
                     val_run_res = sess.run([total_loss, merged_summary_op, acc_op],
-                                           feed_dict = {input_image: val_image, input_label: label_val, is_training: False}) #!!! It was false in the original code. We set it to true. Need to look into it more.
+                        feed_dict = {input_image: val_image, input_label: label_val, is_training: True}) #!!! It was false in the original code. We set it to true. Need to look into it more.
+
                     val_batch_loss = val_run_res[0]
                     val_summary = val_run_res[1]
                     val_acc = val_run_res[2]

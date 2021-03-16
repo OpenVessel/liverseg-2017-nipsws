@@ -34,8 +34,8 @@ def det_lesion_train(config, gpu_id, batch_size, iter_mean_grad, max_training_it
     ### config constants ###
     database_root = config.database_root
     logs_path = config.get_log(task_name)
-    root_folder = config.root_folder
-    resnet_ckpt = config.resnet_ckpt
+    root_folder = config.root_folder ## data root LiTSdataset - Image_volumes etc
+    resnet_ckpt = config.resnet_ckpt ##weights 
     ###
 
     train_file_pos = os.path.join(root_folder, 'det_DatasetList', 'training_positive_det_patches_data_aug.txt')
@@ -53,5 +53,5 @@ def det_lesion_train(config, gpu_id, batch_size, iter_mean_grad, max_training_it
             global_step = tf.Variable(0, name='global_step', trainable=False)
             detection.train(dataset, resnet_ckpt, learning_rate, logs_path, max_training_iters, save_step, display_step,
                             global_step, iter_mean_grad = iter_mean_grad, batch_size = batch_size, finetune = 0,
-                            resume_training = False) # Make true to restore training from a previously saved checkpoint. 
-                                                    #      False to restart training from an empty checkpoint.
+                            resume_training = True) # Make true to restore training from a previously saved checkpoint. 
+                                                    # False to restart training from an empty checkpoint.

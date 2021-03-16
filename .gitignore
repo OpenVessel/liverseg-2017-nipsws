@@ -162,3 +162,16 @@ LiTS_database/item_seg.zip
 LiTS_database/images_volumes.zip
 LiTS_database/images_volumes.zip
 LiTS_database/item_seg.zip
+train_files/det_lesion/networks/checkpoint
+train_files/det_lesion/networks/det_lesion.ckpt-200.data-00000-of-00001
+train_files/det_lesion/networks/det_lesion.ckpt-200.index
+train_files/det_lesion/networks/det_lesion.ckpt-200.meta
+train_files/det_lesion/networks/test/events.out.tfevents.1615912049.DESKTOP-CPG6IEP
+train_files/det_lesion/networks/test/events.out.tfevents.1615912511.DESKTOP-CPG6IEP
+train_files/det_lesion/networks/test/events.out.tfevents.1615912728.DESKTOP-CPG6IEP
+train_files/det_lesion/networks/test/events.out.tfevents.1615913042.DESKTOP-CPG6IEP
+train_files/det_lesion/networks/train/events.out.tfevents.1615911952.DESKTOP-CPG6IEP
+train_files/det_lesion/networks/train/events.out.tfevents.1615912409.DESKTOP-CPG6IEP
+train_files/det_lesion/networks/train/events.out.tfevents.1615912636.DESKTOP-CPG6IEP
+train_files/det_lesion/networks/train/events.out.tfevents.1615912952.DESKTOP-CPG6IEP
+train_files/seg_liver/networks/train/events.out.tfevents.1615587932.DESKTOP-CPG6IEP

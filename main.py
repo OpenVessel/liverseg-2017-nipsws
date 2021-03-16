@@ -181,10 +181,7 @@ if __name__ =='__main__':
 
     liver_lesion = LiverLesion(config)
 
-    if cmdline.mode is "test":
+    if cmdline.mode == "test":
         liver_lesion.test()
-    elif cmdline.mode is "train":
+    elif cmdline.mode == "train":
         liver_lesion.train()
-    else:
-        liver_lesion.train()
-        liver_lesion.test()
