@@ -94,7 +94,6 @@ def binary_cross_entropy(output, target, epsilon=1e-8, name='bce_loss'):
         ## forumla BCE 
         loss = tf.reduce_mean(-(target * tf.log(output + epsilon) + (1. - target) * tf.log(1. - output + epsilon)))
         return loss, output, target
-                              
 
 def preprocess_img(image, x_bb, y_bb, ids=None):
     """Preprocess the image to adapt it to network requirements
@@ -274,7 +273,12 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
     # Define loss
     with tf.name_scope('losses'):
         loss, output, target = binary_cross_entropy(net, input_label) #output,target 
+        
+        print("define loss ->", loss)
+        print("define ouput ->", output)
+        print("define target ->", target)
         total_loss = loss + tf.add_n(tf.losses.get_regularization_losses())
+        
         tf.summary.scalar('losses/total_loss', total_loss)
         tf.summary.histogram('losses/output', output)
         tf.summary.histogram('losses/target', target)
@@ -376,17 +380,17 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
                 # print('val_image', val_image)
                 label_val = batch_label_val
                 # print('label_val', label_val)
-                print(total_loss)
-                print("merged_summary", merged_summary_op)
-                print("acc_op",acc_op)
-                print("grad ",grad_accumulator_ops)
+                # print(total_loss)
+                # print("merged_summary", merged_summary_op)
+                # print("acc_op",acc_op)
+                # print("grad ",grad_accumulator_ops)
                 run_res = sess.run([total_loss, merged_summary_op, acc_op] + grad_accumulator_ops,
                                 feed_dict={input_image: image, input_label: label, is_training: True})
                                 
 
                 print("batch_loss", run_res[0])
-                print("summary ",run_res[1])
-                print("acc ",run_res[2])
+                # print("summary ",run_res[1])
+                # print("acc ",run_res[2])
                 batch_loss = run_res[0] # batch loss gave us NaN
                 summary = run_res[1]
                 acc = run_res[2]

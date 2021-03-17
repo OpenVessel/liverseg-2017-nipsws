@@ -175,3 +175,12 @@ train_files/det_lesion/networks/train/events.out.tfevents.1615912409.DESKTOP-CPG
 train_files/det_lesion/networks/train/events.out.tfevents.1615912636.DESKTOP-CPG6IEP
 train_files/det_lesion/networks/train/events.out.tfevents.1615912952.DESKTOP-CPG6IEP
 train_files/seg_liver/networks/train/events.out.tfevents.1615587932.DESKTOP-CPG6IEP
+train_files/det_lesion/networks/test/events.out.tfevents.1615933767.DESKTOP-CPG6IEP
+train_files/det_lesion/networks/train/events.out.tfevents.1615933588.DESKTOP-CPG6IEP
+train_files/det_lesion/networks/train/events.out.tfevents.1615933670.DESKTOP-CPG6IEP
+train_files/seg_liver/networks/test/events.out.tfevents.1615929255.DESKTOP-CPG6IEP
+train_files/seg_liver/networks/test/events.out.tfevents.1615932334.DESKTOP-CPG6IEP
+train_files/seg_liver/networks/test/events.out.tfevents.1615933379.DESKTOP-CPG6IEP
+train_files/seg_liver/networks/train/events.out.tfevents.1615929099.DESKTOP-CPG6IEP
+train_files/seg_liver/networks/train/events.out.tfevents.1615932163.DESKTOP-CPG6IEP
+train_files/seg_liver/networks/train/events.out.tfevents.1615933215.DESKTOP-CPG6IEP
