@@ -274,9 +274,7 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
     with tf.name_scope('losses'):
         loss, output, target = binary_cross_entropy(net, input_label) #output,target 
         
-        print("define loss ->", loss)
-        print("define ouput ->", output)
-        print("define target ->", target)
+        
         total_loss = loss + tf.add_n(tf.losses.get_regularization_losses())
         
         tf.summary.scalar('losses/total_loss', total_loss)
@@ -384,6 +382,9 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
                 # print("merged_summary", merged_summary_op)
                 # print("acc_op",acc_op)
                 # print("grad ",grad_accumulator_ops)
+                print("define loss ->", loss)
+                print("define ouput ->", output)
+                print("define target ->", target)
                 run_res = sess.run([total_loss, merged_summary_op, acc_op] + grad_accumulator_ops,
                                 feed_dict={input_image: image, input_label: label, is_training: True})
                                 
