@@ -5,15 +5,15 @@ from seg_liver_test import seg_liver_test
 from seg_liver_train import seg_liver_train
 
 from utils.crops_methods.compute_3D_bbs_from_gt_liver import compute_3D_bbs_from_gt_liver
-from utils.sampling_bb.sample_bbs import sample_bbs_test, sample_bbs_train
-
+from utils.sampling_bb.sample_bbs import sample_bbs
+from utils.train_test_split import TrainTestSplit
 from det_lesion_test import det_lesion_test
 from det_lesion_train import det_lesion_train
 
 from seg_lesion_test import seg_lesion_test
-from seg_lesion_train import seg_lesion_train
-
+from utils.train_test_split import TrainTestSplit
 import time
+import math
 
 
 
@@ -48,9 +48,12 @@ class LiverLesion:
         self.det_learning_rate = 0.01
 
 
+        tts = TrainTestSplit(self.config)
+        self.training_volume, self.testing_volume = tts.split(self.config.images_volumes, self.config.item_seg, self.config.liver_seg)
 
-    def seg_liver_test(self):
-        seg_liver_test(self.config, self.number_slices)
+
+    def seg_liver_test(self, test_volume_txt):
+        return seg_liver_test(self.config, test_volume_txt, self.config.num_slices)
     
     def seg_liver_train(self):
         seg_liver_train(self.config, self.gpu_id, self.number_slices, self.batch_size, self.iter_mean_grad, 
@@ -59,31 +62,25 @@ class LiverLesion:
     
 
     def compute_3D_bbs_from_gt_liver(self):
-        compute_3D_bbs_from_gt_liver(self.config)
-    
+        return compute_3D_bbs_from_gt_liver(self.config)
 
-    def sample_bbs(self):
+
+    def sample_bbs(self, crops_list_sp):
         liver_masks_path = os.path.join(self.config.database_root, 'liver_seg')
         lesion_masks_path = os.path.join(self.config.database_root, 'item_seg')
-        output_folder_path =  './det_DatasetList/'
-        crops_list_sp = os.path.join("utils", "crops_list", config.crops_list) # './utils/crops_list/crops_LiTS_gt.txt'
-        #crops_list_sp = '../crops_list/crops_LiTS_gt.txt'
-        output_file_name_sp = 'test_patches'
-
-        data_aug_options_sp = 8
-        sample_bbs_train(crops_list_sp, output_file_name_sp, data_aug_options_sp, liver_masks_path, lesion_masks_path, output_folder_path)
-        sample_bbs_test(crops_list_sp, output_file_name_sp, liver_masks_path, lesion_masks_path, output_folder_path)
+        data_aug_options = 8
+        return sample_bbs(crops_list_sp, data_aug_options, liver_masks_path, lesion_masks_path)
 
 
-    def det_lesion_test(self):
-        det_lesion_test(self.config)
+    def det_lesion_test(self, val_file_pos, val_file_neg):
+        return det_lesion_test(self.config, val_file_pos, val_file_neg)
 
     def det_lesion_train(self):
         det_lesion_train(self.config, self.gpu_id, self.det_batch_size, self.det_iter_mean_grad, self.det_max_training_iters, 
                         self.det_save_step, self.display_step, self.det_learning_rate)
 
     def seg_lesion_test(self):
-        seg_lesion_test(self.config, self.number_slices)
+        return seg_lesion_test(self.config, self.config.num_slices)
     
     def seg_lesion_train(self):
         seg_lesion_train(self.config, self.gpu_id, self.number_slices, self.batch_size, self.iter_mean_grad,
@@ -97,31 +94,50 @@ class LiverLesion:
             Driver code for testing the model.
         """
 
-        test_steps = [
-            # ['seg_liver_test', self.seg_liver_test], ## seg_liver_test.py ## OUTPUT SEG_LIVER_ck
-            ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ## compute_3D_bbs_from_gt_liver.py ## 
-            # ['sample_bbs', self.sample_bbs], ### sample_bbs.py
-            # ['det_lesion_test', self.det_lesion_test], ### det_lesion_test.py
-            # ['seg_lesion_test', self.seg_lesion_test] ##### seg_lesion_test.py
-        ]
-
         time_list = []
+        last_step_output = None
 
-        for name, step in test_steps:
+        
+        def runStepWithTime(name, step):
+            # run step
             print('Running step: ' + name + "\n")
             start_time = time.time()
-            step()
-            tf.reset_default_graph()
-            print('\nDone step: '+ name)
-            total_time = int(time.time() - start_time)
-            time_list.append(total_time)
-            print ("\nTime taken: " + str(total_time) + " seconds or,\t" + str(total_time/60) + " minutes to run\n")
 
-        print("Times for all function: ")
-        for func in range(len(test_steps)):
-            print("\t" + str(test_steps[func][0]) + ": " + str(time_list[func]) + " seconds, " + str(time_list[func]/60) + " minutes.\n")
+            try:
+                step_output = step()
+            except:
+                raise Exception('ERROR running')
+            
+            print('\nDone step: '+ name)
+
+            ## run time
+            total_time = int(time.time() - start_time)
+            time_list.append({'name': name, 'time' :total_time})
+            floor_var = math.floor(total_time/60)
+            mod_var = total_time % 60
+            print("\nTime taken: {} seconds or {} minutes {}s to run\n".format(total_time, floor_var, mod_var))
+
+            # reset tf graph for memory purposes
+            tf.reset_default_graph()
+
+            return step_output
+
+        # run workflow
+        runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(self.testing_volume))
+        crops_df = runStepWithTime('compute_bbs_from_gt_liver', lambda: self.compute_3D_bbs_from_gt_liver())
+        patches =  runStepWithTime('sample_bbs_test', lambda: self.sample_bbs(crops_df))
+        runStepWithTime('det_lesion_test', lambda: self.det_lesion_test(patches["test_pos"], patches["test_neg"]))
+        runStepWithTime('seg_lesion_test', lambda: self.seg_lesion_test()) ## TODO: crops_list_gt.txt --> df
+
+
+        print("---SUMMARY---")
+        for step in time_list:
+            print("Step: ", step['name'])
+            step_time = step['time']
+            print("\nTime taken: {} seconds or {} minutes {}s to run\n".format(step_time, math.floor(step_time/60), step_time % 60))
         
-        print("Total time: " + str(sum(time_list)) + " seconds,\t" + str(sum(time_list)/60) + " minutes.\n")
+        total_time = sum(time_list)
+        print("\nTotal time taken: {} seconds or {} minutes {}s to run\n".format(total_time, math.floor(total_time/60), total_time % 60))
 
 
 
@@ -175,13 +191,15 @@ if __name__ =='__main__':
     cmdline = parser.parse_args()
 
     from config import Config
+    
 
     config = Config()
-    print(config.get_result_root('results'))
 
     liver_lesion = LiverLesion(config)
     
     if cmdline.mode == "test":
+        config.phase = "test"
         liver_lesion.test()
     elif cmdline.mode == "train":
+        config.phase = "train"
         liver_lesion.train()

@@ -15,7 +15,7 @@ import seg_liver as segmentation
 from dataset.dataset_seg import Dataset
 from config import Config
 
-def seg_liver_test(config, number_slices=3):
+def seg_liver_test(config, test_volume_df, number_slices=3):
     """
         segmentation of liver
     """
@@ -25,15 +25,13 @@ def seg_liver_test(config, number_slices=3):
     ### config constants ###
     database_root = config.database_root
     logs_path = config.get_log(task_name)
-    result_root = config.get_result_root('LiTS_database')
+    result_root = os.path.join(config.root_folder, 'LiTS_database')
     root_folder = config.root_folder
     ###
 
     model_name = os.path.join(logs_path, "seg_liver.ckpt")
 
-    test_file = os.path.join(root_folder, 'seg_DatasetList/testing_volume_3.txt')
-
-    dataset = Dataset(None, test_file, None, database_root, number_slices, store_memory=False)
+    dataset = Dataset(None, test_volume_df, None, database_root, number_slices, store_memory=False)
 
     result_path = os.path.join(result_root, task_name)
     checkpoint_path = model_name

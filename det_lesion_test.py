@@ -15,7 +15,10 @@ import det_lesion as detection
 from dataset.dataset_det import Dataset
 from config import Config
 
-def det_lesion_test(config):
+def det_lesion_test(config, val_file_pos, val_file_neg):
+    '''
+    val_file_pos and val_file_neg are the validation set
+    '''
 
     gpu_id = 0
 
@@ -24,19 +27,11 @@ def det_lesion_test(config):
     ### config constants ###
     database_root = config.database_root
     logs_path = config.get_log(task_name)
-    result_root = config.get_result_root('detection_results/')
+    result_root = os.path.join(config.root_folder, 'detection_results/')
     root_folder = config.root_folder
     ###
 
     model_name = os.path.join(logs_path, "det_lesion.ckpt")
-    #liver_open\liverseg-2017-nipsws\det_DatasetList\testing_negative_det_patches_test_patches_dummy.txt
-    #liver_open\liverseg-2017-nipsws\det_DatasetList\testing_positive_det_patches_test_patches_dummy.txt
-    val_file_pos = os.path.join(root_folder, 'det_DatasetList', 'testing_positive_det_patches_test_patches_OV.txt')
-    val_file_neg = os.path.join(root_folder, 'det_DatasetList', 'testing_negative_det_patches_test_patches_OV.txt')
-
-#D:\L_pipe\liver_open\liverseg-2017-nipsws\det_DatasetList\testing_positive_det_patches_test_patches_OVxt
-    # val_file_pos = os.path.join(root_folder, 'det_DatasetList', 'testing_positive_det_patches.txt')
-    # val_file_neg = os.path.join(root_folder, 'det_DatasetList', 'testing_negative_det_patches.txt')
 
     dataset = Dataset(None, None, val_file_pos, val_file_neg, None, database_root, store_memory=False)
 

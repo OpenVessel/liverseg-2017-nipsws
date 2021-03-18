@@ -26,11 +26,11 @@ class Dataset:
                 train_paths = t.readlines()
         else:
             train_paths = []
-        if test_list is not None:
-            with open(test_list) as t:
-                test_paths = t.readlines()
-        else:
-            test_paths = []
+        # if test_list is not None:
+        #     with open(test_list) as t:
+        #         test_paths = t.readlines()
+        # else:
+        #     test_paths = []
 
         if val_list is not None:
             with open(val_list) as t:
@@ -94,14 +94,15 @@ class Dataset:
         # Load testing images (path) and labels
         self.images_test = []
         self.images_test_path = []
-        for idx, line in enumerate(test_paths):
-            if (len(line.split()) > 1):
+        for idx, row in test_list.iterrows(): 
+            if (len(row.columns) > 1):
                 if store_memory:
                     aux_images_test = []
                     for i in range(number_of_slices):
+                        mat_file = os.path.join(database_root, str(row.iloc[i * 3])) # os.path.join(database_root, str(line.split()[i * 3]))
                         aux_images_test.append(
-                            np.array(scipy.io.loadmat(os.path.join(database_root, str(line.split()[i * 3])))['section'],
-                                     dtype=np.float32))
+                            np.array(scipy.io.loadmat(mat_file)['section'],
+                                    dtype=np.float32))
                     self.images_test.append(np.array(aux_images_test))
 
                     if (idx + 1) % 1000 == 0:
@@ -109,7 +110,8 @@ class Dataset:
 
                 aux_images_test_path = []
                 for i in range(number_of_slices):
-                    aux_images_test_path.append(os.path.join(database_root, str(line.split()[i * 3])))
+                    mat_file = os.path.join(database_root, str(row.iloc[i * 3]))
+                    aux_images_test_path.append(mat_file)
                 self.images_test_path.append(np.array(aux_images_test_path))
 
         self.images_val = []

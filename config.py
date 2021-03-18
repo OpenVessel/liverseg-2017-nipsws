@@ -17,6 +17,10 @@ class Config:
         
         self.resnet_ckpt = os.path.join(self.root_folder, 'train_files', 'resnet_v1_50.ckpt')
         self.imagenet_ckpt = os.path.join(self.root_folder, 'train_files', 'vgg_16.ckpt')
+
+        self.images_volumes = 'images_volumes'
+        self.item_seg = 'item_seg'
+        self.liver_seg = 'liver_seg'
         
         self.debug = 0 # 0 for false, 1 for true
 
@@ -24,12 +28,15 @@ class Config:
 
         self.crops_list = 'crops_list_OV.txt' # change as per convenience in comment below but leave this be for final
         # self.crops_list = 'crops_LiTS_gt.txt'
+        self.patient_range = [105,108] # inclusive
 
-    def get_log(self, task_name):
-        return os.path.join(self.root_folder, 'train_files', task_name, 'networks')
+        self.num_slices = 3
 
     def get_result_root(self, result_name):
         return os.path.join(self.root_folder, result_name)
 
     def get_crops_list_path(self):
         return os.path.join(self.root_folder, 'utils', 'crops_list', self.crops_list)
+
+    def get_log(self, task_name):
+        return os.path.join(self.root_folder, 'train_files', task_name, 'networks')

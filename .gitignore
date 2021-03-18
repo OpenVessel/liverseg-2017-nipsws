@@ -97,6 +97,8 @@ ENV/
 # mkdocs documentation
 /site
 
+/data
+
 # mypy
 .mypy_cache/
 *.mat
@@ -124,8 +126,9 @@ utils/.DS_Store
 *.nii
 .vscode/settings.json
 
-# Rishyak stuff
+# Envs
 MyEnv/*
+MyVenv/
 LiverLesionWorkspace.code-workspace
 
 # Matlab nifti_library. Can be found at: https://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image

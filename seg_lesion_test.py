@@ -22,8 +22,6 @@ def seg_lesion_test(config, number_slices=3):
     gpu_id = 0
     number_slices = 3
 
-    #crops_list = 'crops_LiTS_gt.txt'
-    #crops_predict_gt.txt
     det_results_list = 'detection_lesion_example'
 
     task_name = 'seg_lesion_ck'
@@ -77,7 +75,8 @@ def seg_lesion_test(config, number_slices=3):
     # 4. Checks positive detections of lesions in the liver. Remove those false positive of the segmentation network using the detection results.
     print("filtering results")
     utils.det_filter.filter(
-        base_root=root_folder, 
+        base_root=root_folder,
+        config=config, 
         crops_list=crops_list, 
         input_config='masked_out_' + task_name,
         results_list=det_results_list, 
