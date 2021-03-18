@@ -37,6 +37,8 @@ class TrainTestSplit:
 
         patients = []
 
+        patient_ids = list(filter(lambda x: x != ".DS_Store", patient_ids))
+
         for patient_id in patient_ids:
 
             patient_fold = os.path.join(images_volumes_fold, patient_id)

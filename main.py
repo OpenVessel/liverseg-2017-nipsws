@@ -103,10 +103,12 @@ class LiverLesion:
             print('Running step: ' + name + "\n")
             start_time = time.time()
 
-            try:
-                step_output = step()
-            except:
-                raise Exception('ERROR running')
+            step_output = step()
+
+            # try:
+            #     step_output = step()
+            # except:
+            #     raise Exception('ERROR running')
             
             print('\nDone step: '+ name)
 

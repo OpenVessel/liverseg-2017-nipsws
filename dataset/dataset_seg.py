@@ -95,7 +95,7 @@ class Dataset:
         self.images_test = []
         self.images_test_path = []
         for idx, row in test_list.iterrows(): 
-            if (len(row.columns) > 1):
+            if (len(row) > 1):
                 if store_memory:
                     aux_images_test = []
                     for i in range(number_of_slices):
