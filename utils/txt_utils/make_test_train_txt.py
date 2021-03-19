@@ -2,18 +2,34 @@ import os
 import platform
 import pandas as pd
 
-def listSort():
-    images_volumes_fold = os.path.join(root_dataset, images_volumes)
+
+def sort_list(dataset_root, images_volumes, item_seg, liver_seg):
+    """
+    Arguments
+    dataset_root: root folder where the dataset is held 
+    images_volumes: name of ground truths folder
+    item_seg: name of item (lesion) folder
+    liver_seg: name of liver folder
+
+    return: list of lists that will be fed into a pandas DataFrame
+    """
+
+
+
+    # ground truths
+    images_volumes_fold = os.path.join(dataset_root, images_volumes)
     images_volumes_patID = os.listdir(images_volumes_fold)
     images_volumes_patID.sort()
     images_volumes_patID = sorted(images_volumes_patID, key=len)
 
-    item_seg_fold = os.path.join(root_dataset, item_seg)
+    # lesions
+    item_seg_fold = os.path.join(dataset_root, item_seg)
     item_seg_patID = os.listdir(item_seg_fold)
     item_seg_patID.sort()
     item_seg_patID = sorted(item_seg_patID, key=len)
 
-    liver_seg_fold = os.path.join(root_dataset, liver_seg)
+    # liver
+    liver_seg_fold = os.path.join(dataset_root, liver_seg)
     liver_seg_patID = os.listdir(liver_seg_fold)
     liver_seg_patID.sort()
     liver_seg_patID = sorted(liver_seg_patID, key=len)
@@ -59,12 +75,6 @@ def listSort():
 
     return all_paths
 
-# all_paths = [pat0, pat1, pat2, pat3, pat4, ... , pat130]
-    # patXYZ = [[images_volumes], [item_seg], [liver_seg]]
-        # images_volumes = all paths for patientXYZ from that folder
-        #       item_seg = all paths for patientXYZ from that folder
-        #      liver_seg = all paths for patientXYZ from that folder
-
 
 # Makes each individual line for training file
 def makeTrainLine(list):
@@ -81,6 +91,7 @@ def makeTrainLine(list):
 
     return lineList
 
+
 # Makes each individual line for testing file
 def makeTestLine(list):
     lineList = []
@@ -96,9 +107,13 @@ def makeTestLine(list):
 
     return lineList
 
+
+################################# TXT START ############################
+
+
 # Makes each training TXT file
-def makeTrainTXT():
-    lineList = makeTrainLine(listOfLists)
+def generate_train_txt(lol):
+    lineList = makeTrainLine(lol)
 
     if platform.system() == "Windows":
         TXTname = r"..\..\seg_DatasetList\training_volume_OV.txt"
@@ -112,9 +127,10 @@ def makeTrainTXT():
 
     TXTfile.close()
 
+
 # Makes each testing TXT file
-def makeTestTXT():
-    lineList = makeTestLine(listOfLists)
+def generate_test_txt(lol):
+    lineList = makeTestLine(lol)
 
     if platform.system() == "Windows":
         TXTname = r"..\..\seg_DatasetList\testing_volume_OV.txt"
@@ -128,33 +144,49 @@ def makeTestTXT():
 
     TXTfile.close()
 
+################################# TXT END ############################
+
+
 # Makes training DF
-def makeTrainDF():
-    lineList = makeTrainLine(listOfLists)
+def generate_training_volume_df(lol):
+    lineList = makeTrainLine(lol)
 
     return pd.DataFrame(lineList)
+
 
 # Makes testing DF
-def makeTestDF():
-    lineList = makeTestLine(listOfLists)
+def generate_testing_volume_df(lol):
+    lineList = makeTestLine(lol)
 
     return pd.DataFrame(lineList)
 
-# Header
+
+def generate_test_train_volume_dfs(dataset_root, images_volumes, item_seg, liver_seg):
+    """
+    Generates the df for seg_liver_test
+    """
+    
+    lol = sort_list(dataset_root, images_volumes, item_seg, liver_seg)
+    testing_volume = generate_testing_volume_df(lol)
+    training_volume = generate_training_volume_df(lol)
+
+    return training_volume, testing_volume
+
+
 if __name__ == "__main__":
 
     if platform.system() == "Windows":
-        root_dataset = r"..\..\LiTS_database"
+        dataset_root = r"..\..\LiTS_database"
     else:
-        root_dataset = "../../LiTS_database"
+        dataset_root = "../../LiTS_database"
 
     images_volumes = "images_volumes"
     item_seg = "item_seg"
     liver_seg = "liver_seg"
 
-    listOfLists = listSort()
-    makeTestTXT()
-    makeTrainTXT()
+    lol = sort_list(dataset_root, images_volumes, item_seg, liver_seg)
+    generate_test_txt(lol)
+    generate_train_txt(lol)
 
-    testDF = makeTestDF()
-    trainDF = makeTrainDF()
+    testDF = generate_testing_volume_df(lol)
+    trainDF = generate_training_volume_df(lol)

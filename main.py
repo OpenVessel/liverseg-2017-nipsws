@@ -96,9 +96,13 @@ class LiverLesion:
         """
             Driver code for testing the model.
         """
-        
+
         test_steps = [
-            ['seg_liver_test', self.seg_liver_test], ## seg_liver_test.py ## OUTPUT SEG_LIVER_ck
+            # ['seg_liver_test', self.seg_liver_test], ## seg_liver_test.py ## OUTPUT SEG_LIVER_ck
+            ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ## compute_3D_bbs_from_gt_liver.py ## 
+            # ['sample_bbs', self.sample_bbs], ### sample_bbs.py
+            # ['det_lesion_test', self.det_lesion_test], ### det_lesion_test.py
+            # ['seg_lesion_test', self.seg_lesion_test] ##### seg_lesion_test.py
         ]
 
         time_list = []
@@ -155,13 +159,19 @@ class LiverLesion:
 
 # Global vars and driver
 if __name__ =='__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description="Train or Test the Liver Lesion Segmentation Model")
+    parser.add_argument('mode', help="'test' or 'train' depending on what you wish to do.")
+    cmdline = parser.parse_args()
+
     from config import Config
 
     config = Config()
     print(config.get_result_root('results'))
 
-    liver_lesion = LiverLesion(config)
-    liver_lesion.test()
-    #liver_lesion.train()
-
-#updating tensorflow 1.0 to 2.0 
+    liver_lesion = LiverLesion(config
+    )
+    if cmdline.mode == "test":
+        liver_lesion.test()
+    elif cmdline.mode == "train":
+        liver_lesion.train()
