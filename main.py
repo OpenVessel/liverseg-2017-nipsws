@@ -125,7 +125,7 @@ class LiverLesion:
             return step_output
 
         # run workflow
-        runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(self.testing_volume))
+        # runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(self.testing_volume))
         crops_df = runStepWithTime('compute_bbs_from_gt_liver', lambda: self.compute_3D_bbs_from_gt_liver())
         patches =  runStepWithTime('sample_bbs_test', lambda: self.sample_bbs(crops_df))
         runStepWithTime('det_lesion_test', lambda: self.det_lesion_test(patches["test_pos"], patches["test_neg"]))
@@ -196,6 +196,8 @@ if __name__ =='__main__':
     
 
     config = Config()
+
+    config.labels = True # Change to false if we don't have labels
 
     liver_lesion = LiverLesion(config)
     

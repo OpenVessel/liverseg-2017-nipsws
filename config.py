@@ -32,6 +32,8 @@ class Config:
 
         self.num_slices = 3
 
+        self.labels = True
+
     def get_result_root(self, result_name):
         return os.path.join(self.root_folder, result_name)
 
