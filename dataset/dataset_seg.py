@@ -126,7 +126,7 @@ class Dataset:
         self.labels_val_path = []
         self.labels_liver_val = []
         self.labels_liver_val_path = []
-        for idx, line in enumerate(val_paths):
+        for idx, line in enumerate(val_paths): # TODO: When changing to DFs, make sure it checks if it's None.
             if (len(line.split()) > 3):
                 if store_memory:
                     aux_images_val = []
