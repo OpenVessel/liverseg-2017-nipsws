@@ -619,11 +619,11 @@ def test(dataset, checkpoint_path, result_path, number_slices=1, volume=False, c
             os.makedirs(result_path)
         for frame in range(0, dataset.get_test_size()):
             img, curr_img = dataset.next_batch(batch_size, 'test')
-            curr_ct_scan = curr_img[0][0].split('/')[-2]
+            curr_ct_scan = curr_img[0][0].split(os.path.sep)[-2]
             curr_frames = []
             if 1:
                 for i in range(number_of_slices):
-                    curr_frames.append([curr_img[0][i].split('/')[-1].split('.')[0] + '.png'])
+                    curr_frames.append([curr_img[0][i].split(os.path.sep)[-1].split('.')[0] + '.png'])
                 if not os.path.exists(os.path.join(result_path, curr_ct_scan)):
                     os.makedirs(os.path.join(result_path, curr_ct_scan))
                 image = preprocess_img(curr_img, number_slices)

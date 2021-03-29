@@ -124,11 +124,11 @@ class LiverLesion:
 
             return step_output
 
-        # run workflow
-        runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(self.testing_volume))
+        # testing run workflow
+        runStepWithTime('seg_liver_test', lambda: self.seg_liver_test(self.testing_volume)) ## Segmentation of liver mask
         crops_df = runStepWithTime('compute_bbs_from_gt_liver', lambda: self.compute_3D_bbs_from_gt_liver())
         patches =  runStepWithTime('sample_bbs_test', lambda: self.sample_bbs(crops_df))
-        runStepWithTime('det_lesion_test', lambda: self.det_lesion_test(patches["test_pos"], patches["test_neg"]))
+        runStepWithTime('det_lesion_test', lambda: self.det_lesion_test(patches["test_pos"], patches["test_neg"])) ## detection of lesions 
         runStepWithTime('seg_lesion_test', lambda: self.seg_lesion_test()) ## TODO: crops_list_gt.txt --> df
 
 
@@ -149,12 +149,13 @@ class LiverLesion:
         """
         
         train_steps = [
-            #['seg_liver_train', self.seg_liver_train], ### seg_liver_train.py
-            #['seg_liver_test', self.seg_liver_test], ### seg_liver_test.py
+            ## VB step up here
+            ['seg_liver_train', self.seg_liver_train], ### seg_liver_train.py
+            ['seg_liver_test', self.seg_liver_test], ### seg_liver_test.py ##config file is not changing for new checkpoint weights config.py "seg_lesion.ckpt.data-00000-of-00001"
 
-            #['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ### compute_3D_bbs_from_gt_liver.py
+            ['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ### compute_3D_bbs_from_gt_liver.py
 
-            #['sample_bbs', self.sample_bbs], ### sample_bbs.py
+            ['sample_bbs', self.sample_bbs], ### sample_bbs.py
 
             ['det_lesion_train', self.det_lesion_train], ### det_lesion_train.py
             ['det_lesion_test', self.det_lesion_test], ### det_lesion_test.py

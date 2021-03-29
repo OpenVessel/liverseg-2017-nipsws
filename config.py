@@ -15,7 +15,7 @@ class Config:
 
         self.database_root = os.path.join(self.root_folder, self.__database_root)
         
-        self.resnet_ckpt = os.path.join(self.root_folder, 'train_files', 'resnet_v1_50.ckpt')
+        self.resnet_ckpt = os.path.join(self.root_folder, 'train_files', 'resnet_v1_50.ckpt') #"seg_lesion.ckpt.data-00000-of-00001"
         self.imagenet_ckpt = os.path.join(self.root_folder, 'train_files', 'vgg_16.ckpt')
 
         self.images_volumes = 'images_volumes'
