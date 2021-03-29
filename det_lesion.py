@@ -174,7 +174,7 @@ def det_lesion_resnet(inputs, is_training_option=False, scope='det_lesion'):
     net: Output Tensor of the network
     end_points: Dictionary with all Tensors of the network
     """
-    inputs = tf.Print(inputs, [inputs], "image values before it goes into the resnet=")
+    #inputs = tf.Print(inputs, [inputs], "image values before it goes into the resnet=")
 
     with tf.variable_scope(scope, 'det_lesion', [inputs]) as sc:
         end_points_collection = sc.name + '_end_points'

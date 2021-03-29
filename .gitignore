@@ -187,3 +187,5 @@ train_files/seg_liver/networks/test/events.out.tfevents.1615933379.DESKTOP-CPG6I
 train_files/seg_liver/networks/train/events.out.tfevents.1615929099.DESKTOP-CPG6IEP
 train_files/seg_liver/networks/train/events.out.tfevents.1615932163.DESKTOP-CPG6IEP
 train_files/seg_liver/networks/train/events.out.tfevents.1615933215.DESKTOP-CPG6IEP
+LiTS_database/seg_liver_ck.zip
+*.DESKTOP-CPG6IEP
