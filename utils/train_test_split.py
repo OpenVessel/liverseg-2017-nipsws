@@ -7,6 +7,7 @@ from pprint import pprint
 class TrainTestSplit:
     def __init__(self, config):
         self.config = config
+        self.labels = config.labels
 
     def sort_list(self, images_volumes, item_seg, liver_seg):
         """
@@ -29,15 +30,14 @@ class TrainTestSplit:
         def get_sorted_dir(dir):
             dirContents = os.listdir(dir)
             dirContents.sort()
-            return sorted(dirContents, key=len)
+            dirContents = sorted(dirContents, key=len)
+            return list(filter(lambda x: x != ".DS_Store", dirContents))
 
         # ground truths
         images_volumes_fold = os.path.join(self.config.database_root, images_volumes)
         patient_ids = get_sorted_dir(images_volumes_fold)
 
         patients = []
-
-        patient_ids = list(filter(lambda x: x != ".DS_Store", patient_ids))
 
         for patient_id in patient_ids:
 
@@ -49,10 +49,11 @@ class TrainTestSplit:
             livers = []
 
             for i in range(1, num_patient_slices+1):
-                file_id = os.path.join(patient_id, str(i))
-                mats.append(os.path.join(images_volumes, file_id + '.mat'))
-                items.append(os.path.join(item_seg, file_id + '.png'))
-                livers.append(os.path.join(liver_seg, file_id + '.png'))
+                file_id = os.path.join(patient_id, str(i)) ## file won't always be a number
+                mats.append(os.path.join(images_volumes, file_id + '.mat')) 
+                if self.labels:
+                    items.append(os.path.join(item_seg, file_id + '.png')) # ASSUMES that there are item_seg labels, doesn't check it. (Jeph's dataset doesn't)
+                    livers.append(os.path.join(liver_seg, file_id + '.png')) # ASSUMES that there are liver_seg labels, doesn't check it. (Jeph's dataset doesn't)
 
             patients.append([mats, items, livers])
 
@@ -72,11 +73,14 @@ class TrainTestSplit:
             for i in range(0, num_pat_rows + 1):
                 row = []
                 mats = lol[pat][0]
-                items = lol[pat][1]
-                livers = lol[pat][2]
+                if self.labels:
+                    items = lol[pat][1]
+                    livers = lol[pat][2]
 
                 for j in range(0, self.config.num_slices):
-                    row.extend([ mats[j + i], items[j + i], livers[j + i] ]) # 1.mat 1.itempng 1.liverpng
+                    row.extend([mats[j + i]]) # 1.mat 
+                    if self.labels:
+                        row.extend([items[j + i], livers[j + i] ]) # 1.itempng 1.liverpng
                 rows.append(row)
 
         return pd.DataFrame(rows)

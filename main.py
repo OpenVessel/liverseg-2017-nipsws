@@ -198,6 +198,8 @@ if __name__ =='__main__':
 
     config = Config()
 
+    config.labels = True # Change to false if we don't have labels
+
     liver_lesion = LiverLesion(config)
     
     if cmdline.mode == "test":
