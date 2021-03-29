@@ -134,8 +134,8 @@ class Dataset:
                     aux_labels_liver_val = []
                     for i in range(number_of_slices):
                         aux_images_val.append(
-                            np.array(scipy.io.loadmat(os.path.join(database_root, str(line.split()[i * 3])))['section'],
-                                     dtype=np.float32))
+                            np.array(scipy.io.loadmat(os.path.join(database_root, 
+                                    str(line.split()[i * 3])))['section'], dtype=np.float32))
                     self.images_val.append(np.array(aux_images_val))
 
                     for i in range(number_of_slices):
