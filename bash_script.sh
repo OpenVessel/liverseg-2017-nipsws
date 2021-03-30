@@ -9,6 +9,7 @@ arg parse train or test
 : '
  find process like this ps ax | grep main.py
  kill process like this kill PID
+ pgrep -af python
 '
 nohup python main.py train &
 nohup python main.py train > nohup.out &
