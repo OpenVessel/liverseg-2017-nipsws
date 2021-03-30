@@ -22,22 +22,23 @@ class Dataset:
         """
         # Load training images (path) and labels
         print('Started loading files...')
-        if train_list is not None:
-            with open(train_list) as t:
-                train_paths = t.readlines()
-        else:
-            train_paths = []
+        # if train_list is not None:
+        #     with open(train_list) as t:
+        #         train_paths = t.readlines()
+        # else:
+        #     train_paths = []
+
         # if test_list is not None:
         #     with open(test_list) as t:
         #         test_paths = t.readlines()
         # else:
         #     test_paths = []
 
-        if val_list is not None:
-            with open(val_list) as t:
-                val_paths = t.readlines()
-        else:
-            val_paths = []
+        # if val_list is not None:
+        #     with open(val_list) as t:
+        #         val_paths = t.readlines()
+        # else:
+        #     val_paths = []
 
         self.images_train = []
         self.images_train_path = []
@@ -100,6 +101,8 @@ class Dataset:
         self.images_test = []
         self.images_test_path = []
         if test_list is not None:
+            test_list = pd.read_csv(test_list, delim_whitespace = True) if isinstance(test_list, str) else test_list
+
             for idx, row in test_list.iterrows(): 
                 if (len(row) > 1):
                     if store_memory:
@@ -126,48 +129,52 @@ class Dataset:
         self.labels_val_path = []
         self.labels_liver_val = []
         self.labels_liver_val_path = []
-        for idx, line in enumerate(val_paths): # TODO: When changing to DFs, make sure it checks if it's None.
-            if (len(line.split()) > 3):
-                if store_memory:
-                    aux_images_val = []
-                    aux_labels_val = []
-                    aux_labels_liver_val = []
-                    for i in range(number_of_slices):
-                        aux_images_val.append(
-                            np.array(scipy.io.loadmat(os.path.join(database_root, 
-                                    str(line.split()[i * 3])))['section'], dtype=np.float32))
-                    self.images_val.append(np.array(aux_images_val))
+
+        if val_list is not None:
+            val_list = pd.read_csv(val_list, delim_whitespace = True) if isinstance(val_list, str) else val_list
+
+            for idx, row in val_list.iterrows():
+                if (len(row) > 3):
+                    if store_memory:
+                        aux_images_val = []
+                        aux_labels_val = []
+                        aux_labels_liver_val = []
+                        for i in range(number_of_slices):
+                            mat_file = os.path.join(database_root, str(row.iloc[i * 3]))
+                            aux_images_val.append(
+                                np.array(scipy.io.loadmat(mat_file)['section'], dtype=np.float32))
+                        self.images_val.append(np.array(aux_images_val))
+
+                        for i in range(number_of_slices):
+                            mat_file = os.path.join(database_root, str(row.iloc[i * 3 + 1]))
+                            aux_images_val.append(
+                                np.array(scipy.io.loadmat(mat_file)['section'], dtype=np.float32))
+                        self.labels_val.append(np.array(aux_labels_val))
+
+                        for i in range(number_of_slices):
+                            mat_file = os.path.join(database_root, str(row.iloc[i * 3 + 2]))
+                            aux_images_val.append(
+                                np.array(scipy.io.loadmat(mat_file)['section'], dtype=np.float32))
+                        self.labels_liver_val.append(np.array(aux_labels_liver_val))
+
+                        if (idx + 1) % 1000 == 0:
+                            print('Loaded ' + str(idx) + ' train images')
+
+                    aux_images_val_path = []
+                    aux_labels_val_path = []
+                    aux_labels_liver_val_path = []
 
                     for i in range(number_of_slices):
-                        aux_labels_val.append(np.array(
-                            scipy.io.loadmat(os.path.join(database_root, str(line.split()[i * 3 + 1])))['section'],
-                            dtype=np.float32))
-                    self.labels_val.append(np.array(aux_labels_val))
+                        aux_images_val_path.append(os.path.join(database_root, str(row.iloc[i * 3])))
+                    self.images_val_path.append(np.array(aux_images_val_path))
 
                     for i in range(number_of_slices):
-                        aux_labels_liver_val.append(np.array(
-                            scipy.io.loadmat(os.path.join(database_root, str(line.split()[i * 3 + 2])))['section'],
-                            dtype=np.float32))
-                    self.labels_liver_val.append(np.array(aux_labels_liver_val))
+                        aux_labels_val_path.append(os.path.join(database_root, str(row.iloc[i * 3 + 1])))
+                    self.labels_val_path.append(np.array(aux_labels_val_path))
 
-                    if (idx + 1) % 1000 == 0:
-                        print('Loaded ' + str(idx) + ' train images')
-
-                aux_images_val_path = []
-                aux_labels_val_path = []
-                aux_labels_liver_val_path = []
-
-                for i in range(number_of_slices):
-                    aux_images_val_path.append(os.path.join(database_root, str(line.split()[i * 3])))
-                self.images_val_path.append(np.array(aux_images_val_path))
-
-                for i in range(number_of_slices):
-                    aux_labels_val_path.append(os.path.join(database_root, str(line.split()[i * 3 + 1])))
-                self.labels_val_path.append(np.array(aux_labels_val_path))
-
-                for i in range(number_of_slices):
-                    aux_labels_liver_val_path.append(os.path.join(database_root, str(line.split()[i * 3 + 2])))
-                self.labels_liver_val_path.append(np.array(aux_labels_liver_val_path))
+                    for i in range(number_of_slices):
+                        aux_labels_liver_val_path.append(os.path.join(database_root, str(row.iloc[i * 3 + 2])))
+                    self.labels_liver_val_path.append(np.array(aux_labels_liver_val_path))
 
         self.images_val_path = np.array(self.images_val_path)
         self.labels_val_path = np.array(self.labels_val_path)
