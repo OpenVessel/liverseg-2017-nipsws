@@ -131,6 +131,10 @@ MyEnv/*
 MyVenv/
 LiverLesionWorkspace.code-workspace
 
+# Old train files
+old train_files/*
+*.zip
+
 # Matlab nifti_library. Can be found at: https://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image
 nifti_library/*
 *.local
@@ -165,27 +169,4 @@ LiTS_database/item_seg.zip
 LiTS_database/images_volumes.zip
 LiTS_database/images_volumes.zip
 LiTS_database/item_seg.zip
-train_files/det_lesion/networks/checkpoint
-train_files/det_lesion/networks/det_lesion.ckpt-200.data-00000-of-00001
-train_files/det_lesion/networks/det_lesion.ckpt-200.index
-train_files/det_lesion/networks/det_lesion.ckpt-200.meta
-train_files/det_lesion/networks/test/events.out.tfevents.1615912049.DESKTOP-CPG6IEP
-train_files/det_lesion/networks/test/events.out.tfevents.1615912511.DESKTOP-CPG6IEP
-train_files/det_lesion/networks/test/events.out.tfevents.1615912728.DESKTOP-CPG6IEP
-train_files/det_lesion/networks/test/events.out.tfevents.1615913042.DESKTOP-CPG6IEP
-train_files/det_lesion/networks/train/events.out.tfevents.1615911952.DESKTOP-CPG6IEP
-train_files/det_lesion/networks/train/events.out.tfevents.1615912409.DESKTOP-CPG6IEP
-train_files/det_lesion/networks/train/events.out.tfevents.1615912636.DESKTOP-CPG6IEP
-train_files/det_lesion/networks/train/events.out.tfevents.1615912952.DESKTOP-CPG6IEP
-train_files/seg_liver/networks/train/events.out.tfevents.1615587932.DESKTOP-CPG6IEP
-train_files/det_lesion/networks/test/events.out.tfevents.1615933767.DESKTOP-CPG6IEP
-train_files/det_lesion/networks/train/events.out.tfevents.1615933588.DESKTOP-CPG6IEP
-train_files/det_lesion/networks/train/events.out.tfevents.1615933670.DESKTOP-CPG6IEP
-train_files/seg_liver/networks/test/events.out.tfevents.1615929255.DESKTOP-CPG6IEP
-train_files/seg_liver/networks/test/events.out.tfevents.1615932334.DESKTOP-CPG6IEP
-train_files/seg_liver/networks/test/events.out.tfevents.1615933379.DESKTOP-CPG6IEP
-train_files/seg_liver/networks/train/events.out.tfevents.1615929099.DESKTOP-CPG6IEP
-train_files/seg_liver/networks/train/events.out.tfevents.1615932163.DESKTOP-CPG6IEP
-train_files/seg_liver/networks/train/events.out.tfevents.1615933215.DESKTOP-CPG6IEP
-LiTS_database/seg_liver_ck.zip
-*.DESKTOP-CPG6IEP
+train_files/*
