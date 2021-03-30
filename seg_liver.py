@@ -511,10 +511,13 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
         while step < max_training_iters + 1:
             # Average the gradient
             for iter_steps in range(0, iter_mean_grad):
+                ### dataset.next_batch is called for train and val function stored in dattaset_seg.py
                 batch_image, batch_label, batch_label_liver = dataset.next_batch(batch_size, 'train')
                 batch_image_val, batch_label_val, batch_label_liver_val = dataset.next_batch(batch_size, 'val')
                 image = preprocess_img(batch_image, number_slices)
                 val_image = preprocess_img(batch_image_val, number_slices)
+
+                ## image object is used here tto pass through the run_res and define batch_loss
                 if task_id == 2:
                     batch_label = batch_label_liver
                     batch_label_val = batch_label_liver_val
@@ -525,6 +528,8 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
                 batch_loss = run_res[0]
                 summary = run_res[1]
                 train_dice_coef = run_res[2]
+
+                ## image val
                 if step % display_step == 0:
                     val_run_res = sess.run([total_loss, merged_summary_op, dice_coef_op],
                                            feed_dict={input_image: val_image, input_label: label_val})
