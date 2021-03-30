@@ -33,9 +33,14 @@ from config import Config
 # values = [ini_learning_rate, ini_learning_rate * 0.1, ini_learning_rate, ini_learning_rate * 0.1, ini_learning_rate,
 #           ini_learning_rate * 0.1]
 
-def seg_liver_train(config, gpu_id, number_slices, batch_size, iter_mean_grad, max_training_iters_1,
+def seg_liver_train(config, train_file, val_file,
+                    gpu_id, number_slices, batch_size, iter_mean_grad, max_training_iters_1,
                     max_training_iters_2, max_training_iters_3, save_step, display_step,
                     ini_learning_rate, boundaries, values):
+    """
+    train_file: Training DF
+    val_file: Testing DF used to evaluate.
+    """
 
     task_name = 'seg_liver'
 
@@ -46,8 +51,8 @@ def seg_liver_train(config, gpu_id, number_slices, batch_size, iter_mean_grad, m
     imagenet_ckpt = config.imagenet_ckpt
     ###
 
-    train_file = os.path.join(root_folder, 'seg_DatasetList', 'training_volume_3.txt')
-    val_file = os.path.join(root_folder, 'seg_DatasetList', 'testing_volume_3.txt')
+    # train_file = os.path.join(root_folder, 'seg_DatasetList', 'training_volume_3.txt')
+    # val_file = os.path.join(root_folder, 'seg_DatasetList', 'testing_volume_3.txt')
 
     dataset = Dataset(train_file, None, val_file, database_root, number_slices, store_memory=False)
 
