@@ -33,7 +33,7 @@ from config import Config
 # values = [ini_learning_rate, ini_learning_rate * 0.1, ini_learning_rate, ini_learning_rate * 0.1, ini_learning_rate,
 #           ini_learning_rate * 0.1]
 
-def seg_liver_train(config, train_file, val_file,
+def seg_liver_train(config, train_df, val_df,
                     gpu_id, number_slices, batch_size, iter_mean_grad, max_training_iters_1,
                     max_training_iters_2, max_training_iters_3, save_step, display_step,
                     ini_learning_rate, boundaries, values):
@@ -54,7 +54,7 @@ def seg_liver_train(config, train_file, val_file,
     # train_file = os.path.join(root_folder, 'seg_DatasetList', 'training_volume_3.txt')
     # val_file = os.path.join(root_folder, 'seg_DatasetList', 'testing_volume_3.txt')
 
-    dataset = Dataset(train_file, None, val_file, database_root, number_slices, store_memory=False)
+    dataset = Dataset(train_df, None, val_df, database_root, number_slices, store_memory=False)
 
     # Train the network
     with tf.Graph().as_default():

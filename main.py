@@ -56,9 +56,9 @@ class LiverLesion:
         return seg_liver_test(self.config, test_volume_txt, self.config.num_slices)
     
     def seg_liver_train(self):
-        train_file = self.training_volume
-        val_file = self.testing_volume
-        seg_liver_train(self.config, train_file, val_file,
+        train_df = self.training_volume
+        val_df = self.testing_volume
+        seg_liver_train(self.config, train_df, val_df,
                         self.gpu_id, self.number_slices, self.batch_size, self.iter_mean_grad, 
                         self.max_training_iters_1, self.max_training_iters_2, self.max_training_iters_3, 
                         self.save_step, self.display_step, self.ini_learning_rate, self.boundaries, self.values)
