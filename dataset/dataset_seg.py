@@ -41,21 +41,19 @@ class Dataset:
                         aux_labels_train = []
                         aux_labels_liver_train = []
                         for i in range(number_of_slices):
-                            aux_images_train.append(
-                                np.array(scipy.io.loadmat(os.path.join(database_root, str(row.iloc[i * 3])))['section'],
-                                        dtype=np.float32))
+                            mat_file = os.path.join(database_root, str(row.iloc[i * 3]))
+                            print("Train DF, {}".format(mat_file))
+                            aux_images_train.append(np.array(scipy.io.loadmat(mat_file)['section'], dtype=np.float32))
                         self.images_train.append(np.array(aux_images_train))
 
                         for i in range(number_of_slices):
-                            aux_labels_train.append(np.array(
-                                scipy.io.loadmat(os.path.join(database_root, str(row.iloc[i * 3 + 1])))['section'],
-                                dtype=np.float32))
+                            mat_file = os.path.join(database_root, str(row.iloc[i * 3 + 1]))
+                            aux_labels_train.append(np.array(scipy.io.loadmat(mat_file)['section'], dtype=np.float32))
                         self.labels_train.append(np.array(aux_labels_train))
 
                         for i in range(number_of_slices):
-                            aux_labels_liver_train.append(np.array(
-                                scipy.io.loadmat(os.path.join(database_root, str(row.iloc[i * 3 + 2])))['section'],
-                                dtype=np.float32))
+                            mat_file = os.path.join(database_root, str(row.iloc[i * 3 + 2]))
+                            aux_labels_liver_train.append(np.array(scipy.io.loadmat(mat_file)['section'], dtype=np.float32))
                         self.labels_liver_train.append(np.array(aux_labels_liver_train))
 
                         if (idx + 1) % 1000 == 0:
