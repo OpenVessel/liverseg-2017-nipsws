@@ -30,6 +30,10 @@ class Dataset:
         self.labels_liver_train = []
         self.labels_liver_train_path = []
 
+
+        if train_df is not None:
+            train_df = pd.read_csv(train_df, delim_whitespace = True) if isinstance(train_df, str) else train_df
+
             for idx, row in train_df.iterrows():
                 if (len(row) > 3):
                     if store_memory:
@@ -81,6 +85,9 @@ class Dataset:
         self.images_test = []
         self.images_test_path = []
 
+        if test_df is not None:
+            test_df = pd.read_csv(test_df, delim_whitespace = True) if isinstance(test_df, str) else test_df
+
             for idx, row in test_df.iterrows(): 
                 if (len(row) > 1):
                     if store_memory:
@@ -108,7 +115,10 @@ class Dataset:
         self.labels_liver_val = []
         self.labels_liver_val_path = []
 
-            for idx, row in val_df.iterrows():
+        if val_df is not None:
+            val_df = pd.read_csv(val_df, delim_whitespace = True) if isinstance(val_df, str) else val_df
+
+            for idx, row in val_df.iterrows():  
                 if (len(row) > 3):
                     if store_memory:
                         aux_images_val = []
