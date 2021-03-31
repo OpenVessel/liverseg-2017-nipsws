@@ -547,10 +547,10 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
 
             # Display training status
             if step % display_step == 0:
-                print >> sys.stderr, "{} Iter {}: Training Loss = {:.4f}".format(datetime.now(), step, batch_loss)
-                print >> sys.stderr, "{} Iter {}: Validation Loss = {:.4f}".format(datetime.now(), step, val_batch_loss)
-                print >> sys.stderr, "{} Iter {}: Training Dice = {:.4f}".format(datetime.now(), step, train_dice_coef)
-                print >> sys.stderr, "{} Iter {}: Validation Dice = {:.4f}".format(datetime.now(), step, val_dice_coef)
+                print >> sys.stderr, "{} Iter {}: Training Loss = {:,.4f}".format(datetime.now(), step, batch_loss)
+                print >> sys.stderr, "{} Iter {}: Validation Loss = {:,.4f}".format(datetime.now(), step, val_batch_loss)
+                print >> sys.stderr, "{} Iter {}: Training Dice = {:,.4f}".format(datetime.now(), step, train_dice_coef)
+                print >> sys.stderr, "{} Iter {}: Validation Dice = {:,.4f}".format(datetime.now(), step, val_dice_coef)
 
             # Save a checkpoint
             if step % save_step == 0:
