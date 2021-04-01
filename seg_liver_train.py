@@ -33,12 +33,8 @@ from config import Config
 # values = [ini_learning_rate, ini_learning_rate * 0.1, ini_learning_rate, ini_learning_rate * 0.1, ini_learning_rate,
 #           ini_learning_rate * 0.1]
 
-<<<<<<< Updated upstream
 def seg_liver_train(config, train_df, val_df,
                     gpu_id, number_slices, batch_size, iter_mean_grad, max_training_iters_1,
-=======
-def seg_liver_train(config, gpu_id, number_slices, batch_size, iter_mean_grad, max_training_iters_1,
->>>>>>> Stashed changes
                     max_training_iters_2, max_training_iters_3, save_step, display_step,
                     ini_learning_rate, boundaries, values):
     """

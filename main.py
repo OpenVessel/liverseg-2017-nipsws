@@ -37,13 +37,7 @@ class LiverLesion:
         self.ini_learning_rate = 1e-8
         self.boundaries = [10000, 15000, 25000, 30000, 40000]
         self.values = [self.ini_learning_rate, self.ini_learning_rate * 0.1, self.ini_learning_rate, 
-<<<<<<< Updated upstream
                     self.ini_learning_rate * 0.1, self.ini_learning_rate, self.ini_learning_rate * 0.1]
-=======
-                     self.ini_learning_rate * 0.1, self.ini_learning_rate, self.ini_learning_rate * 0.1]
-        # self.values = [ini_learning_rate, ini_learning_rate * 0.1, ini_learning_rate, ini_learning_rate * 0.1, ini_learning_rate,
-        #           ini_learning_rate * 0.1]
->>>>>>> Stashed changes
 
         # only for det_lesion_train
         self.det_batch_size = 16#64
@@ -158,7 +152,6 @@ class LiverLesion:
         """
         
         train_steps = [
-<<<<<<< Updated upstream
             ## VB step up here
             ['seg_liver_train', self.seg_liver_train], ### seg_liver_train.py
             ['seg_liver_test', self.seg_liver_test], ### seg_liver_test.py ##config file is not changing for new checkpoint weights config.py "seg_lesion.ckpt.data-00000-of-00001"
@@ -169,13 +162,6 @@ class LiverLesion:
 
             ['det_lesion_train', self.det_lesion_train], ### det_lesion_train.py
             ['det_lesion_test', self.det_lesion_test], ### det_lesion_test.py
-=======
-            ['seg_liver_train', self.seg_liver_train], ## seg_liver_train.py
-            #['compute_bbs_from_gt_liver', self.compute_3D_bbs_from_gt_liver], ## compute_3D_bbs_from_gt_liver.py
-            #['sample_bbs', self.sample_bbs], ### sample_bbs.py
-            #['det_lesion_train', self.det_lesion_train], ### det_lesion_train.py
-            #['seg_lesion_train', self.seg_lesion_train] ##### seg_lesion_train.py
->>>>>>> Stashed changes
 
             ['seg_lesion_train', self.seg_lesion_train], ##### seg_lesion_train.py
             ['seg_lesion_test', self.seg_lesion_test] ##### seg_lesion_test.py
@@ -215,12 +201,7 @@ if __name__ =='__main__':
 
     config = Config()
 
-<<<<<<< Updated upstream
     config.labels = True # Change to false if we don't have labels
-=======
-    liver_lesion = LiverLesion(config)
-    #liver_lesion.test()
->>>>>>> Stashed changes
 
     liver_lesion = LiverLesion(config)
     
