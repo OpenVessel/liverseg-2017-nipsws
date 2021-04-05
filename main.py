@@ -119,7 +119,7 @@ class LiverLesion:
 
 
         print("---SUMMARY---")
-        for step in time_list:
+        for step in self.time_list:
             print("Step: ", step['name'])
             step_time = step['time']
             print("\nTime taken: {} seconds or {} minutes {}s to run\n".format(step_time, math.floor(step_time/60), step_time % 60))

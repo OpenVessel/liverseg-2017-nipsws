@@ -27,32 +27,3 @@ def with_time(time_list):
             return step_output
         return wrapper
     return runStepWithTime
-
-
-def with_time(step):
-    def runStepWithTime():
-        # run step
-        print('Running step: ' + step.__name__ + "\n")
-        start_time = time.time()
-
-        step_output = step()
-
-        # try:
-        #     step_output = step()
-        # except:
-        #     raise Exception('ERROR running')
-        
-        print('\nDone step: '+ step.__name__)
-
-        ## run time
-        total_time = int(time.time() - start_time)
-        
-        floor_var = math.floor(total_time/60)
-        mod_var = total_time % 60
-        print("\nTime taken: {} seconds or {} minutes {}s to run\n".format(total_time, floor_var, mod_var))
-
-        # reset tf graph for memory purposes
-        tf.reset_default_graph()
-
-        return step_output
-    return runStepWithTime
