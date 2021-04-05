@@ -1,5 +1,6 @@
 import time
 import tensorflow as tf
+from functools import wraps
 
 
 def with_time(time_list):
