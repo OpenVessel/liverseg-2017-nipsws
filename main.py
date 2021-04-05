@@ -124,7 +124,7 @@ class LiverLesion:
             step_time = step['time']
             print("\nTime taken: {} seconds or {} minutes {}s to run\n".format(step_time, math.floor(step_time/60), step_time % 60))
         
-        total_time = sum(time_list)
+        total_time = sum(time_list.map(lambda x: x['time']))
         print("\nTotal time taken: {} seconds or {} minutes {}s to run\n".format(total_time, math.floor(total_time/60), total_time % 60))
 
 
