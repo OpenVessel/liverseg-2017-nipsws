@@ -12,7 +12,6 @@ from det_lesion_train import det_lesion_train
 
 from seg_lesion_test import seg_lesion_test
 from utils.train_test_split import TrainTestSplit
-from utils.decorators import with_time
 import time
 import math
 
@@ -53,13 +52,37 @@ class LiverLesion:
         tts = TrainTestSplit(self.config)
         self.training_volume, self.testing_volume = tts.split(self.config.images_volumes, self.config.item_seg, self.config.liver_seg)
 
+    def with_time(step):
+        def wrapper(self):
+            # run step
+            print('Running step: ' + step.__name__ + "\n")
+            start_time = time.time()
 
-    @with_time(self.time_list)
+            step_output = step(self)
+
+            print('\nDone step: '+ step.__name__)
+
+            ## run time
+            total_time = int(time.time() - start_time)
+            self.time_list.append({'name': step.__name__, 'time' :total_time})
+            
+            floor_var = math.floor(total_time/60)
+            mod_var = total_time % 60
+            print("\nTime taken: {} seconds or {} minutes {}s to run\n".format(total_time, floor_var, mod_var))
+            
+            # reset tf graph for memory purposes
+            tf.reset_default_graph()
+
+            return step_output
+        return wrapper
+
+
+    @with_time
     def seg_liver_test(self, test_volume_txt):
         return seg_liver_test(self.config, test_volume_txt, self.config.num_slices)
     
 
-    @with_time(self.time_list)
+    @with_time
     def seg_liver_train(self):
         train_df = self.training_volume
         val_df = self.testing_volume
@@ -69,12 +92,12 @@ class LiverLesion:
                         self.save_step, self.display_step, self.ini_learning_rate, self.boundaries, self.values)
     
 
-    @with_time(self.time_list)
+    @with_time
     def compute_3D_bbs_from_gt_liver(self):
         return compute_3D_bbs_from_gt_liver(self.config)
 
 
-    @with_time(self.time_list)
+    @with_time
     def sample_bbs(self, crops_list_sp):
         liver_masks_path = os.path.join(self.config.database_root, 'liver_seg')
         lesion_masks_path = os.path.join(self.config.database_root, 'item_seg')
@@ -82,23 +105,23 @@ class LiverLesion:
         return sample_bbs(crops_list_sp, data_aug_options, liver_masks_path, lesion_masks_path)
 
 
-    @with_time(self.time_list)
+    @with_time
     def det_lesion_test(self, val_file_pos, val_file_neg):
         return det_lesion_test(self.config, val_file_pos, val_file_neg)
 
 
-    @with_time(self.time_list)
+    @with_time
     def det_lesion_train(self):
         det_lesion_train(self.config, self.gpu_id, self.det_batch_size, self.det_iter_mean_grad, self.det_max_training_iters, 
                         self.det_save_step, self.display_step, self.det_learning_rate)
 
 
-    @with_time(self.time_list)
+    @with_time
     def seg_lesion_test(self):
         return seg_lesion_test(self.config, self.config.num_slices)
     
 
-    @with_time(self.time_list)
+    @with_time
     def seg_lesion_train(self):
         seg_lesion_train(self.config, self.gpu_id, self.number_slices, self.batch_size, self.iter_mean_grad,
                         self.max_training_iters_1, self.max_training_iters_2, self.max_training_iters_3, self.save_step,
