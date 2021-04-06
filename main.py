@@ -49,9 +49,6 @@ class LiverLesion:
 
         self.time_list = []
 
-        tts = TrainTestSplit(self.config)
-        self.training_volume, self.testing_volume = tts.split(self.config.images_volumes, self.config.item_seg, self.config.liver_seg)
-
 
     def logSummary(self, phase, time_list):
         print("--- SUMMARY ({0}) ---".format(phase))
@@ -95,10 +92,8 @@ class LiverLesion:
     
 
     @with_time
-    def seg_liver_train(self):
-        train_df = self.training_volume
-        val_df = self.testing_volume
-        seg_liver_train(self.config, train_df, val_df,
+    def seg_liver_train(self, training_df, valildation_df):
+        seg_liver_train(self.config, training_df, valildation_df,
                         self.gpu_id, self.number_slices, self.batch_size, self.iter_mean_grad, 
                         self.max_training_iters_1, self.max_training_iters_2, self.max_training_iters_3, 
                         self.save_step, self.display_step, self.ini_learning_rate, self.boundaries, self.values)
@@ -140,7 +135,7 @@ class LiverLesion:
                         self.display_step, self.ini_learning_rate, self.boundaries, self.values)
 
 
-    def test(self):
+    def test(self, testing_volume):
         """
             Driver code for testing the model.
         """
@@ -150,7 +145,7 @@ class LiverLesion:
         self.time_list = []
 
         # testing workflow
-        self.seg_liver_test(self.testing_volume)
+        self.seg_liver_test(testing_volume)
         crops_df = self.compute_3D_bbs_from_gt_liver()
         patches = self.sample_bbs(crops_df)
         self.det_lesion_test(patches["test_pos"], patches["test_neg"])
@@ -159,7 +154,7 @@ class LiverLesion:
         self.logSummary('Testing', self.time_list)
         
 
-    def train(self):
+    def train(self, testing_volume, validation_volume):
         """
             Driver code for training the model.
         """
@@ -169,7 +164,9 @@ class LiverLesion:
         self.time_list = []
 
         # training workflow
-        self.seg_liver_train()
+        self.seg_liver_train(
+            training_df = training_volume, 
+            validation_df = validation_volume) # is it correct to use testing volume as the validation volume?
         self.seg_liver_test()
         self.compute_3D_bbs_from_gt_liver()
         self.sample_bbs()
@@ -189,16 +186,18 @@ if __name__ =='__main__':
 
     from config import Config
     
-
     config = Config()
-
     config.labels = True # Change to false if we don't have labels
 
+
+    tts = TrainTestSplit(config)
+    training_volume, testing_volume = tts.split(config.images_volumes, config.item_seg, config.liver_seg)
+    
     liver_lesion = LiverLesion(config)
     
     if cmdline.mode == "test":
-        liver_lesion.test()
+        liver_lesion.test(testing_volume)
     elif cmdline.mode == "train":
-        liver_lesion.train()
+        liver_lesion.train(testing_volume, validation_volume = training_volume)
     else:
         raise BaseException('Invalid mode. Must be test or train')
