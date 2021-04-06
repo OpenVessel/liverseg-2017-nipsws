@@ -34,6 +34,8 @@ class Config:
 
         self.labels = True
 
+        self.fine_tune = 0
+
     def get_result_root(self, result_name):
         return os.path.join(self.root_folder, result_name)
 

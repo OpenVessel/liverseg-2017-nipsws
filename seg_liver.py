@@ -239,6 +239,33 @@ def load_vgg_imagenet(ckpt_path, number_slices):
     return init_fn
 
 
+# ORIGINAL BARCELONA CODE
+#  def class_balanced_cross_entropy_loss(output, label):
+#     """Define the class balanced cross entropy loss to train the network
+#     Args:
+#     output: Output of the network
+#     label: Ground truth label
+#     Returns:
+#     Tensor that evaluates the loss
+
+#     """
+
+#     labels = tf.cast(tf.greater(label, 0.5), tf.float32)
+
+#     output_gt_zero = tf.cast(tf.greater_equal(output, 0), tf.float32)
+
+#     loss_val = tf.multiply(output, (labels - output_gt_zero)) - tf.log(
+#         1 + tf.exp(output - 2 * tf.multiply(output, output_gt_zero)))
+
+#     loss_pos = tf.reduce_sum(-tf.multiply(labels, loss_val))
+#     loss_neg = tf.reduce_sum(-tf.multiply(1.0 - labels, loss_val))
+    
+#     #How to calulate weights
+#     final_loss = 0.931 * loss_pos + 0.069 * loss_neg
+
+#     return final_loss
+
+# ADDED ON APRIL 6, 2021. 
 def class_balanced_cross_entropy_loss(output, label):
     """Define the class balanced cross entropy loss to train the network
     Args:
@@ -246,22 +273,20 @@ def class_balanced_cross_entropy_loss(output, label):
     label: Ground truth label
     Returns:
     Tensor that evaluates the loss
-
     """
-
     labels = tf.cast(tf.greater(label, 0.5), tf.float32)
-
+    num_labels_pos = tf.reduce_sum(labels)
+    num_labels_neg = tf.reduce_sum(1.0 - labels)
+    num_total = num_labels_pos + num_labels_neg
     output_gt_zero = tf.cast(tf.greater_equal(output, 0), tf.float32)
-
     loss_val = tf.multiply(output, (labels - output_gt_zero)) - tf.log(
         1 + tf.exp(output - 2 * tf.multiply(output, output_gt_zero)))
-
     loss_pos = tf.reduce_sum(-tf.multiply(labels, loss_val))
     loss_neg = tf.reduce_sum(-tf.multiply(1.0 - labels, loss_val))
-    
-    #How to calulate weights
-    final_loss = 0.931 * loss_pos + 0.069 * loss_neg
-
+    final_loss = num_labels_neg / num_total * loss_pos + num_labels_pos / num_total * loss_neg
+    #tf.print("num total",num_total)
+    #tf.print("num_labels_neg",num_labels_neg)
+    #tf.print("num_labels_pos",num_labels_pos)
     return final_loss
 
 
@@ -569,7 +594,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
 def train_seg(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step,
                  display_step, global_step, number_slices=1, volume=False, iter_mean_grad=1, batch_size=1, task_id=2,
                  loss=1, momentum=0.9, resume_training=False,
-                 config=None):
+                 config=None, finetune = 0):
     """Train parent network
     Args:
     See _train()
@@ -578,7 +603,7 @@ def train_seg(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_t
 
     _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step, display_step,
            global_step, number_slices, volume, iter_mean_grad, batch_size, task_id, loss, momentum,
-           resume_training, config, finetune=0)
+           resume_training, config, finetune=finetune)
 
 
 def test(dataset, checkpoint_path, result_path, number_slices=1, volume=False, config=None):

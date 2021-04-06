@@ -57,7 +57,7 @@ def seg_lesion_train(config, gpu_id, number_slices, batch_size, iter_mean_grad, 
             learning_rate = tf.train.piecewise_constant(global_step, boundaries, values)
             segmentation.train_seg(dataset, imagenet_ckpt, 1, learning_rate, logs_path, max_training_iters_1, save_step,
                             display_step, global_step, number_slices=number_slices, iter_mean_grad=iter_mean_grad,
-                            batch_size=batch_size, task_id=1, resume_training=False)
+                            batch_size=batch_size, task_id=1, resume_training=False, finetune = config.fine_tune)
 
     with tf.Graph().as_default():
         with tf.device('/gpu:' + str(gpu_id)):
@@ -65,7 +65,7 @@ def seg_lesion_train(config, gpu_id, number_slices, batch_size, iter_mean_grad, 
             learning_rate = tf.train.piecewise_constant(global_step, boundaries, values)
             segmentation.train_seg(dataset, imagenet_ckpt, 2, learning_rate, logs_path, max_training_iters_2, save_step,
                             display_step, global_step, number_slices=number_slices, iter_mean_grad=iter_mean_grad,
-                            batch_size=batch_size, task_id=1, resume_training=True)
+                            batch_size=batch_size, task_id=1, resume_training=True, finetune = config.fine_tune)
 
     with tf.Graph().as_default():
         with tf.device('/gpu:' + str(gpu_id)):
@@ -73,4 +73,4 @@ def seg_lesion_train(config, gpu_id, number_slices, batch_size, iter_mean_grad, 
             learning_rate = tf.train.piecewise_constant(global_step, boundaries, values)
             segmentation.train_seg(dataset, imagenet_ckpt, 3, learning_rate, logs_path, max_training_iters_3, save_step,
                             display_step, global_step, number_slices=number_slices, iter_mean_grad=iter_mean_grad,
-                            batch_size=batch_size, task_id=1, resume_training=True)
+                            batch_size=batch_size, task_id=1, resume_training=True, finetune = config.fine_tune)

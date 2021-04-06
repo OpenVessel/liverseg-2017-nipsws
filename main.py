@@ -40,7 +40,7 @@ class LiverLesion:
                     self.ini_learning_rate * 0.1, self.ini_learning_rate, self.ini_learning_rate * 0.1]
 
         # only for det_lesion_train
-        self.det_batch_size = 16#64
+        self.det_batch_size = 16 # 64
         self.det_iter_mean_grad = 1
         self.det_max_training_iters = 5000
 
@@ -62,12 +62,12 @@ class LiverLesion:
 
 
     def with_time(step):
-        def wrapper(self):
+        def wrapper(self, *args, **kwargs):
             # run step
             print('Running step: ' + step.__name__ + "\n")
             start_time = time.time()
 
-            step_output = step(self)
+            step_output = step(self, *args, **kwargs)
 
             print('\nDone step: '+ step.__name__)
 
@@ -92,8 +92,8 @@ class LiverLesion:
     
 
     @with_time
-    def seg_liver_train(self, training_df, valildation_df):
-        seg_liver_train(self.config, training_df, valildation_df,
+    def seg_liver_train(self, training_df, validation_df):
+        seg_liver_train(self.config, training_df, validation_df,
                         self.gpu_id, self.number_slices, self.batch_size, self.iter_mean_grad, 
                         self.max_training_iters_1, self.max_training_iters_2, self.max_training_iters_3, 
                         self.save_step, self.display_step, self.ini_learning_rate, self.boundaries, self.values)
@@ -167,11 +167,14 @@ class LiverLesion:
         self.seg_liver_train(
             training_df = training_volume, 
             validation_df = validation_volume) # is it correct to use testing volume as the validation volume?
-        self.seg_liver_test()
-        self.compute_3D_bbs_from_gt_liver()
-        self.sample_bbs()
+        self.seg_liver_test(testing_volume)
+
+        crops_df = self.compute_3D_bbs_from_gt_liver()
+        patches = self.sample_bbs(crops_df)
+
         self.det_lesion_train()
-        self.det_lesion_test()
+        self.det_lesion_test(patches["test_pos"], patches["test_neg"])
+
         self.seg_lesion_train()
         self.seg_lesion_test()
 
@@ -188,6 +191,7 @@ if __name__ =='__main__':
     
     config = Config()
     config.labels = True # Change to false if we don't have labels
+    config.fine_tune = 0 # Change to 1 to 0 for the parent network and 1 for finetunning
 
 
     tts = TrainTestSplit(config)
