@@ -49,7 +49,6 @@ class Dataset:
                         aux_labels_liver_train = []
                         for i in range(number_of_slices):
                             mat_file = os.path.join(database_root, str(row.iloc[i * 3]))
-                            print("Train DF, {}".format(mat_file))
                             aux_images_train.append(np.array(scipy.io.loadmat(mat_file)['section'], dtype=np.float32))
                         self.images_train.append(np.array(aux_images_train))
 

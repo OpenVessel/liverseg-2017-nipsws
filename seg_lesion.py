@@ -375,7 +375,8 @@ def parameter_lr():
 
 
 def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step, display_step,
-           global_step, number_slices=1, volume=False, iter_mean_grad=1, batch_size=1, task_id=1, loss=1, momentum=0.9, resume_training=False, config=None, finetune=1):
+           global_step, number_slices=1, volume=False, iter_mean_grad=1, batch_size=1, task_id=1, loss=1, momentum=0.9, 
+           resume_training=False, config=None, finetune=1):
     """Train network
     Args:
     dataset: Reference to a Dataset object instance
@@ -579,7 +580,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
 
 def train_seg(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step,
                  display_step, global_step, number_slices=1, volume=False, iter_mean_grad=1, batch_size=1, task_id=1,
-                 loss=1, momentum=0.9, resume_training=False, config=None):
+                 loss=1, momentum=0.9, resume_training=False, config=None, finetune = 0):
     """Train parent network
     Args:
     See _train()
@@ -588,7 +589,7 @@ def train_seg(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_t
     
     _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step, display_step,
            global_step, number_slices, volume, iter_mean_grad, batch_size, task_id, loss, momentum, resume_training,
-           config, finetune=0)
+           config, finetune=finetune)
 
 
 def test(dataset, checkpoint_path, result_path, number_slices=1, volume=False, config=None):
