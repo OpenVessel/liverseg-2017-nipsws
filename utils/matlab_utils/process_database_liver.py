@@ -44,7 +44,7 @@ for filename in filenames:
         volume = nib.load(path_file) # load nifti
         imgs = volume.get_fdata() # get 3d NumPy array
 
-        # clipping
+        # clipping HU pixel clipping 
         imgs[imgs<-150] = -150
         imgs[imgs>250] = 250
 

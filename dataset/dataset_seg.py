@@ -22,6 +22,13 @@ class Dataset:
             store_memory (bool, optional): Memory management argument. Defaults to True.
         """
 
+        # for idx, row in train_df.iterrows():
+        #     print(type(row))
+        #     print(row)
+        #     #print("Images volumes, {}".format(row.iloc[i*3]))
+
+        # #     #scipy 1.2.3
+
 
         self.images_train = []
         self.images_train_path = []
@@ -227,6 +234,10 @@ class Dataset:
                 labels = labels_1 + labels_2
                 labels_liver = labels_liver_1 + labels_liver_2
                 self.train_ptr = new_ptr
+                print("images object", type(images)) 
+                print("labels object", type(labels)) 
+                print("labels shape", labels.shape)
+                
             return images, labels, labels_liver
         if phase == 'val':
             if self.val_ptr + batch_size < self.val_size:

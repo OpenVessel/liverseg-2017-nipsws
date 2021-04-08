@@ -170,3 +170,5 @@ LiTS_database/images_volumes.zip
 LiTS_database/images_volumes.zip
 LiTS_database/item_seg.zip
 train_files/*
+testing_volume.csv
+training_volume.csv

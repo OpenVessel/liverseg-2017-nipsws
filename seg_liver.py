@@ -17,7 +17,7 @@ from PIL import Image
 slim = tf.contrib.slim
 import scipy.io
 import timeit
-
+import matplotlib.pyplot as plt
 DTYPE = tf.float32
 
 
@@ -158,10 +158,10 @@ def interp_surgery(variables):
             h, w, k, m = v.get_shape()
             tmp = np.zeros((m, k, h, w))
             if m != k:
-                print 'input + output channels need to be the same'
+                print ('input + output channels need to be the same')
                 raise
             if h != w:
-                print 'filters need to be square'
+                print ('filters need to be square')
                 raise
             up_filter = upsample_filt(int(h))
             tmp[range(m), range(k), :, :] = up_filter
@@ -189,8 +189,11 @@ def preprocess_img(image, number_slices):
         for j in range(np.array(image).shape[0]):
             for i in range(3):
                 images[j].append(np.array(scipy.io.loadmat(image[0][0])['section'], dtype=np.float32))
+
+    ## we load images above from matlab files into numpy array
     in_ = np.array(images[0])
     in_ = in_.transpose((1, 2, 0))
+    #in_ = in_[:, :, ::-1]
     in_ = np.expand_dims(in_, axis=0)
 
     return in_
@@ -239,6 +242,38 @@ def load_vgg_imagenet(ckpt_path, number_slices):
     return init_fn
 
 
+# def class_balanced_cross_entropy_loss(output, label):
+#     """Define the class balanced cross entropy loss to train the network
+#     Args:
+#     output: Output of the network
+#     label: Ground truth label
+#     Returns:
+#     Tensor that evaluates the loss
+#     """
+#     print("what is the type of output?", type(output))
+#     print("what is the sahpe output?", output.shape)
+#     labels = tf.cast(tf.greater(label, 0.5), tf.float32)
+
+#     num_labels_pos = tf.reduce_sum(labels)
+#     num_labels_neg = tf.reduce_sum(1.0 - labels)
+#     num_total = num_labels_pos + num_labels_neg
+
+#     output_gt_zero = tf.cast(tf.greater_equal(output, 0), tf.float32)
+#     loss_val = tf.multiply(output, (labels - output_gt_zero)) - tf.log(
+#         1 + tf.exp(output - 2 * tf.multiply(output, output_gt_zero)))
+
+#     loss_pos = tf.reduce_sum(-tf.multiply(labels, loss_val))
+#     loss_neg = tf.reduce_sum(-tf.multiply(1.0 - labels, loss_val))
+
+#     final_loss = num_labels_neg / num_total * loss_pos + num_labels_pos / num_total * loss_neg
+#     print("what is the type of final loss?", type(final_loss))
+#     print("what is the sahpe final loss?", final_loss.shape)
+#     #tf.print("num total",num_total)
+#     #tf.print("num_labels_neg",num_labels_neg)
+#     #tf.print("num_labels_pos",num_labels_pos)
+#     #final_loss = final_loss / output.shape
+#     return final_loss
+
 def class_balanced_cross_entropy_loss(output, label):
     """Define the class balanced cross entropy loss to train the network
     Args:
@@ -246,7 +281,6 @@ def class_balanced_cross_entropy_loss(output, label):
     label: Ground truth label
     Returns:
     Tensor that evaluates the loss
-
     """
 
     labels = tf.cast(tf.greater(label, 0.5), tf.float32)
@@ -258,12 +292,10 @@ def class_balanced_cross_entropy_loss(output, label):
 
     loss_pos = tf.reduce_sum(-tf.multiply(labels, loss_val))
     loss_neg = tf.reduce_sum(-tf.multiply(1.0 - labels, loss_val))
-    
-    #How to calulate weights
+
     final_loss = 0.931 * loss_pos + 0.069 * loss_neg
 
     return final_loss
-
 
 def dice_coef_theoretical(y_pred, y_true):
     """Define the dice coefficient
@@ -353,7 +385,7 @@ def parameter_lr():
 
 
 def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step, display_step,
-           global_step, number_slices=1, volume=False, iter_mean_grad=1, batch_size=1, task_id=2, loss=1, momentum=0.9, resume_training=False, config=None, finetune=1):
+           global_step, number_slices=1, volume=False, iter_mean_grad=1, batch_size=1, task_id=2, loss=1, momentum=0.9, resume_training=False, config=None, finetune=0):
     """Train network
     Args:
     dataset: Reference to a Dataset object instance
@@ -366,7 +398,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
     display_step: Information of the training will be displayed every display_steps
     global_step: Reference to a Variable that keeps track of the training steps
     iter_mean_grad: Number of gradient computations that are average before updating the weights
-    batch_size:
+    batch_size: Size of the training batch
     momentum: Value of the momentum parameter for the Momentum optimizer
     resume_training: Boolean to try to restore from a previous checkpoint (True) or not (False)
     config: Reference to a Configuration object used in the creation of a Session
@@ -374,7 +406,10 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
     Returns:
     """
     model_name = os.path.join(logs_path, "seg_liver.ckpt")
+     #model_name = os.path.join(logs_path, ckpt_name+".ckpt")
+    #that is this config object is it screwed?
     if config is None:
+        print("if config is None")
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
         # config.log_device_placement = True
@@ -385,6 +420,9 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
     input_depth = 3
     if number_slices > 3:
         input_depth = number_slices
+    
+    if number_slices == input_depth:
+        print("number of slices equals the input depth of placeholder var tensor")
 
     # Prepare the input data
     input_image = tf.placeholder(tf.float32, [batch_size, None, None, input_depth])
@@ -392,6 +430,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
 
     # Create the network
     with slim.arg_scope(seg_liver_arg_scope()):
+        print("create - network")
         net, end_points = seg_liver(input_image, number_slices, volume)
 
     # Initialize weights from pre-trained model
@@ -421,11 +460,13 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
         else:
             sys.exit('Incorrect supervision id, select 1 for supervision of the side outputs, 2 for weak supervision '
                      'of the side outputs and 3 for no supervision of the side outputs')
-        # total_loss = output_loss + tf.add_n(slim.losses.get_regularization_losses())
-        total_loss = output_loss + tf.add_n(tf.losses.get_regularization_losses())
+        #total_loss = output_loss + tf.add_n(slim.losses.get_regularization_losses())
+        ## total_loss var is printed 
+        total_loss = output_loss + tf.add_n(tf.losses.get_regularization_losses()) ## preventing  overfit 
+        
         tf.summary.scalar('losses/total_loss', total_loss)
 
-        # total_loss = output_loss + 0.001 * tf.add_n(slim.losses.get_regularization_losses())
+        #total_loss = output_loss + 0.001 * tf.add_n(slim.losses.get_regularization_losses())
         total_loss = output_loss + 0.001 * tf.add_n(tf.losses.get_regularization_losses())
 
         tf.summary.scalar('losses/total_loss', total_loss)
@@ -456,14 +497,20 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
                     mean_grads_and_vars.append(
                         (grad_accumulator[ind].take_grad(iter_mean_grad), grads_and_vars[ind][1]))
             apply_gradient_op = optimizer.apply_gradients(mean_grads_and_vars, global_step=global_step)
-            # Log training info
+            # Log training info 
 
     with tf.name_scope('metrics'):
         dice_coef_op = dice_coef_theoretical(net, input_label)
         tf.summary.scalar('metrics/dice_coeff', dice_coef_op)
 
+    ## Log training into 
     merged_summary_op = tf.summary.merge_all()
 
+    #     # Log evolution of test image
+    # if test_image_path is not None:
+    #     probabilities = tf.nn.sigmoid(net)
+    #     img_summary = tf.summary.image("Output probabilities", probabilities, max_outputs=1)
+    # # Initialize variables
     # Initialize variables
     init = tf.global_variables_initializer()
 
@@ -476,6 +523,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
         sess.run(init)
 
         # op to write logs to Tensorboard
+        #summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
         summary_writer = tf.summary.FileWriter(logs_path + '/train', graph=tf.get_default_graph())
         test_writer = tf.summary.FileWriter(logs_path + '/test')
 
@@ -514,18 +562,40 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
                 ### dataset.next_batch is called for train and val function stored in dattaset_seg.py
                 batch_image, batch_label, batch_label_liver = dataset.next_batch(batch_size, 'train')
                 batch_image_val, batch_label_val, batch_label_liver_val = dataset.next_batch(batch_size, 'val')
+        
+                #fig, axs = plt.subplots(211)
+                # print("batch_image input ", batch_image)
                 image = preprocess_img(batch_image, number_slices)
+                # print("batch image shape",image.shape)
+                #print("batch_image_val", batch_image_val)
                 val_image = preprocess_img(batch_image_val, number_slices)
-
                 ## image object is used here tto pass through the run_res and define batch_loss
-                if task_id == 2:
+                if task_id == 2: ## what is the point of this task_id? its not explained anywhere
+                    #print("print me?")
                     batch_label = batch_label_liver
+                    #print("battch_label", batch_label)
                     batch_label_val = batch_label_liver_val
-                label = preprocess_labels(batch_label, number_slices)
-                label_val = preprocess_labels(batch_label_val, number_slices)
+                
+                # print("batch_label_val", batch_label)
+                label = preprocess_labels(batch_label, number_slices) ## are theses supposed to be the same?
+                # print("batch_label_label", label.shape)
+                label_val = preprocess_labels(batch_label_val, number_slices) ## are theses supposed to be the same?
+                #print("label_val", label_val.shape)
+                #print(output_loss)
+                #print("hello", total_loss)
+
+            #a) Run model with replaced cross_entropy_loss function with all patients, record final loss for all patients 
+            # b) Run model with original cross_entropy_loss, on single patient and compare to multiple patients
+                # print("label is input_label or ground truth label ", np.count_nonzero(label))
+
                 run_res = sess.run([total_loss, merged_summary_op, dice_coef_op] + grad_accumulator_ops,
                                    feed_dict={input_image: image, input_label: label})
+                #print(run_res)
                 batch_loss = run_res[0]
+                # print(type(batch_loss))
+                # print(batch_loss)
+                batch_loss = batch_loss / float(512*512)
+                # print(batch_loss)
                 summary = run_res[1]
                 train_dice_coef = run_res[2]
 
@@ -534,6 +604,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
                     val_run_res = sess.run([total_loss, merged_summary_op, dice_coef_op],
                                            feed_dict={input_image: val_image, input_label: label_val})
                     val_batch_loss = val_run_res[0]
+                    val_batch_loss = val_batch_loss / float(512*512)
                     val_summary = val_run_res[1]
                     val_dice_coef = val_run_res[2]
 
@@ -547,10 +618,10 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
 
             # Display training status
             if step % display_step == 0:
-                print >> sys.stderr, "{} Iter {}: Training Loss = {:.4f}".format(datetime.now(), step, batch_loss)
-                print >> sys.stderr, "{} Iter {}: Validation Loss = {:.4f}".format(datetime.now(), step, val_batch_loss)
-                print >> sys.stderr, "{} Iter {}: Training Dice = {:.4f}".format(datetime.now(), step, train_dice_coef)
-                print >> sys.stderr, "{} Iter {}: Validation Dice = {:.4f}".format(datetime.now(), step, val_dice_coef)
+                print >> sys.stderr, "{} Iter {}: Training Loss = {:,.4f}".format(datetime.now(), step, batch_loss)
+                print >> sys.stderr, "{} Iter {}: Validation Loss = {:,.4f}".format(datetime.now(), step, val_batch_loss)
+                print >> sys.stderr, "{} Iter {}: Training Dice = {:,.4f}".format(datetime.now(), step, train_dice_coef)
+                print >> sys.stderr, "{} Iter {}: Validation Dice = {:,.4f}".format(datetime.now(), step, val_dice_coef)
 
             # Save a checkpoint
             if step % save_step == 0:
@@ -569,7 +640,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
 def train_seg(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step,
                  display_step, global_step, number_slices=1, volume=False, iter_mean_grad=1, batch_size=1, task_id=2,
                  loss=1, momentum=0.9, resume_training=False,
-                 config=None):
+                 config=None, finetune=1):
     """Train parent network
     Args:
     See _train()
@@ -578,7 +649,7 @@ def train_seg(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_t
 
     _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step, display_step,
            global_step, number_slices, volume, iter_mean_grad, batch_size, task_id, loss, momentum,
-           resume_training, config, finetune=0)
+           resume_training, config, finetune)
 
 
 def test(dataset, checkpoint_path, result_path, number_slices=1, volume=False, config=None):
