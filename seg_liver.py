@@ -457,12 +457,12 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
         #total_loss = output_loss + tf.add_n(slim.losses.get_regularization_losses())
         ## total_loss var is printed 
         total_loss = output_loss + tf.add_n(tf.losses.get_regularization_losses()) ## preventing  overfit 
-        
+        total_loss = total_loss / float(512*512)
         tf.summary.scalar('losses/total_loss', total_loss)
 
         #total_loss = output_loss + 0.001 * tf.add_n(slim.losses.get_regularization_losses())
         total_loss = output_loss + 0.001 * tf.add_n(tf.losses.get_regularization_losses())
-
+        total_loss = total_loss / float(512*512)
         tf.summary.scalar('losses/total_loss', total_loss)
 
     # Define optimization method
@@ -588,7 +588,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
                 batch_loss = run_res[0]
                 # print(type(batch_loss))
                 # print(batch_loss)
-                batch_loss = batch_loss / float(512*512)
+                # batch_loss = batch_loss / float(512*512)
                 # print(batch_loss)
                 summary = run_res[1]
                 train_dice_coef = run_res[2]
@@ -598,7 +598,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
                     val_run_res = sess.run([total_loss, merged_summary_op, dice_coef_op],
                                            feed_dict={input_image: val_image, input_label: label_val})
                     val_batch_loss = val_run_res[0]
-                    val_batch_loss = val_batch_loss / float(512*512)
+                    # val_batch_loss = val_batch_loss / float(512*512)
                     val_summary = val_run_res[1]
                     val_dice_coef = val_run_res[2]
 
