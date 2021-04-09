@@ -63,7 +63,7 @@ def seg_liver_train(config, train_df, val_df,
             learning_rate = tf.train.piecewise_constant(global_step, boundaries, values)
             segmentation.train_seg(dataset, imagenet_ckpt, 1, learning_rate, logs_path, max_training_iters_1, save_step,
                             display_step, global_step, number_slices=number_slices, iter_mean_grad=iter_mean_grad,
-                            batch_size=batch_size, resume_training=False, finetune = config.fine_tune)
+                            batch_size=batch_size, resume_training=True, finetune = config.fine_tune)
 
     with tf.Graph().as_default():
         with tf.device('/gpu:' + str(gpu_id)):

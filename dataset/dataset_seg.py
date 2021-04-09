@@ -233,10 +233,6 @@ class Dataset:
                 labels = labels_1 + labels_2
                 labels_liver = labels_liver_1 + labels_liver_2
                 self.train_ptr = new_ptr
-                print("images object", type(images)) 
-                print("labels object", type(labels)) 
-                print("labels shape", labels.shape)
-                
             return images, labels, labels_liver
         if phase == 'val':
             if self.val_ptr + batch_size < self.val_size:
