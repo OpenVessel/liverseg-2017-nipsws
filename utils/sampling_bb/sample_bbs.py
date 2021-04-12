@@ -2,6 +2,7 @@ import numpy as np
 import scipy.misc
 import scipy.io
 import os
+
 #from utils.parse_result import parse_result
     #create a function that parses out only the slices with useful liver mask pngs from 
         # the crops_list.txt file generated in 3D bb's 
@@ -173,7 +174,7 @@ def sample_bbs_test(crops_list, output_file_name, liver_masks_path, lesion_masks
                             
     test_file.close() 
 
-# this function outputs the training and testing sets into 2 distinct sets where there have been lesions detected and where there has not been a lesion detected 
+# this function outputs the training and testing sets into 2 distinct sets where there have been lesions detected (positive) and where there has NOT been a lesion detected (negative)
     # the parameter difference between sample_bbs_test & sample_bbs_train is that train! has "data_aug_options" extra 
 def sample_bbs_train(crops_list, output_file_name, data_aug_options, liver_masks_path, lesion_masks_path, output_folder_path):
     """
@@ -317,7 +318,7 @@ def sample_bbs_train(crops_list, output_file_name, data_aug_options, liver_masks
                             
                             # if lower min of x & y's bound > 15 and the upper min of x & y's bound of the BB is < 490 (482?)
                             if (mina + mult*x) > 15.0 and ((mina + (x+1)*mult) < 490.0) and (minb + y*mult) > 15.0 and ((minb + (y+1)*mult) < 490.0):
-                                
+                            
                                 #subtracting the region's mins for both x & y by 15 to create a margin of overlap with this BB and the previous one 
                                 a1 = mina + mult*x - 15.0
                                 b1 = minb + y*mult - 15.0

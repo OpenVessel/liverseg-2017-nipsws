@@ -23,11 +23,12 @@ import scipy.misc
 DTYPE = tf.float32
 
 
-### Function from old tensorflow that wan't working (their comments or ours?)
+### Function from old tensorflow that wasn't working (their comments or ours?)
 def upsample_filt(size):
     """
     Make a 2D bilinear kernel suitable for upsampling of the given (h, w) size.
     """
+    # analyze 
     factor = (size + 1) // 2
     if size % 2 == 1:
         center = factor - 1
@@ -43,7 +44,7 @@ def upsample_filt(size):
 # Note: this is for deconvolution without groups 
 # this function reassigns some of our "-up" global tf variables into being able to be bilinearly interpolated 
 #QUESTION: #what goes into variables? 
-    # global variables that come form tf.global_variables_initializer() 
+    # global variables that come from tf.global_variables_initializer() 
 def interp_surgery(variables):
     # initate the list that we will return as outputs 
     interp_tensors = []
@@ -73,11 +74,10 @@ def interp_surgery(variables):
 
             #this makes a 2D* bilinear kernel suitable for upsampling* 
             #QUESTION: what is upsampling? what is bilinear interpolation? 
-            #QUESTION: it's supposed to be given an (h,w) size parameter but it is only given h
             up_filter = upsample_filt(int(h))
             
             # the up_filter is a 4D input except the 3D & 4D are 0's since these are the filter lengths
-            # what is the difference between tmp = np.zeroes((m,k,h,w)) & tmp[range(m), range(k), :, :]
+            #QUESTION: what is the difference between tmp = np.zeroes((m,k,h,w)) & tmp[range(m), range(k), :, :]
                 # but really the better question is, what's the difference between range(m) & : in displaying/accessing a columns' values
             tmp[range(m), range(k), :, :] = up_filter
             
@@ -96,24 +96,29 @@ def det_lesion_arg_scope(weight_decay=0.0002):
         #Small values of L2 can help prevent overfitting the training data.
     Returns: An arg_scope.
     """
+    
     with slim.arg_scope(
                         #List or tuple of operations to set argument scope
                         #QUESTION: what is slim.conv2d, convolution2d_transpose ? 
                         [slim.conv2d, slim.convolution2d_transpose], 
                         # relu is our activation function 
                         # QUESTION: can we get the leaky activation function or others? 
-                        activation_fn=tf.nn.relu,
-                        # looks like we are going to start with random "normal" weights
-                        # QUESTION: what other options are there for starting weights?  
-                        weights_initializer=tf.random_normal_initializer(stddev=0.001),
+                        activation_fn= tf.nn.relu,
+                        # looks like we are going to start with normally distributed weights
+                        # default stddev = 0.5 
+                            #QUESTION: how does 0.001 change a normal distribution? 
+                        # QUESTION: what other options are there for starting weights & standard devs? what does random mean for normal distribution  
+                        weights_initializer= tf.random_normal_initializer(stddev=0.001),
                         # QUESTION: what do different weight decays do to the weight regularizer and what are our options? 
-                        weights_regularizer=slim.l2_regularizer(weight_decay),
+                        #we use our only argument weight decay as the regularizer's input (it's coefficient)
+                        weights_regularizer= slim.l2_regularizer(weight_decay),
                         # QUESTION: what is this and what are our options?  
-                        biases_initializer=tf.zeros_initializer,
+                            # Initializer that generates tensors initialized to 0.
+                            # I guess we don't want to start with any implicit biases 
+                        biases_initializer= tf.zeros_initializer,
                         # QUESTION: what is this? and what are our options? 
                         biases_regularizer=None,
                         # padding = SAME means we will pad the input with the needed extra 0's in order to make sure all values within the input are accounted for 
-                            # https://stackoverflow.com/questions/37674306/what-is-the-difference-between-same-and-valid-padding-in-tf-nn-max-pool-of-t
                         padding='SAME') as arg_sc:
         return arg_sc
         
@@ -123,7 +128,7 @@ def binary_cross_entropy(output, target, epsilon=1e-8, name='bce_loss'):
     Args:
     output: the output of the network
     target: the ground truth
-    epsilon: what does the variable epsilon 
+    epsilon: ???
     name: what do you want to name the output?? 
     Returns:
     A scalar with the loss, the output and the target
@@ -132,6 +137,7 @@ def binary_cross_entropy(output, target, epsilon=1e-8, name='bce_loss'):
     target = tf.cast(target, tf.float32)
     #cast the output of the deep learning model variable in the format of a float 
     #QUESTION: what is tf.squeeze? 
+        # removes all dimensions with size 1 within a tensor 
     output = tf.cast(tf.squeeze(output), tf.float32)
     
     # name the output ? 
@@ -176,6 +182,8 @@ def preprocess_img(image, x_bb, y_bb, ids=None):
             
             #cropping the data arrays into proper bounding box shape (80 x 80)
             crop = aux[int(float(x_bb[j])):int((float(x_bb[j])+80)), int(float(y_bb[j])): int((float(y_bb[j])+80))]
+            
+            
             """Different data augmentation options""" 
             # I believe this section is set up like this because our txt files that come out of sample_BBs 
             # have the same information patient and slice information and coordinates for as many data augmentation options we wanted at the time 
@@ -408,7 +416,7 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
 
     # Prepare the input data
     input_image = tf.placeholder(tf.float32, [batch_size, 80, 80, 3])
-    input_label = tf.placeholder(tf.float32, [batch_size])
+    input_label = tf.placeholder(tf.float32, [batch_size]) 
     is_training = tf.placeholder(tf.bool, shape=())
     
     # input_label = 1 or is re-defined from batch_size parameter 
@@ -601,7 +609,7 @@ def train(dataset, initial_ckpt, learning_rate, logs_path, max_training_iters, s
                 saver_res.restore(sess, initial_ckpt)
             step = 1 
         
-        # int
+        # bi-linear interpolation on the input image is being completed 
         sess.run(interp_surgery(tf.global_variables()))
         print('Weights initialized')
 
