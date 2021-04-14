@@ -33,7 +33,7 @@ def compute_3D_bbs_from_gt_liver(config, image_size= 512.0):
     liver_results = os.path.join(config.database_root, 'seg_liver_ck/') ## DL predicted liver mask 
 
     # outputs: bounding boxes applied to all of the inputs and stored in these output paths 
-    output_images_path_bb = os.path.join(config.database_root, 'bb_images_volumes_alldatabase3_gt_nozoom_common_bb')
+    output_images_path_bb = os.path.join(config.database_root, 'bb_images_volumes_alldatabase3_gt_nozoom_common_bb') 
     output_labels_path_bb = os.path.join(config.database_root,  'bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb')
     output_labels_liver_path_bb = os.path.join(config.database_root,  'bb_liver_seg_alldatabase3_gt_nozoom_common_bb')
     output_liver_results_path_bb = os.path.join(config.database_root, 'liver_results/') 

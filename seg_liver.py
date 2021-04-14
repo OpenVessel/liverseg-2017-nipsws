@@ -41,10 +41,10 @@ def seg_liver_arg_scope(weight_decay=0.0002):
 def crop_features(feature, out_size):
     """Crop the center of a feature map
     Args:
-    feature: Feature map to crop
-    out_size: Size of the output feature map
-    Returns:
-    Tensor that performs the cropping
+    feature: Feature map to crop 
+    out_size: Size of the output feature map 
+    Returns: 
+    Tensor that performs the cropping 
     """
     up_size = tf.shape(feature)
     ini_w = tf.div(tf.subtract(up_size[1], out_size[1]), 2)
@@ -183,7 +183,7 @@ def preprocess_img(image, number_slices):
             if type(image) is not np.ndarray:
                 for i in range(number_slices):
                     images[j].append(np.array(scipy.io.loadmat(image[0][i])['section'], dtype=np.float32))
-            else:
+            else: 
                 img = image
     else:
         for j in range(np.array(image).shape[0]):

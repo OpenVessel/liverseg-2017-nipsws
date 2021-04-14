@@ -219,11 +219,6 @@ create_lesion_data(matlabfilepath,
     r"C:\Users\12673\Desktop\Projects\OpenVessel\liverseg-2017-nipsws\LiTS_database\images_volumes\Lesion PNGs")
 data = pd.read_csv(r"C:\Users\12673\Desktop\Projects\OpenVessel\liverseg-2017-nipsws\LiTS_database\images_volumes\Lesion PNGs\statistics.csv")
 
-
-
-
-
-
 ###################  Create Only Lesion Data (no Bounding Boxes)   ####################################
 def create_only_lesion_data(matlabfilepath, lesionpngspathtosave):
     pos_patches = open(r"C:\Users\12673\Desktop\Projects\OpenVessel\liverseg-2017-nipsws\det_DatasetList\training_positive_det_patches.txt")
@@ -365,7 +360,9 @@ def Stats_for_3D_BBs(crops_list):
 
     for line in lines: 
         
-        line = line.split(' ')
+        line = line.split()
+
+        if len(line) > 2: 
 
         int(id_img), int(aux), int(minX), int(maxX), int(minY), int(maxY) = line
         #id_img, aux = line
@@ -406,16 +403,21 @@ def Stats_for_3D_BBs(crops_list):
                 a = 0
 
 
+
+
     df = pd.DataFrame(patient_tracker, BB_2D_Coords[i][0] for i in BB_2D_Coords, BB_2D_Coords[i][1] for i in BB_2D_Coords, 
             BB_2D_Coords[i][2] for i in BB_2D_Coords, BB_2D_Coords[i][3] for i in BB_2D_Coords, BB_Z_Coords[i][0], BB_Z_Coords[i][1], Liver_Lengths,
             columns=["patient","Min-X", "Max-X", "Min-Y",  "Max-Y",  "Min-Z", "Max-Z", "Liver Length"]).to_csv(os.path.join(
                         outputCSVpath, "Stats_for_3D_BBs.csv"))
-        
 
 Stats_for_3D_BBs(crops_list) 
-        
-
-            
 
 
+###### Actual Change Preprocessing 
 
+# change the normalization 
+# to-do's 
+    # find the smallest min-X & Y and the largest max-X & Y 
+    # read the matlab PNG's in and convert to numpy 
+    # apply bounding boxes on every slice of every patient 
+    # output to different dataset folder  
