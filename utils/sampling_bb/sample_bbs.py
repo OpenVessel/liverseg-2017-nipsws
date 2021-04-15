@@ -166,7 +166,7 @@ def sample_bbs(crops_df, data_aug_options, liver_masks_path, lesion_masks_path):
 
 
 if __name__ == "__main__":
-    config = Config
+    config = Config()
 
     database_root = '../../LiTS_database/'
 
