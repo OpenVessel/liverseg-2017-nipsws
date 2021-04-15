@@ -1,0 +1,77 @@
+TESTING: (ONLY RUNS ON PATIENTS 104 to 130)
+    LIVER SEGMENTATION:
+        1. Testing_Volume        -- DONE
+        2. Training_Volume       -- DONE
+
+    LESION DETECTION:
+        1. Crops_LiTS            -- DONE
+        2. Test_Patches_Pos      -- DONE
+        3. Test_Patches_Neg      -- DONE
+
+    LESION SEGMENTATION:
+        1. Testing_Volume_Crops  -- !
+            INPUT = CROPS DF
+
+            bb_images_volumes_alldatabase3_gt_nozoom_common_bb/0/46.mat 
+            bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/0/46.png 
+            bb_liver_seg_alldatabase3_gt_nozoom_common_bb/0/46.png 
+            
+            bb_images_volumes_alldatabase3_gt_nozoom_common_bb/0/47.mat 
+            bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/0/47.png 
+            bb_liver_seg_alldatabase3_gt_nozoom_common_bb/0/47.png 
+            
+            bb_images_volumes_alldatabase3_gt_nozoom_common_bb/0/48.mat 
+            bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/0/48.png 
+            bb_liver_seg_alldatabase3_gt_nozoom_common_bb/0/48.png 
+            0.000132 0.000132
+
+
+TRAINING: (ONLY RUNS ON PATIENTS 0 to 104)
+    LIVER SEGMENTATION:
+        1. Testing_Volume        -- DONE
+        2. Training_Volume       -- DONE
+
+    LESION DETECTION:
+        1. Crops_LiTS            -- DONE
+        2. Train_Patches_Pos     -- DONE
+        3. Train_Patches_Neg     -- DONE
+
+    LESION SEGMENTATION:
+        1. Testing_Volume NoProp -- !
+            INPUT = CROPS DF
+            bb_images_volumes_alldatabase3_gt_nozoom_common_bb/105/393.mat 
+            bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/105/393.png 
+            bb_liver_seg_alldatabase3_gt_nozoom_common_bb/105/393.png 
+            liver_results/105/393.png 
+            
+            bb_images_volumes_alldatabase3_gt_nozoom_common_bb/105/394.mat 
+            bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/105/394.png 
+            bb_liver_seg_alldatabase3_gt_nozoom_common_bb/105/394.png 
+            liver_results/105/394.png 
+            
+            bb_images_volumes_alldatabase3_gt_nozoom_common_bb/105/395.mat 
+            bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/105/395.png 
+            bb_liver_seg_alldatabase3_gt_nozoom_common_bb/105/395.png 
+            liver_results/105/395.png 
+            0 0
+
+        2. Training_Volume NoPro -- !
+            INPUT = CROPS DF
+
+            bb_images_volumes_alldatabase3_gt_nozoom_common_bb/0/46.mat 
+            bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/0/46.png 
+            bb_liver_seg_alldatabase3_gt_nozoom_common_bb/0/46.png 
+            liver_results/0/46.png                                      #!! HOW??? Patient 0 in liver_results.
+            
+            bb_images_volumes_alldatabase3_gt_nozoom_common_bb/0/47.mat 
+            bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/0/47.png
+            bb_liver_seg_alldatabase3_gt_nozoom_common_bb/0/47.png 
+            liver_results/0/47.png 
+            
+            bb_images_volumes_alldatabase3_gt_nozoom_common_bb/0/48.mat 
+            bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/0/48.png 
+            bb_liver_seg_alldatabase3_gt_nozoom_common_bb/0/48.png 
+            liver_results/0/48.png
+            0 0
+
+

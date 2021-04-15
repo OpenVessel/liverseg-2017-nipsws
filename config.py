@@ -30,7 +30,7 @@ class Config:
         self.phase = 'train' ## train or test
 
         #self.crops_list = 'crops_list_OV.txt' # change as per convenience in comment below but leave this be for final
-        self.crops_list = 'crops_LiTS_gt.txt'
+        self.crops_list = 'crops_LiTS_gt.txt' # Do we still need this? Most likely, no.
         self.patient_range = [105,108] # inclusive
 
         self.num_slices = 3

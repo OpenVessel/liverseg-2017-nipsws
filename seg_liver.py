@@ -17,7 +17,7 @@ from PIL import Image
 slim = tf.contrib.slim
 import scipy.io
 import timeit
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 DTYPE = tf.float32
 
 

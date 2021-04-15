@@ -118,8 +118,8 @@ class LiverLesion:
 
 
     @with_time
-    def det_lesion_train(self):
-        det_lesion_train(self.config, self.gpu_id, self.det_batch_size, self.det_iter_mean_grad, self.det_max_training_iters, 
+    def det_lesion_train(self, train_file_pos, train_file_neg, val_file_pos, val_file_neg):
+        det_lesion_train(self.config, train_file_pos, train_file_neg, val_file_pos, val_file_neg, self.gpu_id, self.det_batch_size, self.det_iter_mean_grad, self.det_max_training_iters, 
                         self.det_save_step, self.display_step, self.det_learning_rate)
 
 
@@ -152,7 +152,7 @@ class LiverLesion:
         self.seg_lesion_test()
 
         self.logSummary('Testing', self.time_list)
-        
+
 
     def train(self, testing_volume, validation_volume):
         """
@@ -172,7 +172,7 @@ class LiverLesion:
         crops_df = self.compute_3D_bbs_from_gt_liver()
         patches = self.sample_bbs(crops_df)
 
-        self.det_lesion_train()
+        self.det_lesion_train(patches["train_pos"], patches["train_neg"], patches["test_pos"], patches["test_neg"])
         self.det_lesion_test(patches["test_pos"], patches["test_neg"])
 
         self.seg_lesion_train()

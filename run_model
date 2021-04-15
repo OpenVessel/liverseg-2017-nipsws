@@ -1,0 +1,15 @@
+#!/bin/bash
+    # Shebang tells OS which shell to use -- bash
+
+    # Bash script to run "python main train" or "python main test"
+    # Liver Lesion detection model and LIRADs classificaion
+
+    # find process like this ps ax | grep main.py
+    # kill process like this kill PID
+    # pgrep -af python
+
+    # To run this file:
+        # chmod +x ./run_model
+        # ./run_model
+
+nohup python main.py train > train_output.txt &

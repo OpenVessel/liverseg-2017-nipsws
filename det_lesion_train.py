@@ -26,7 +26,8 @@ from config import Config
 # display_step = 2
 # learning_rate = 0.01
 
-def det_lesion_train(config, gpu_id, batch_size, iter_mean_grad, max_training_iters,
+def det_lesion_train(config, train_file_pos, train_file_neg, val_file_pos, val_file_neg,
+                    gpu_id, batch_size, iter_mean_grad, max_training_iters,
                     save_step, display_step, learning_rate):
 
     task_name = 'det_lesion'
