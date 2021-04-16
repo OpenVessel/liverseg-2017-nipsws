@@ -42,13 +42,13 @@ class TrainTestSplit:
         for patient_id in patient_ids:
 
             patient_fold = os.path.join(images_volumes_fold, patient_id)
-            num_patient_slices = len(os.listdir(patient_fold))
+            num_patient_slices = os.listdir(patient_fold)
 
             mats = []
             items = []
             livers = []
             list_of_id = []
-            range(len(num_patient_slices))
+            
             
             for string_id in num_patient_slices:
                 if string_id.endswith('.mat'):
