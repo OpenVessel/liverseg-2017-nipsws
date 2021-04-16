@@ -202,6 +202,6 @@ if __name__ =='__main__':
     if cmdline.mode == "test":
         liver_lesion.test(testing_volume)
     elif cmdline.mode == "train":
-        liver_lesion.train(testing_volume, validation_volume = training_volume)
+        liver_lesion.train(training_volume, validation_volume = testing_volume )
     else:
         raise BaseException('Invalid mode. Must be test or train')
