@@ -20,7 +20,7 @@ class Config:
         self.imagenet_ckpt = os.path.join(self.root_folder, 'train_files', 'vgg_16.ckpt')
         
         ## the news weights are saved 
-        "D:\L_pipe\liver_open\liverseg-2017-nipsws\train_files\seg_liver\networks\train"
+        #"D:\L_pipe\liver_open\liverseg-2017-nipsws\train_files\seg_liver\networks\train"
         self.images_volumes = 'images_volumes'
         self.item_seg = 'item_seg'
         self.liver_seg = 'liver_seg'

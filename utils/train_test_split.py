@@ -47,16 +47,25 @@ class TrainTestSplit:
             mats = []
             items = []
             livers = []
+            list_of_id = []
+            range(len(num_patient_slices))
+            
+            for string_id in num_patient_slices:
+                if string_id.endswith('.mat'):
+                        string_id = string_id[:-4]
+                list_of_id.append(int(string_id))
+                list_of_id.sort()
 
-            for i in range(1, num_patient_slices+1):
-                file_id = os.path.join(patient_id, str(i)) ## file won't always be a number
+            for i in range(len(num_patient_slices)):
+                string_id_file = list_of_id[i]
+                file_id = os.path.join(patient_id, str(string_id_file)) ## file won't always be a number
                 mats.append(os.path.join(images_volumes, file_id + '.mat')) 
                 if self.labels:
                     items.append(os.path.join(item_seg, file_id + '.png')) # ASSUMES that there are item_seg labels, doesn't check it. (Jeph's dataset doesn't)
                     livers.append(os.path.join(liver_seg, file_id + '.png')) # ASSUMES that there are liver_seg labels, doesn't check it. (Jeph's dataset doesn't)
 
             patients.append([mats, items, livers])
-
+            list_of_id = []
         return patients
 
 
