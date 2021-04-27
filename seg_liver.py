@@ -378,7 +378,7 @@ def parameter_lr():
     return vars_corresp
 
 
-def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step, display_step,
+def _train(dataset, trained_weights, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step, display_step,
            global_step, number_slices=1, volume=False, iter_mean_grad=1, batch_size=1, task_id=2, loss=1, momentum=0.9, resume_training=False, config=None, finetune=0):
     """Train network
     Args:
@@ -400,7 +400,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
     Returns:
     """
     model_name = os.path.join(logs_path, "seg_liver.ckpt")
-     #model_name = os.path.join(logs_path, ckpt_name+".ckpt")
+    #model_name = os.path.join(logs_path, ckpt_name+".ckpt")
     #that is this config object is it screwed?
     if config is None:
         print("if config is None")
@@ -408,6 +408,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
         config.gpu_options.allow_growth = True
         # config.log_device_placement = True
         config.allow_soft_placement = True
+
 
     tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -429,6 +430,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
 
     # Initialize weights from pre-trained model
     if finetune == 0:
+        print("initial_ckpt", initial_ckpt)
         init_weights = load_vgg_imagenet(initial_ckpt, number_slices)
 
     # Define loss
@@ -512,6 +514,9 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
     # run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE) # Option in the session options=run_options
     # run_metadata = tf.RunMetadata() # Option in the session run_metadata=run_metadata
     # summary_writer.add_run_metadata(run_metadata, 'step%d' % i)
+
+
+
     with tf.Session(config=config) as sess:
         print ('Init variable')
         sess.run(init)
@@ -523,12 +528,19 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
 
         # Create saver to manage checkpoints
         saver = tf.train.Saver(max_to_keep=None)
-
+        print("logs",logs_path)
+        ## what if statement for 
+        logs_path = r"D:\L_pipe\liver_open\liverseg-2017-nipsws\train_files\seg_liver_ck\networks"
+        print("logs",logs_path)
         last_ckpt_path = tf.train.latest_checkpoint(logs_path)
+        
+        # last_ckpt_path = tf.train.load_checkpoint(logs_path)
+        print("after latest_checkpoint", last_ckpt_path)
         if last_ckpt_path is not None and resume_training:
             # Load last checkpoint
             print('Initializing from previous checkpoint...')
-            saver.restore(sess, last_ckpt_path)
+            print("checkpoint -->", last_ckpt_path)
+            saver.restore(sess, last_ckpt_path) # /seg_liver.ckpt-34000
             step = global_step.eval() + 1
         else:
             # Load pre-trained model
@@ -538,13 +550,15 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
             else:
                 print('Initializing from pre-trained model...')
                 # init_weights(sess)
+                last_ckpt_path = trained_weights
                 var_list = []
                 for var in tf.global_variables():
                     var_type = var.name.split('/')[-1]
                     if 'weights' in var_type or 'bias' in var_type:
                         var_list.append(var)
                 saver_res = tf.train.Saver(var_list=var_list)
-                saver_res.restore(sess, initial_ckpt)
+                # saver_res.restore(sess, initial_ckpt)
+                saver_res.restore(sess, last_ckpt_path)
             step = 1
         sess.run(interp_surgery(tf.global_variables()))
         print('Weights initialized')
@@ -631,7 +645,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
         print('Finished training.')
 
 
-def train_seg(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step,
+def train_seg(dataset, trained_weights, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step,
                  display_step, global_step, number_slices=1, volume=False, iter_mean_grad=1, batch_size=1, task_id=2,
                  loss=1, momentum=0.9, resume_training=False,
                  config=None, finetune=0):
@@ -641,7 +655,7 @@ def train_seg(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_t
     Returns:
     """
 
-    _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step, display_step,
+    _train(dataset, trained_weights, initial_ckpt, supervison, learning_rate, logs_path, max_training_iters, save_step, display_step,
            global_step, number_slices, volume, iter_mean_grad, batch_size, task_id, loss, momentum,
            resume_training, config, finetune=finetune)
 
@@ -684,6 +698,7 @@ def test(dataset, checkpoint_path, result_path, number_slices=1, volume=False, c
     with tf.Session(config=config) as sess:
         sess.run(tf.global_variables_initializer())
         sess.run(interp_surgery(tf.global_variables()))
+        print(checkpoint_path)
         saver.restore(sess, checkpoint_path)
         if not os.path.exists(result_path):
             os.makedirs(result_path)

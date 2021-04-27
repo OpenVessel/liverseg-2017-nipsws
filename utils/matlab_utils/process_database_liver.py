@@ -48,7 +48,8 @@ for filename in filenames:
         imgs[imgs<-150] = -150
         imgs[imgs>250] = 250
 
-        imgs = imgs.astype(np.float32) # equivalent to matlab single()
+        ## # equivalent to matlab single()
+        imgs = imgs.astype(np.float32) 
         img_max, img_min = (np.max(imgs), np.min(imgs))
 
         # create folder_volume folder

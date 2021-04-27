@@ -29,10 +29,10 @@ def crop(base_root, input_config='lesion/',
             else:
                 id_img, bool_zoom = result
             
-            
+            ### this shit 
             if int(id_img.split(os.path.sep)[-1]) > 104:
-                if not os.path.exists(os.path.join(output_results_path, id_img.split('/')[0])):
-                    os.makedirs(os.path.join(output_results_path, id_img.split('/')[0]))
+                if not os.path.exists(os.path.join(output_results_path, id_img.split(os.path.sep)[0])):
+                    os.makedirs(os.path.join(output_results_path, id_img.split(os.path.sep)[0]))
 
 
                 mask = np.zeros([512, 512])

@@ -43,13 +43,18 @@ def seg_liver_train(config, train_df, val_df,
     """
 
     task_name = 'seg_liver'
-
+    # \seg_liver_ck\networks\seg_liver.ckpt
     ### config constants ###
     root_folder = config.root_folder
     database_root = config.database_root
     logs_path = config.get_log('seg_liver')
     imagenet_ckpt = config.imagenet_ckpt
-    ###
+    finetune = config.fine_tune
+    trained_weights = config.old_weights
+    print("finetune", finetune)
+    print("loading weights path ",imagenet_ckpt)
+    print("logs_path", logs_path)
+    # D:\L_pipe\liver_open\liverseg-2017-nipsws\train_files\seg_liver_ck\networks\seg_liver.ckpt
 
     # train_file = os.path.join(root_folder, 'seg_DatasetList', 'training_volume_3.txt')
     # val_file = os.path.join(root_folder, 'seg_DatasetList', 'testing_volume_3.txt')
@@ -61,7 +66,15 @@ def seg_liver_train(config, train_df, val_df,
         with tf.device('/gpu:' + str(gpu_id)):
             global_step = tf.Variable(0, name='global_step', trainable=False)
             learning_rate = tf.train.piecewise_constant(global_step, boundaries, values)
-            segmentation.train_seg(dataset, imagenet_ckpt, 1, learning_rate, logs_path, max_training_iters_1, save_step,
+            segmentation.train_seg(dataset, trained_weights, imagenet_ckpt, 1, learning_rate, logs_path, max_training_iters_1, save_step,
+                            display_step, global_step, number_slices=number_slices, iter_mean_grad=iter_mean_grad,
+                            batch_size=batch_size, resume_training=False, finetune = finetune)
+
+    with tf.Graph().as_default():
+        with tf.device('/gpu:' + str(gpu_id)):
+            global_step = tf.Variable(0, name='global_step', trainable=False)
+            learning_rate = tf.train.piecewise_constant(global_step, boundaries, values)
+            segmentation.train_seg(dataset, trained_weights, imagenet_ckpt, 2, learning_rate, logs_path, max_training_iters_2, save_step,
                             display_step, global_step, number_slices=number_slices, iter_mean_grad=iter_mean_grad,
                             batch_size=batch_size, resume_training=True, finetune = config.fine_tune)
 
@@ -69,14 +82,6 @@ def seg_liver_train(config, train_df, val_df,
         with tf.device('/gpu:' + str(gpu_id)):
             global_step = tf.Variable(0, name='global_step', trainable=False)
             learning_rate = tf.train.piecewise_constant(global_step, boundaries, values)
-            segmentation.train_seg(dataset, imagenet_ckpt, 2, learning_rate, logs_path, max_training_iters_2, save_step,
-                            display_step, global_step, number_slices=number_slices, iter_mean_grad=iter_mean_grad,
-                            batch_size=batch_size, resume_training=True, finetune = config.fine_tune)
-
-    with tf.Graph().as_default():
-        with tf.device('/gpu:' + str(gpu_id)):
-            global_step = tf.Variable(0, name='global_step', trainable=False)
-            learning_rate = tf.train.piecewise_constant(global_step, boundaries, values)
-            segmentation.train_seg(dataset, imagenet_ckpt, 3, learning_rate, logs_path, max_training_iters_3, save_step,
+            segmentation.train_seg(dataset, trained_weights, imagenet_ckpt, 3, learning_rate, logs_path, max_training_iters_3, save_step,
                             display_step, global_step, number_slices=number_slices, iter_mean_grad=iter_mean_grad,
                             batch_size=batch_size, resume_training=True, finetune = config.fine_tune)

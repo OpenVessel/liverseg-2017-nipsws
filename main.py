@@ -145,10 +145,10 @@ class LiverLesion:
         self.time_list = []
 
         # testing workflow
-        self.seg_liver_test(testing_volume)
-        crops_df = self.compute_3D_bbs_from_gt_liver()
-        patches = self.sample_bbs(crops_df)
-        self.det_lesion_test(patches["test_pos"], patches["test_neg"])
+        # self.seg_liver_test(testing_volume)
+        # crops_df = self.compute_3D_bbs_from_gt_liver()
+        # patches = self.sample_bbs(crops_df)
+        # self.det_lesion_test(patches["test_pos"], patches["test_neg"])
         self.seg_lesion_test()
 
         self.logSummary('Testing', self.time_list)
@@ -191,7 +191,6 @@ if __name__ =='__main__':
     
     config = Config()
     config.labels = True # Change to false if we don't have labels
-    config.fine_tune = 0 # Change to 1 to 0 for the parent network and 1 for finetunning
 
 
     tts = TrainTestSplit(config)

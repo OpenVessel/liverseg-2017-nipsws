@@ -17,8 +17,9 @@ class Config:
         self.database_root = os.path.join(self.root_folder, self.__database_root)
         
         self.resnet_ckpt = os.path.join(self.root_folder, 'train_files', 'resnet_v1_50.ckpt') #"seg_lesion.ckpt.data-00000-of-00001"
-        self.imagenet_ckpt = os.path.join(self.root_folder, 'train_files', 'vgg_16.ckpt')
-        
+        self.imagenet_ckpt = os.path.join(self.root_folder, 'train_files', 'vgg_16.ckpt') #D:\L_pipe\results\3_23_2021 results\train_files\seg_liver_ck\networks
+        self.bar_ckpt = os.path.join(self.root_folder, 'train_files', 'seg_liver_ck' , 'networks', 'seg_liver.ckpt')
+        self.old_weights =  os.path.join(self.root_folder, 'train_files', 'seg_liver_ck' , 'networks', 'seg_liver.ckpt')
         ## the news weights are saved 
         #"D:\L_pipe\liver_open\liverseg-2017-nipsws\train_files\seg_liver\networks\train"
         self.images_volumes = 'images_volumes'
