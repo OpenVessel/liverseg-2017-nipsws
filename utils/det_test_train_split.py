@@ -1,37 +1,39 @@
-import os
-import platform
 import pandas as pd
+import os
 import math
-from pprint import pprint
 
-class TrainTestSplit:
-    def __init__(self, config):
+
+class DetTestTrain():
+    def __init__(self, config, crops_df):
         self.config = config
         self.labels = config.labels
+        self.crops = crops_df
 
-    def sort_list(self, images_volumes, item_seg, liver_seg):
-        """
-        Arguments
-        images_volumes: name of ground truths folder
-        item_seg: name of item (lesion) folder
-        liver_seg: name of liver folder
+    # bb_images_volumes_alldatabase3_gt_nozoom_common_bb/0/46.mat 
+    # bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/0/46.png 
+    # bb_liver_seg_alldatabase3_gt_nozoom_common_bb/0/46.png 
+    
+    # bb_images_volumes_alldatabase3_gt_nozoom_common_bb/0/47.mat 
+    # bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/0/47.png 
+    # bb_liver_seg_alldatabase3_gt_nozoom_common_bb/0/47.png 
+    
+    # bb_images_volumes_alldatabase3_gt_nozoom_common_bb/0/48.mat 
+    # bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb/0/48.png 
+    # bb_liver_seg_alldatabase3_gt_nozoom_common_bb/0/48.png 
+    # 0.000132 0.000132
 
-        return: list of lists that will be fed into a pandas DataFrame
-
-        [
-            [
-                [images1.mat, images2.mat], [item1.png, item2.png], [liver1.png, liver2.png]
-            ], 
-            [..]
-        ]
-        
-        """
-
+    def sort_list(self, images_volumes, lesion_seg, liver_seg, liver_results):
         def get_sorted_dir(dir):
             dirContents = os.listdir(dir)
             dirContents.sort()
             dirContents = sorted(dirContents, key=len)
             return list(filter(lambda x: x != ".DS_Store", dirContents))
+
+        crops_files = []
+
+        for index, row in self.crops.iterrows():
+            if row["is_liver"]:
+                crops_files.append(row["liver_seg"])
 
         # ground truths
         images_volumes_fold = os.path.join(self.config.database_root, images_volumes)
@@ -48,7 +50,7 @@ class TrainTestSplit:
             items = []
             livers = []
             list_of_id = []
-            
+            res = []
             
             for string_id in num_patient_slices:
                 if string_id.endswith('.mat'):
@@ -59,12 +61,14 @@ class TrainTestSplit:
             for i in range(len(num_patient_slices)):
                 string_id_file = list_of_id[i]
                 file_id = os.path.join(patient_id, str(string_id_file)) ## file won't always be a number
-                mats.append(os.path.join(images_volumes, file_id + '.mat')) 
-                if self.labels:
-                    items.append(os.path.join(item_seg, file_id + '.png')) 
-                    livers.append(os.path.join(liver_seg, file_id + '.png')) 
+                if file_id in crops_files:
+                    mats.append(os.path.join(images_volumes, file_id + '.mat')) 
+                    if self.labels:
+                        items.append(os.path.join(lesion_seg, file_id + '.png')) 
+                        livers.append(os.path.join(liver_seg, file_id + '.png'))
+                        res.append(os.path.join(liver_results, file_id + ".png"))
 
-            patients.append([mats, items, livers])
+            patients.append([mats, items, livers, res])
             list_of_id = []
         return patients
 
@@ -72,9 +76,6 @@ class TrainTestSplit:
     def get_data_volume(self, lol):
 
         rows = []
-
-        # PatientID-105 mat1 item1 liver1 mat2 item2 liver 2 ... matn itemn livern  3 * num_slices
-        # PatientID-105 
 
         for pat in range(len(lol)):
             # construct row for given num_slices
@@ -95,7 +96,7 @@ class TrainTestSplit:
         return pd.DataFrame(rows)
 
 
-    def split(self, images_volumes, item_seg, liver_seg, train_test_split_ratio = 0.8):
+    def split(self, images_volumes, lesion_seg, liver_seg, liver_results, train_test_split_ratio = 0.8):
         """
         Arguments
         self.config.database_root: root folder where the dataset is held 
@@ -106,7 +107,7 @@ class TrainTestSplit:
         return: training and testing df for seg_liver_train/test()
         """
         
-        lol = self.sort_list(images_volumes, item_seg, liver_seg)
+        lol = self.sort_list(images_volumes, lesion_seg, liver_seg, liver_results)
 
 
         # split data
@@ -130,4 +131,4 @@ class TrainTestSplit:
         training_volume = self.get_data_volume(training_set)
         testing_volume = self.get_data_volume(testing_set)
 
-        return training_volume, testing_volume
+        return lesion_train_no_backprop, lesion_test_no_backprop
