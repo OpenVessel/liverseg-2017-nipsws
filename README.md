@@ -2,7 +2,8 @@
 **this is a fork of [imatge-upc](https://github.com/imatge-upc/liverseg-2017-nipsws) which is derivative of [OSVOS](https://github.com/scaelles/OSVOS-TensorFlow)**
 
 
-List of research papers 
+**List of research papers 
+**
 [Detection-aided liver lesion segmentation using deep learning](https://arxiv.org/abs/1711.11069) with assoicated github [project](https://imatge-upc.github.io/liverseg-2017-nipsws/) 
 
 [OSVOS](https://github.com/scaelles/OSVOS-TensorFlow) 
