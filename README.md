@@ -1,4 +1,5 @@
-# Detection-aided liver lesion segmentation
+# OpenVessel - Liver Lesion Detection model
+** this is a fork of [imatge-upc](https://github.com/imatge-upc/liverseg-2017-nipsws) which is derivative of [OSVOS](https://github.com/scaelles/OSVOS-TensorFlow) **
 
 Here we present the implementation in TensorFlow of our [work](https://arxiv.org/abs/1711.11069) about liver lesion segmentation accepted in the [Machine Learning 4 Health Workshop](https://ml4health.github.io/2017/) of NIPS 2017. Check our [project](https://imatge-upc.github.io/liverseg-2017-nipsws/) page for more information.
 
