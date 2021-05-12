@@ -2,13 +2,12 @@
 **this is a fork of [imatge-upc](https://github.com/imatge-upc/liverseg-2017-nipsws) which is derivative of [OSVOS](https://github.com/scaelles/OSVOS-TensorFlow)**
 
 
-**List of research papers 
-**
+**List of research papers **
+
 [Detection-aided liver lesion segmentation using deep learning](https://arxiv.org/abs/1711.11069) with assoicated github [project](https://imatge-upc.github.io/liverseg-2017-nipsws/) 
 
 [OSVOS](https://github.com/scaelles/OSVOS-TensorFlow) 
 
-![Architecture of the network](https://github.com/imatge-upc/medical-2017-liver/blob/master/img/architecture.png?raw=true)
 
  In this work we propose a method to segment the liver and its lesions from Computed Tomography (CT) scans using Convolutional Neural Networks (CNNs), that have proven good results in a variety of computer vision tasks, including medical imaging. The network that segments the lesions consists of a cascaded architecture, which first focuses on the region of the liver in order to segment the lesions on it. Moreover, we train a detector to localize the lesions, and mask the results of the segmentation network with the positive detections. The segmentation architecture is based on DRIU(Maninis, 2016), a Fully Convolutional Network (FCN) with side outputs that work on feature maps of different resolutions, to finally  benefit from the multi-scale information learned by different stages of the network. The main contribution of this work is the use of a detector to localize the lesions, which we show to be beneficial to remove false positives triggered by the segmentation network. 
  
