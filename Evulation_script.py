@@ -33,19 +33,21 @@ def get_scores(pred,label,vxlspacing):
 
 	return volscores
 
-label_path = ''
-prob_path = ''
+label_path = 'D:\L_pipe\liver_open\liverseg-2017-nipsws\comparsion'
+prob_path = 'D:\L_pipe\liver_open\liverseg-2017-nipsws\data_output'
 
-labels = sorted(glob.glob(label_path+'label*.nii'))
-probs = sorted(glob.glob(prob_path+'probs*.nii'))
-
+labels = sorted(glob.glob(label_path+'/*.nii'))
+probs = sorted(glob.glob(prob_path+'/*.nii'))
+# print(labels)
+# print(probs)
 results = []
-outpath = '/data/results.csv'
+outpath = 'D:\L_pipe\liver_open\liverseg-2017-nipsws\data/results.csv'
+# D:\L_pipe\liver_open\liverseg-2017-nipsws\data
 
 for label, prob in zip(labels,probs):
     loaded_label = nb.load(label)
     loaded_prob = nb.load(prob)
-    
+    print("working")
     liver_scores = get_scores(loaded_prob.get_data()>=1,loaded_label.get_data()>=1,loaded_label.header.get_zooms()[:3])
     lesion_scores = get_scores(loaded_prob.get_data()==2,loaded_label.get_data()==2,loaded_label.header.get_zooms()[:3])
     print("Liver dice",liver_scores['dice'], "Lesion dice", lesion_scores['dice'])

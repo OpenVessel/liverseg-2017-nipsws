@@ -51,9 +51,14 @@ def seg_liver_train(config, train_df, val_df,
     imagenet_ckpt = config.imagenet_ckpt
     finetune = config.fine_tune
     trained_weights = config.old_weights
+    
+
     print("finetune", finetune)
-    print("loading weights path ",imagenet_ckpt)
-    print("logs_path", logs_path)
+    if finetune == 0: 
+        print("loading weights path of vgg-16 or resnet",imagenet_ckpt)
+        print("logs_path", logs_path)
+    else:
+        print("trained weights", trained_weights)
     # D:\L_pipe\liver_open\liverseg-2017-nipsws\train_files\seg_liver_ck\networks\seg_liver.ckpt
 
     # train_file = os.path.join(root_folder, 'seg_DatasetList', 'training_volume_3.txt')
