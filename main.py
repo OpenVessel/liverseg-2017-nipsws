@@ -7,6 +7,7 @@ from seg_liver_train import seg_liver_train
 from utils.crops_methods.compute_3D_bbs_from_gt_liver import compute_3D_bbs_from_gt_liver
 from utils.sampling_bb.sample_bbs import sample_bbs
 from utils.train_test_split import TrainTestSplit
+from utils.det_test_train_split import DetTestTrain
 from det_lesion_test import det_lesion_test
 from det_lesion_train import det_lesion_train
 
@@ -146,9 +147,10 @@ class LiverLesion:
 
         # testing workflow
         # self.seg_liver_test(testing_volume)
-        # crops_df = self.compute_3D_bbs_from_gt_liver()
+        crops_df = self.compute_3D_bbs_from_gt_liver()
         # patches = self.sample_bbs(crops_df)
         # self.det_lesion_test(patches["test_pos"], patches["test_neg"])
+        lesion_train_no_backprop, lesion_test_no_backprop = DetTestTrain(config, crops_df).split("bb_images_volumes_alldatabase3_gt_nozoom_common_bb", "bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb", "bb_liver_seg_alldatabase3_gt_nozoom_common_bb", "liver_results")
         self.seg_lesion_test()
 
         self.logSummary('Testing', self.time_list)
@@ -174,6 +176,8 @@ class LiverLesion:
 
         self.det_lesion_train(patches["train_pos"], patches["train_neg"], patches["test_pos"], patches["test_neg"])
         self.det_lesion_test(patches["test_pos"], patches["test_neg"])
+
+        lesion_train_no_backprop, lesion_test_no_backprop = DetTestTrain(config, crops_df).split("bb_images_volumes_alldatabase3_gt_nozoom_common_bb", "bb_liver_lesion_seg_alldatabase3_gt_nozoom_common_bb", "bb_liver_seg_alldatabase3_gt_nozoom_common_bb", "liver_results")
 
         self.seg_lesion_train()
         self.seg_lesion_test()
