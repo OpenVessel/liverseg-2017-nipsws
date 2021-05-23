@@ -1,27 +1,6 @@
 # OpenVessel - Liver Lesion Detection model
+
 **this is a fork of [imatge-upc](https://github.com/imatge-upc/liverseg-2017-nipsws) which is derivative of [OSVOS](https://github.com/scaelles/OSVOS-TensorFlow)**
-
-
-**List of research papers **
-
-[Detection-aided liver lesion segmentation using deep learning](https://arxiv.org/abs/1711.11069) with assoicated github [project](https://imatge-upc.github.io/liverseg-2017-nipsws/) 
-
-[OSVOS](https://github.com/scaelles/OSVOS-TensorFlow) 
-
-
- In this work we propose a method to segment the liver and its lesions from Computed Tomography (CT) scans using Convolutional Neural Networks (CNNs), that have proven good results in a variety of computer vision tasks, including medical imaging. The network that segments the lesions consists of a cascaded architecture, which first focuses on the region of the liver in order to segment the lesions on it. Moreover, we train a detector to localize the lesions, and mask the results of the segmentation network with the positive detections. The segmentation architecture is based on DRIU(Maninis, 2016), a Fully Convolutional Network (FCN) with side outputs that work on feature maps of different resolutions, to finally  benefit from the multi-scale information learned by different stages of the network. The main contribution of this work is the use of a detector to localize the lesions, which we show to be beneficial to remove false positives triggered by the segmentation network. 
- 
-Our workshop paper is available on [arXiv](https://arxiv.org/abs/1711.11069), and related slides [here](https://www.slideshare.net/xavigiro/detectionaided-liver-lesion-segmentation-using-deep-learning).
-
-If you find this code useful, please cite with the following Bibtex code:
-````
-@misc{1711.11069,
-Author = {Miriam Bellver and Kevis-Kokitsi Maninis and Jordi Pont-Tuset and Xavier Giro-i-Nieto and Jordi Torres and Luc Van Gool},
-Title = {Detection-aided liver lesion segmentation using deep learning},
-Year = {2017},
-Eprint = {arXiv:1711.11069},
-}
-````
 
 ## Code Instructions
 
@@ -202,4 +181,25 @@ In this case, observe that the script does 4 different steps:
 
 ## Contact
 
-If you have any general doubt about our work or code which may be of interest for other researchers, please use the [public issues section](https://github.com/imatge-upc/liverseg-2017-nipsws/issues) on this github repo. Alternatively, drop us an e-mail at <miriam.bellver@bsc.es>.
+E-mail at <contact@openvessel.org>. for questions or post in issues 
+
+
+
+**List of research papers **
+
+[Detection-aided liver lesion segmentation using deep learning](https://arxiv.org/abs/1711.11069) with assoicated github [project](https://imatge-upc.github.io/liverseg-2017-nipsws/) 
+ [arXiv](https://arxiv.org/abs/1711.11069), and related slides [here](https://www.slideshare.net/xavigiro/detectionaided-liver-lesion-segmentation-using-deep-learning).
+
+[OSVOS](https://github.com/scaelles/OSVOS-TensorFlow) 
+
+
+ # Work Cited
+````
+@misc{1711.11069,
+Author = {Miriam Bellver and Kevis-Kokitsi Maninis and Jordi Pont-Tuset and Xavier Giro-i-Nieto and Jordi Torres and Luc Van Gool},
+Title = {Detection-aided liver lesion segmentation using deep learning},
+Year = {2017},
+Eprint = {arXiv:1711.11069},
+}
+````
+
