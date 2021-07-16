@@ -234,18 +234,19 @@ def preprocess_labels(label):
     """
 
     # this variable is a list that creates a list of lists that has the same width as the image 
-        # this seems to create a 2d array of lists in the same shape of the label
+        # this seems to create a 2d array of lists in the same shape of the rows of the label
     
     labels = [[] for i in range(np.array(label).shape[0])]  
     
-    # for loop that goes through the length of the width of the image 
-    #QUESTION: again what does j really mean? 
-    print("label.shape[0]=",np.array(label).shape[0])
-
+    
+    print("np.array(label)=", np.array(label))
+    print("np.array(label.shape[0])=",np.array(label).shape[0])
+    
+    #QUESTION: again what does j really mean?
     for j in range(np.array(label).shape[0]):
         #make sure that label is not a multidimensional array 
         if type(label) is not np.ndarray:
-            
+            #again this for loop seems to contribute nothing except return the last image within the set
             for i in range(3):
                 print("label=", label)
                 print("label[j][i] =", label[j][i])

@@ -28,13 +28,29 @@ def seg_liver_arg_scope(weight_decay=0.0002):
     Returns:
     An arg_scope.
     """
-    with slim.arg_scope([slim.conv2d, slim.convolution2d_transpose],
-                        activation_fn=tf.nn.relu,
-                        weights_initializer=tf.random_normal_initializer(stddev=0.001),
-                        weights_regularizer=slim.l2_regularizer(weight_decay),
-                        biases_initializer=tf.zeros_initializer,
-                        biases_regularizer=None,
-                        padding='SAME') as arg_sc:
+    with slim.arg_scope(
+            #List or tuple of operations to set argument scope
+            #QUESTION: what is slim.conv2d, convolution2d_transpose ? 
+            [slim.conv2d, slim.convolution2d_transpose], 
+            # relu is our activation function 
+            # QUESTION: can we get the leaky activation function or others? 
+            activation_fn= tf.nn.relu,
+            # looks like we are going to start with normally distributed weights
+            # default stddev = 0.5 
+                #QUESTION: how does 0.001 change a normal distribution? 
+            # QUESTION: what other options are there for starting weights & standard devs? what does random mean for normal distribution  
+            weights_initializer= tf.random_normal_initializer(stddev=0.001),
+            # QUESTION: what do different weight decays do to the weight regularizer and what are our options? 
+            #we use our only argument weight decay as the regularizer's input (it's coefficient)
+            weights_regularizer= slim.l2_regularizer(weight_decay),
+            # QUESTION: what is this and what are our options?  
+                # Initializer that generates tensors initialized to 0.
+                # I guess we don't want to start with any implicit biases 
+            biases_initializer= tf.zeros_initializer,
+            # QUESTION: what is this? and what are our options? 
+            biases_regularizer=None,
+            # padding = SAME means we will pad the input with the needed extra 0's in order to make sure all values within the input are accounted for 
+            padding='SAME') as arg_sc:
         return arg_sc
 
 
@@ -43,21 +59,49 @@ def crop_features(feature, out_size):
     Args:
     feature: Feature map to crop 
     out_size: Size of the output feature map 
+        - QUESTION: is this the size we want it to be? what size do we want it to be?
+            - when it's called, out_size is being passed in as the image shape of the input image 
+            to the model which will be in the shape of the tensorflow placeholder
+                tf.placeholder(tf.float32, [batch_size, None, None, input_depth])
+                - so it sounds like we want the size to be 512 x 512? 
     Returns: 
     Tensor that performs the cropping 
     """
-    up_size = tf.shape(feature)
+
+    #get the shape of the feature map 
+    up_size = tf.shape(feature) 
+    print("shape of the feature map: ", up_size)
+    print("shape of the input image: ", out_size)
+    
+    #subtract the width/height of the feature map by the  width/height of the image 
+    # and then divide this result size in half to get to the center? 
     ini_w = tf.div(tf.subtract(up_size[1], out_size[1]), 2)
     ini_h = tf.div(tf.subtract(up_size[2], out_size[2]), 2)
+    
+    print("tf.div(tf.subtract(up_size[1], out_size[1]), 2) *(width)*:", ini_w)
+    print("tf.div(tf.subtract(up_size[1], out_size[1]), 2) *(height)*:", ini_h)
+    
+    #format of tf.slice = tf.slice(input_, begin, size)
+        # begin tells you where to start cutting out a slice
+        # size tells you how long that cut should be 
     slice_input = tf.slice(feature, (0, ini_w, ini_h, 0), (-1, out_size[1], out_size[2], -1))
+    
+    print("cropped feature map:", slice_input)
+
+    #add whatever is in the input placeholder to this cropped feature map and the cropped feature map should be getting resized to 512 x 512  
+    
     return tf.reshape(slice_input, [int(feature.get_shape()[0]), out_size[1], out_size[2], int(feature.get_shape()[3])])
+    print("output shape:",[int(feature.get_shape()[0]), out_size[1], out_size[2], int(feature.get_shape()[3])])
+    print("the output itself:", tf.reshape(slice_input, [int(feature.get_shape()[0]), out_size[1], out_size[2], int(feature.get_shape()[3])]))
 
-
+    # call the weight variable with an initializer on it 
 def _weight_variable(name, shape):
+    #QUESTION: what is tf.truncated_normal_initializer? 
     return tf.get_variable(name, shape, DTYPE, tf.truncated_normal_initializer(stddev=0.1))
 
-
+    # call the bias variable with an initializer added to it 
 def _bias_variable(name, shape):
+    #QUESTION: what is tf.constant_initializer?
     return tf.get_variable(name, shape, DTYPE, tf.constant_initializer(0.1, dtype=DTYPE))
 
 
@@ -65,19 +109,24 @@ def seg_liver(inputs, number_slices=1, volume=False, scope='seg_liver'):
     """Defines the network
     Args:
     inputs: Tensorflow placeholder that contains the input image
+    number_slices: ?? is this the distinction between whether we are sending in 3 images or not, to create depth
     scope: Scope name for the network
     Returns:
     net: Output Tensor of the network
     end_points: Dictionary with all Tensors of the network
     """
+
+    # size of the image 
     im_size = tf.shape(inputs)
 
+    #QUESTION: what are the parameters of tf.variable_scope?
     with tf.variable_scope(scope, 'seg_liver', [inputs]) as sc:
         end_points_collection = sc.name + '_end_points'
         # Collect outputs of all intermediate layers.
-        with slim.arg_scope([slim.conv2d, slim.max_pool2d],
-                            padding='SAME',
-                            outputs_collections=end_points_collection):
+        with slim.arg_scope(
+            slim.conv2d, slim.max_pool2d], padding='SAME', outputs_collections=end_points_collection):
+            #QUESTION: what are the parameters for slim.repeat? 
+            #QUESTION: why does it go 64 , 128 , 256, 512, 512? 
             net = slim.repeat(inputs, 2, slim.conv2d, 64, [3, 3], scope='conv1')
             net = slim.max_pool2d(net, [2, 2], scope='pool1')
             net_2 = slim.repeat(net, 2, slim.conv2d, 128, [3, 3], scope='conv2')
@@ -89,18 +138,26 @@ def seg_liver(inputs, number_slices=1, volume=False, scope='seg_liver'):
             net_5 = slim.repeat(net, 3, slim.conv2d, 512, [3, 3], scope='conv5')
 
             # Get side outputs of the network
+                #QUESTION: what are side outputs? 
+            #QUESTION: notice there is no activation function but are we still convoluting these already convuluted outputs? 
+                # what does slim.conv2d exactly output 
             with slim.arg_scope([slim.conv2d],
                                 activation_fn=None):
+                #QUESTION: why are the scopes named in that way? 
                 side_2 = slim.conv2d(net_2, 16, [3, 3], scope='conv2_2_16')
                 side_3 = slim.conv2d(net_3, 16, [3, 3], scope='conv3_3_16')
                 side_4 = slim.conv2d(net_4, 16, [3, 3], scope='conv4_3_16')
                 side_5 = slim.conv2d(net_5, 16, [3, 3], scope='conv5_3_16')
 
                 # Supervise side outputs
+                    #QUESTION: what does it mean to supervise the side outputs? 
+                        # understand how the parameters are impacting the input data
                 side_2_s = slim.conv2d(side_2, number_slices, [1, 1], scope='score-dsn_2')
                 side_3_s = slim.conv2d(side_3, number_slices, [1, 1], scope='score-dsn_3')
                 side_4_s = slim.conv2d(side_4, number_slices, [1, 1], scope='score-dsn_4')
                 side_5_s = slim.conv2d(side_5, number_slices, [1, 1], scope='score-dsn_5')
+                
+                #QUESTION: is this the supervision part?
                 with slim.arg_scope([slim.convolution2d_transpose],
                                     activation_fn=None, biases_initializer=None, padding='VALID',
                                     outputs_collections=end_points_collection, trainable=False):
@@ -115,6 +172,7 @@ def seg_liver(inputs, number_slices=1, volume=False, scope='seg_liver'):
                     utils.collect_named_outputs(end_points_collection, 'seg_liver/score-dsn_4-cr', side_4_s)
                     side_5_s = slim.convolution2d_transpose(side_5_s, number_slices, 32, 16, scope='score-dsn_5-up')
                     side_5_s = crop_features(side_5_s, im_size)
+                    
                     utils.collect_named_outputs(end_points_collection, 'seg_liver/score-dsn_5-cr', side_5_s)
 
                     # Main output
@@ -130,41 +188,82 @@ def seg_liver(inputs, number_slices=1, volume=False, scope='seg_liver'):
                     side_5_f = slim.convolution2d_transpose(side_5, 16, 32, 16, scope='score-multi5-up')
                     side_5_f = crop_features(side_5_f, im_size)
                     utils.collect_named_outputs(end_points_collection, 'seg_liver/side-multi5-cr', side_5_f)
+                #QUESTION: what does tf.concat do? 
                 concat_side = tf.concat([side_2_f, side_3_f, side_4_f, side_5_f], 3)
-
+                #QUESTION: this is our final output of net so what does this do to the concatenated sides? 
                 net = slim.conv2d(concat_side, number_slices, [1, 1], scope='upscore-fuse')
-
+    #QUESTION: what is end_points all comprised of now? 
     end_points = slim.utils.convert_collection_to_dict(end_points_collection)
+    print("end points", end_points)
     return net, end_points
 
-
+# all of these comments were said about this function that is in det_lesion.py
+### Function from old tensorflow that wasn't working (their comments or ours?)
 def upsample_filt(size):
-    factor = (size + 1) // 2
-    if size % 2 == 1:
-        center = factor - 1
-    else:
-        center = factor - 0.5
-    og = np.ogrid[:size, :size]
+    """ 
+    Make a 2D bilinear kernel suitable for upsampling of the given (h, w) size.
+    """ 
+    # analyze 
+    factor = (size + 1) // 2 
+    if size % 2 == 1: 
+        center = factor - 1 
+    else: 
+        center = factor - 0.5  
+    og = np.ogrid[:size, :size] 
     return (1 - abs(og[0] - center) / factor) * \
            (1 - abs(og[1] - center) / factor)
+### Ignore it. We can find a way to remove this (their comments or ours?)
 
 
-# set parameters s.t. deconvolutional layers compute bilinear interpolation
-# N.B. this is for deconvolution without groups
+
+
+# set parameters so that Deconvolutional layers compute bilinear interpolation
+# Note: this is for deconvolution without groups 
+
+#Note: everything underneath this is what was commented for this same function in det_lesion.py 
+# this function reassigns some of our "-up" global tf variables into being able to be bilinearly interpolated 
+#QUESTION: #what goes into variables? 
+    # global variables that come from tf.global_variables_initializer() 
 def interp_surgery(variables):
+    # initate the list that we will return as outputs 
     interp_tensors = []
     for v in variables:
+        #QUESTION: what variables have in their name "-up"? 
+        # for all variables with "-up" in their name 
         if '-up' in v.name:
+            #we are getting the shape of the variable which should be 4D 
+                #k & m are inputs and output channels 
+                #h & w are filters that we want to be square  
             h, w, k, m = v.get_shape()
-            tmp = np.zeros((m, k, h, w))
+            
+            #creates a temporary variable that has the same shape as the variable 
+                #  except everything inside are 0's and now they switch the order of the variable shape 
+                # instead of h,w,k,m it's now m,k,h,w 
+            tmp = np.zeros((m, k, h, w)) 
+
+            # checks to see that m & k are the same (since they are apparently input & output channels)
             if m != k:
-                print 'input + output channels need to be the same'
+                print('input + output channels need to be the same')
                 raise
+            # filters need to be square so the lengths of the filters need to be the same 
+                #raises an error if condition not met 
             if h != w:
-                print 'filters need to be square'
+                print('filters need to be square')
                 raise
+
+            #this makes a 2D* bilinear kernel suitable for upsampling* 
+            #QUESTION: what is upsampling? what is bilinear interpolation? 
             up_filter = upsample_filt(int(h))
+            
+            # the up_filter is a 4D input except the 3D & 4D are 0's since these are the filter lengths
+            #QUESTION: what is the difference between tmp = np.zeroes((m,k,h,w)) & tmp[range(m), range(k), :, :]
+                # but really the better question is, what's the difference between range(m) & : in displaying/accessing a columns' values
             tmp[range(m), range(k), :, :] = up_filter
+            
+            #appending the newly assigned variables (that were taken in as inputs) into the output list (interp_sensors)
+            #How: changes the shape with tmp.transpose 
+            # use_locking = Passing use_locking=True when creating a TensorFlow optimizer, or a variable assignment op, causes a lock to be acquired around the relevant updates to the variable. Other optimizers/assignments on the same variable also created with use_locking=True will be serialized. 2 caveats to keep in mind. 
+            # validate_shape = True means that we have to pass in a specified shape of a specific input which is apparently the tmp.transpose variable 
             interp_tensors.append(tf.assign(v, tmp.transpose((2, 3, 1, 0)), validate_shape=True, use_locking=True))
     return interp_tensors
 
@@ -176,19 +275,29 @@ def preprocess_img(image, number_slices):
     Returns:
 	Image ready to input the network (1,W,H,3)
     """
+    # this variable is a list that creates a list of lists that has the same width as the image 
+        # this seems to create a 2d array of lists 
     images = [[] for i in range(np.array(image).shape[0])]
+
 
     if number_slices > 2:
         for j in range(np.array(image).shape[0]):
             if type(image) is not np.ndarray:
                 for i in range(number_slices):
+                    # this seems to ineffectively append each image or only truly appends the last slice within the image to the images variable
+                    # this is because j will be the same value inside of this for loop so it should overwrite each appended slice until we reach the final slice within this image
                     images[j].append(np.array(scipy.io.loadmat(image[0][i])['section'], dtype=np.float32))
+            
+            # this seems to handle nothing if the type of the image IS a numpy array 
             else: 
                 img = image
+    
     else:
         for j in range(np.array(image).shape[0]):
+            #again this for loop seems to contribute nothing except return the last image within the set
             for i in range(3):
                 images[j].append(np.array(scipy.io.loadmat(image[0][0])['section'], dtype=np.float32))
+    #QUESTION: we appended multiple images but we only want to return the first one?
     in_ = np.array(images[0])
     in_ = in_.transpose((1, 2, 0))
     in_ = np.expand_dims(in_, axis=0)
@@ -203,34 +312,51 @@ def preprocess_labels(label, number_slices):
     Returns:
     Label ready to compute the loss (1,W,H,1)
     """
+
+    # this variable is a list that creates a list of lists that has the same width as the image 
+        # this seems to create a 2d array of lists in the same shape of the rows of the label
+
     labels = [[] for i in range(np.array(label).shape[0])]
 
+    print"np.array(label)=", np.array(label)
+    print"np.array(label.shape[0])=",np.array(label).shape[0]
+    print"labels = [[] for i in range(np.array(label).shape[0])]" , labels
+
+
     for j in range(np.array(label).shape[0]):
+        #make sure that label is not a multidimensional array 
         if type(label) is not np.ndarray:
+
             for i in range(number_slices):
+                #again this for loop seems to contribute nothing except truly append the last image within the set
+                print"label[0][i] = ", label[0][i]
                 labels[j].append(np.array(Image.open(label[0][i]), dtype=np.uint8))
 
     label = np.array(labels[0])
+    print"label = np.array(labels[0]) = ", np.array(labels[0])
     label = label.transpose((1, 2, 0))
+
     max_mask = np.max(label) * 0.5
+    print"max_mask = np.max(label) * 0.5 = ", max_mask
     label = np.greater(label, max_mask)
+    print"label = np.greater(label, max_mask) = ", label 
     label = np.expand_dims(label, axis=0)
 
     return label
 
 
-def load_vgg_imagenet(ckpt_path, number_slices):
-    """Initialize the network parameters from the VGG-16 pre-trained model provided by TF-SLIM
-    Args:
-    Path to the checkpoint
-    Returns:
-    Function that takes a session and initializes the network
-    """
-    reader = tf.train.NewCheckpointReader(ckpt_path)
-    var_to_shape_map = reader.get_variable_to_shape_map()
-    vars_corresp = dict()
-    for v in var_to_shape_map:
-        if "conv" in v:
+def load_vgg_imagenet(ckpt_path, number_slices): 
+    """Initialize the network parameters from the VGG-16 pre-trained model provided by TF-SLIM 
+    Args: 
+    Path to the checkpoint 
+    Returns: 
+    Function that takes a session and initializes the network 
+    """ 
+    reader = tf.train.NewCheckpointReader(ckpt_path) 
+    var_to_shape_map = reader.get_variable_to_shape_map() 
+    vars_corresp = dict() 
+    for v in var_to_shape_map: 
+        if "conv" in v: 
             if not "conv1/conv1_1/weights" in v or number_slices < 4:
                 vars_corresp[v] = slim.get_model_variables(v.replace("vgg_16", "seg_liver"))[0]
     init_fn = slim.assign_from_checkpoint_fn(
@@ -242,27 +368,57 @@ def load_vgg_imagenet(ckpt_path, number_slices):
 def class_balanced_cross_entropy_loss(output, label):
     """Define the class balanced cross entropy loss to train the network
     Args:
-    output: Output of the network
+    output: Output of the network (what is the range of values for the output?)
     label: Ground truth label
     Returns:
     Tensor that evaluates the loss
-
     """
 
+    print("gt_label=", label)
+    #I thought ground truth labels were 0's & 1's 
+    # seems to me that we are finding the points that are the truth points within the gt labels 
     labels = tf.cast(tf.greater(label, 0.5), tf.float32)
+    print("labels = tf.cast(tf.greater(label, 0.5), tf.float32) = ", labels)
 
+    #find the outputs greater than 0 
+    #QUESTION: what is tf.greater_equal? by the variable name I thought this would just want greater than 0 not equal? 
+    # looks like we're finding all of the positive liver predictions 
     output_gt_zero = tf.cast(tf.greater_equal(output, 0), tf.float32)
+    print("output_gt_zero = tf.cast(tf.greater_equal(output, 0), tf.float32) = ", output_gt_zero)
 
+    # find the difference between the positive label and the positive predictions and multiply it by the total output
+        #QUESTION: what is the point of this? what does this accomplish? 
+    #QUESTION: what does tf.exp() do?, what does tf.log() do 
+    # multiply the total predictions by the positive predictions, what does this do? 
+        # then multiply that by 2 and have the 
+
+    print("A = tf.multiply(output, output_gt_zero)= ", tf.multiply(output, output_gt_zero))
+    print("B = tf.multiply(output, (labels - output_gt_zero)) =", tf.multiply(output, (labels - output_gt_zero))) 
+    
     loss_val = tf.multiply(output, (labels - output_gt_zero)) - tf.log(
         1 + tf.exp(output - 2 * tf.multiply(output, output_gt_zero)))
+    
+    print("loss_val = A - B ==", loss_val)
 
+    # what does reduce_sum 
+    
     loss_pos = tf.reduce_sum(-tf.multiply(labels, loss_val))
+    print"A = -tf.multiply(labels, loss_val) = ", -tf.multiply(labels, loss_val)
+    print"tf.reduce_sum( A ) = ", tf.reduce_sum(-tf.multiply(labels, loss_val))
+    #
     loss_neg = tf.reduce_sum(-tf.multiply(1.0 - labels, loss_val))
+    print"B = -tf.multiply(1.0 - labels, loss_val) = ", -tf.multiply(1.0 - labels, loss_val)
+    print"tf.reduce_sum( B ) = ", tf.reduce_sum(-tf.multiply(1.0 - labels, loss_val))
     
     #How to calulate weights
+    print"0.931 * loss_pos = ", 0.931 * loss_pos
+    print"0.069 * loss_neg = ", 0.069 * loss_neg
+    print"final_loss = ", 0.931 * loss_pos + 0.069 * loss_neg
+
     final_loss = 0.931 * loss_pos + 0.069 * loss_neg
 
     return final_loss
+
 
 
 def dice_coef_theoretical(y_pred, y_true):
@@ -274,9 +430,14 @@ def dice_coef_theoretical(y_pred, y_true):
         Dice coefficient
         """
 
+    
     y_true_f = tf.cast(tf.reshape(y_true, [-1]), tf.float32)
 
+    print"tf.cast(tf.reshape(y_true, [-1]), tf.float32) = ", y_true_f
+
     y_pred_f = tf.nn.sigmoid(y_pred)
+    print"y_pred_f = tf.nn.sigmoid(y_pred) = ", y_pred_f 
+    
     y_pred_f = tf.cast(tf.greater(y_pred_f, 0.5), tf.float32)
     y_pred_f = tf.cast(tf.reshape(y_pred_f, [-1]), tf.float32)
 
@@ -297,16 +458,20 @@ def parameter_lr():
     Dictionary with the learning rate for every parameter
     """
 
+    #weights are set to 1 and biases are set to 2, convolutions 1 & 2 have only 2 subsets of weights & biases while 3 - 5 have 3 subsets  
+
     vars_corresp = dict()
     vars_corresp['seg_liver/conv1/conv1_1/weights'] = 1
     vars_corresp['seg_liver/conv1/conv1_1/biases'] = 2
     vars_corresp['seg_liver/conv1/conv1_2/weights'] = 1
     vars_corresp['seg_liver/conv1/conv1_2/biases'] = 2
 
+
     vars_corresp['seg_liver/conv2/conv2_1/weights'] = 1
     vars_corresp['seg_liver/conv2/conv2_1/biases'] = 2
     vars_corresp['seg_liver/conv2/conv2_2/weights'] = 1
     vars_corresp['seg_liver/conv2/conv2_2/biases'] = 2
+
 
     vars_corresp['seg_liver/conv3/conv3_1/weights'] = 1
     vars_corresp['seg_liver/conv3/conv3_1/biases'] = 2
@@ -315,6 +480,7 @@ def parameter_lr():
     vars_corresp['seg_liver/conv3/conv3_3/weights'] = 1
     vars_corresp['seg_liver/conv3/conv3_3/biases'] = 2
 
+
     vars_corresp['seg_liver/conv4/conv4_1/weights'] = 1
     vars_corresp['seg_liver/conv4/conv4_1/biases'] = 2
     vars_corresp['seg_liver/conv4/conv4_2/weights'] = 1
@@ -322,12 +488,14 @@ def parameter_lr():
     vars_corresp['seg_liver/conv4/conv4_3/weights'] = 1
     vars_corresp['seg_liver/conv4/conv4_3/biases'] = 2
 
+
     vars_corresp['seg_liver/conv5/conv5_1/weights'] = 1
     vars_corresp['seg_liver/conv5/conv5_1/biases'] = 2
     vars_corresp['seg_liver/conv5/conv5_2/weights'] = 1
     vars_corresp['seg_liver/conv5/conv5_2/biases'] = 2
     vars_corresp['seg_liver/conv5/conv5_3/weights'] = 1
     vars_corresp['seg_liver/conv5/conv5_3/biases'] = 2
+
 
     vars_corresp['seg_liver/conv2_2_16/weights'] = 1
     vars_corresp['seg_liver/conv2_2_16/biases'] = 2
@@ -337,6 +505,7 @@ def parameter_lr():
     vars_corresp['seg_liver/conv4_3_16/biases'] = 2
     vars_corresp['seg_liver/conv5_3_16/weights'] = 1
     vars_corresp['seg_liver/conv5_3_16/biases'] = 2
+
 
     vars_corresp['seg_liver/score-dsn_2/weights'] = 0.1
     vars_corresp['seg_liver/score-dsn_2/biases'] = 0.2
@@ -373,6 +542,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
     finetune: Use to select to select type of training, 0 for the parent network and 1 for finetunning
     Returns:
     """
+
     model_name = os.path.join(logs_path, "seg_liver.ckpt")
     if config is None:
         config = tf.ConfigProto()
@@ -399,7 +569,7 @@ def _train(dataset, initial_ckpt, supervison, learning_rate, logs_path, max_trai
         init_weights = load_vgg_imagenet(initial_ckpt, number_slices)
 
     # Define loss
-    with tf.name_scope('losses'):
+    with tf.name_scope('losses'): 
         dsn_2_loss = class_balanced_cross_entropy_loss(end_points['seg_liver/score-dsn_2-cr'], input_label)
         tf.summary.scalar('losses/dsn_2_loss', dsn_2_loss)
         dsn_3_loss = class_balanced_cross_entropy_loss(end_points['seg_liver/score-dsn_3-cr'], input_label)
