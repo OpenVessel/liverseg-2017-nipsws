@@ -1,0 +1,41 @@
+
+data flow: 
+    1) Do we have the proper data for deep learning? (Need enough data + labels)  
+        data = stack of 2D 512 x 512 images in a grey pixel scale (DICOM conversion?)
+        labels = stack of 2D 512 x 512 images that are binary 
+    
+    2.) How will the data be read into the CNN? 
+            DICOM --> Numpy? --> test_train_split ? 
+    
+    3.) What will the model architecture be? 
+            1.) load data
+            2.) create model
+            3.) compile the configuration of the model  
+            4.) fit the model to the data 
+                    - have callbacks to monitor training performance 
+            5.) test the model on the testing data 
+
+        What callbacks and helper functions will be needed to guide the training/testing sessions? 
+
+    4.) What will the output of the model be? 
+
+    5.) How do we wish to evaluate the performance of the model and give tangible deliverables of its performance? 
+
+cx when you save the model architecture can you see like patience used and other parameter settings? when you save the model architecture can you see like patience used and other parameter settings? 
+
+the flow to make this work: 
+    1.) set the configs 
+    2.) run main.py and have a terminal selection of train, test, or both which determines whether to call the overarching function that calls their needed respective functions
+
+    configs --> main.py --> run_organizer --> Liver_Detection.py functions
+
+
+Presentation Game Plan: 
+    Tuesday: Get data ready, load the trained weights from previous model? would that work?, finish Tensorflow 2.0 course + review notes to see if there's anything else I should add before running, study parameter and tool utilization, run model tonight  
+                    - when you save the model architecture can you see like patience used and other parameter settings? 
+                    - what was the pixel threshold for being classified as a positive liver slice? 
+
+    Wednesday: Create presentation, create new model workflow diagrams + gifs, finish Tensorflow 2.0 course 
+    Thursday: build results review charts, visualize the end result of it classifying livers, is it done? start a new run and start on NLP Machine Learning course 
+    Friday-Tues: finish NLP course + as much of the Machine Learning course as I can, as well as, cleaning up presentation, practicing it, and adding new training and testing results 
+
